@@ -1,16 +1,86 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// learn more about it in the docs:  https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
-  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id        Int       @id @default(autoincrement())
+  felhasznalonev String    @unique
+  email          String    @unique
+  jelszo         String
+  nev            String
+  munkakor       String
+  munkaora       Float     @default(0)
+  isActive       Boolean   @default(true)
+  isAdmin        Boolean   @default(false)
+  
+  munka          Munka[]
+  comment        Comment[]
+  
+  @@map("user")
+}
+
+model Eszkoz {
+  eszkoz_id    Int       @id @default(autoincrement())
+  nev          String    @unique
+  tipus        String
+  darabszam    Int
+  hasznalatban Boolean   @default(false)
+  
+  munka        Munka[]
+  
+  @@map("eszkoz")
+}
+
+model Feladat {
+  feladat_id  Int       @id @default(autoincrement())
+  munka_id    Int
+  leiras      String    @db.Text
+  isCompleted Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  
+  munka       Munka     @relation(fields: [munka_id], references: [munka_id], onDelete: Cascade)
+  
+  @@map("feladat")
+}
+
+model Munka {
+  munka_id                 Int       @id @default(autoincrement())
+  munka_neve               String    @unique
+  eszkoz_id                Int
+  user_id                  Int
+  ertesitesIsActive        Boolean   @default(false)
+  isActive                 Boolean   @default(true)
+  kezdeti_datum            DateTime  @default(now())
+  varhato_befejezes_datuma DateTime
+  
+  eszkoz                   Eszkoz    @relation(fields: [eszkoz_id], references: [eszkoz_id])
+  user                     User      @relation(fields: [user_id], references:  [user_id])
+  feladat                  Feladat[]
+  comment                  Comment[]
+  
+  @@map("munka")
+}
+
+model Comment {
+  comment_id  Int       @id @default(autoincrement())
+  user_id     Int
+  munka_id    Int
+  uzenet      String    @db.Text
+  kuldesi_ido DateTime  @default(now())
+  delete      Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  
+  user        User      @relation(fields: [user_id], references: [user_id])
+  munka       Munka     @relation(fields: [munka_id], references: [munka_id], onDelete: Cascade)
+  
+  @@map("comment")
 }
