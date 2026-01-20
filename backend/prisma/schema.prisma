@@ -18,7 +18,7 @@ model User {
   jelszo         String
   nev            String
   munkakor       String
-  munkaora       Float     @default(0)
+  munkaora       Float     @default(8)
   isActive       Boolean   @default(true)
   isAdmin        Boolean   @default(false)
   
