@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FeladatService } from './feladat.service';
 import { CreateFeladatDto } from './dto/create-feladat.dto';
+import { FeladatService } from './feladat.service';
 import { UpdateFeladatDto } from './dto/update-feladat.dto';
 
-@Controller('feladat')
+
+@Controller('feladatok')
 export class FeladatController {
   constructor(private readonly feladatService: FeladatService) {}
 
@@ -29,6 +30,6 @@ export class FeladatController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.feladatService.remove(+id);
+    return this.feladatService.delete(Number(id));
   }
 }
