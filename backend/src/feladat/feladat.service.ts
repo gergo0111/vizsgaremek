@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
+import { CreateFeladatDto } from "./dto/create-feladat.dto";
+import { UpdateFeladatDto } from "./dto/update-feladat.dto";
 
 
 @Injectable()

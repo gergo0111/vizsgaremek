@@ -1,4 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { CreateFeladatDto } from './dto/create-feladat.dto';
+import { FeladatService } from './feladat.service';
+import { UpdateFeladatDto } from './dto/update-feladat.dto';
 
 
 @Controller('feladatok')

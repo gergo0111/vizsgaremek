@@ -1,26 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { CreateEszkozDto } from './dto/create-eszkoz.dto';
-import { UpdateEszkozDto } from './dto/update-eszkoz.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma.service";
+import { CreateEszkozDto } from "./dto/create-eszkoz.dto";
+import { UpdateEszkozDto } from "./dto/update-eszkoz.dto";
+
 
 @Injectable()
 export class EszkozService {
-  create(createEszkozDto: CreateEszkozDto) {
-    return 'This action adds a new eszkoz';
-  }
+       constructor(private prisma: PrismaService) {}
+       async findAll() {
+                    return (this.prisma as any).eszkoz.findMany();
+       }
 
-  findAll() {
-    return `This action returns all eszkoz`;
-  }
+       async findOne(id: number) {
+                    return (this.prisma as any).eszkoz.findUnique({ 
+                     where: { eszkoz_id: id } 
+              });
+       }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eszkoz`;
-  }
+       async create(data: CreateEszkozDto) {
+                    return (this.prisma as any).eszkoz.create({
+                     data
+              })
+       }
 
-  update(id: number, updateEszkozDto: UpdateEszkozDto) {
-    return `This action updates a #${id} eszkoz`;
-  }
+       async update(id:number, data: UpdateEszkozDto) {
+                    return (this.prisma as any).eszkoz.update({
+                     where: { eszkoz_id: id },
+                     data
+              })
+       }
 
-  remove(id: number) {
-    return `This action removes a #${id} eszkoz`;
-  }
+       async delete(id:number) {
+                    return (this.prisma as any).eszkoz.delete({
+                     where: { eszkoz_id: id }
+              })
+       }
 }

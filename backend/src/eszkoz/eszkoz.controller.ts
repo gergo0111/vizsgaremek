@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { EszkozService } from './eszkoz.service';
 import { CreateEszkozDto } from './dto/create-eszkoz.dto';
+import { EszkozService } from './eszkoz.service';
 import { UpdateEszkozDto } from './dto/update-eszkoz.dto';
 
-@Controller('eszkoz')
+
+@Controller('feladatok')
 export class EszkozController {
   constructor(private readonly eszkozService: EszkozService) {}
 
@@ -29,6 +30,6 @@ export class EszkozController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.eszkozService.remove(+id);
+    return this.eszkozService.delete(Number(id));
   }
 }
