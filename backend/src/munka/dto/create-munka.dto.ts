@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
  
 export class CreateMunkaDto {
  
@@ -14,11 +14,11 @@ export class CreateMunkaDto {
   @IsNotEmpty()
   user_id: number;
  
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   ertesitesIsActive: boolean;
  
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   isActive: boolean;
  
