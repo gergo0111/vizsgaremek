@@ -29,6 +29,6 @@ export class MunkaController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.munkaService.remove(+id);
+    return this.munkaService.delete(+id);
   }
 }
