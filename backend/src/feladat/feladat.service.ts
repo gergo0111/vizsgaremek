@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFeladatDto } from './dto/create-feladat.dto';
-import { UpdateFeladatDto } from './dto/update-feladat.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma.service";
+
 
 @Injectable()
 export class FeladatService {
-  create(createFeladatDto: CreateFeladatDto) {
-    return 'This action adds a new feladat';
-  }
+       constructor(private prisma: PrismaService) {}
+       async findAll() {
+                    return (this.prisma as any).feladat.findMany();
+       }
 
-  findAll() {
-    return `This action returns all feladat`;
-  }
+       async findOne(id: number) {
+                    return (this.prisma as any).feladat.findUnique({ 
+                     where: { feladat_id: id } 
+              });
+       }
 
-  findOne(id: number) {
-    return `This action returns a #${id} feladat`;
-  }
+       async create(data: CreateFeladatDto) {
+                    return (this.prisma as any).feladat.create({
+                     data
+              })
+       }
 
-  update(id: number, updateFeladatDto: UpdateFeladatDto) {
-    return `This action updates a #${id} feladat`;
-  }
+       async update(id:number, data: UpdateFeladatDto) {
+                    return (this.prisma as any).feladat.update({
+                     where: { feladat_id: id },
+                     data
+              })
+       }
 
-  remove(id: number) {
-    return `This action removes a #${id} feladat`;
-  }
+       async delete(id:number) {
+                    return (this.prisma as any).feladat.delete({
+                     where: { feladat_id: id }
+              })
+       }
 }
