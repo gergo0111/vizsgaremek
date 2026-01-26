@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router"
+import UsersList from "./UsersList";
 
 export function UserManagement() {
        const navigate = useNavigate();
@@ -6,10 +7,7 @@ export function UserManagement() {
        
 
        return <>
-              <tr>
-                     <td>Felhasználó neve</td>
-                     <td>Munkacsoport</td>
-              </tr>
+              <UsersList />
               <button onClick={() => navigate("/uj-felhasznalo")}>⊕Új felhasználó</button>
        </>
 }
