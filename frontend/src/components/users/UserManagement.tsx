@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router"
-import UsersList from "./UsersList";
+import { UsersList } from "./UsersList"
 
 export function UserManagement() {
        const navigate = useNavigate();

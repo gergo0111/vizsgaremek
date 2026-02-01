@@ -4,7 +4,7 @@ import { EszkozService } from './eszkoz.service';
 import { UpdateEszkozDto } from './dto/update-eszkoz.dto';
 
 
-@Controller('feladatok')
+@Controller('eszkozok')
 export class EszkozController {
   constructor(private readonly eszkozService: EszkozService) {}
 

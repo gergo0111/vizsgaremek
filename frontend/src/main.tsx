@@ -3,8 +3,9 @@ import { MainSite } from "./components/MainSite";
 import Login from "./components/Login";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
-import { UserManagement } from "./components/UserManagement";
-import { NewUserAdd } from "./components/NewUserAdd";
+import { UserManagement } from "./components/users/UserManagement";
+import { NewUserAdd } from "./components/users/NewUserAdd";
+import { Tools } from "./components/tools/ToolsList";
 
 
 const router = createBrowserRouter([
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/uj-felhasznalo",
     Component: NewUserAdd,
+  },
+  {
+    path: "/eszkozok",
+    Component: Tools,
   },
   
 ]);

@@ -37,7 +37,9 @@ export function Menusor() {
               </button>
             </li>
             <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }}>
+              <button className="nav-link" 
+              style={{ color: "white" }}
+              onClick={() => navigate("/eszkozok")}>
                 Gépek kezelése
               </button>
             </li>
