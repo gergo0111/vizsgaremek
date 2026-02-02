@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString, Matches, Min, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Min, MinLength } from 'class-validator';
 
 export class CreateUserDto {
 
@@ -14,7 +14,7 @@ export class CreateUserDto {
        @IsString()
        @IsNotEmpty()
        @MinLength(8)
-       @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'Túl gyenge jelszó'})
+       @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'Túl gyenge jelszó! A jelszónak tartalmaznia kell legalább egy nagybetűt, egy kisbetűt és egy számot vagy speciális karaktert.'})
        jelszo: string;
 
        @IsString()
@@ -30,11 +30,11 @@ export class CreateUserDto {
        @Min(2)
        munkaora: number;
 
-       @IsNotEmpty()
+       @IsOptional()
        @IsBoolean()
        isActive: boolean;
 
-       @IsNotEmpty()
+       @IsOptional()
        @IsBoolean()
        isAdmin: boolean;
 
