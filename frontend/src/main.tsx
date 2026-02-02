@@ -6,6 +6,8 @@ import { StrictMode } from "react";
 import { UserManagement } from "./components/users/UserManagement";
 import { NewUserAdd } from "./components/users/NewUserAdd";
 import { Tools } from "./components/tools/ToolsList";
+import { newToolAdd } from "./components/tools/NewToolAdd";
+import { PatchTools } from "./components/tools/PatchTools";
 
 
 const router = createBrowserRouter([
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
     path: "/eszkozok",
     Component: Tools,
   },
+  {
+    path: "/uj-eszkoz",
+    Component: newToolAdd,
+  },
+  {
+    path: "eszkoz-modositas/:eszkoz_id",
+    Component: PatchTools,
+  }
   
 ]);
 

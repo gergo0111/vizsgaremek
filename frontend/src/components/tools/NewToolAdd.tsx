@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 
 interface Eszkoz{
@@ -18,6 +19,7 @@ export function newToolAdd() {
               darabszam: 0,
               hasznalatban: false,
        });
+       const navigate = useNavigate();
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
@@ -63,6 +65,7 @@ export function newToolAdd() {
                                    <input type="checkbox" checked={formState.hasznalatban} onChange={e => setFormState({...formState, hasznalatban: e.target.checked})} />
                             </div>
                             <button type="submit" onClick={handleSubmit}>Hozzáadás</button>
+                            <button onClick={() => navigate('/eszkozok')}>Vissza</button>
                      </form>
               </main>
        </>
