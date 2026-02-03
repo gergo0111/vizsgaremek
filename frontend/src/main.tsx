@@ -8,6 +8,7 @@ import { NewUserAdd } from "./components/users/NewUserAdd";
 import { Tools } from "./components/tools/ToolsList";
 import { newToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
+import { UserPatch } from "./components/users/UserPatch";
 
 
 const router = createBrowserRouter([
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "/uj-felhasznalo",
     Component: NewUserAdd,
+  },
+  {
+    path: "/felhasznalo-modositas/:user_id",
+    Component: UserPatch,
   },
   {
     path: "/eszkozok",

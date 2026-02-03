@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { User } from "../../interfaces/User";
 
 export function UsersList() {
        const [users, setUsers] = React.useState<User[]>([]);
+       const navigate = useNavigate();
 
        useEffect(() => {
               const fetchUsers = async () => {
@@ -54,7 +56,7 @@ export function UsersList() {
                                           <td>{user.nev}</td>
                                           <td>{user.munkakor}</td>
                                           <td>
-                                                 <button aria-label={`Szerkesztés ${user.nev}`}>✏️</button>
+                                                 <button aria-label={`Szerkesztés ${user.nev}`} onClick={() => navigate(`/felhasznalo-modositas/${user.user_id}`)} >✏️</button>
                                           </td>
                                           <td>
                                                  <button aria-label={`Jelszó módosítása ${user.nev}`}>🔐</button>
