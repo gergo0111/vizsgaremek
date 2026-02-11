@@ -55,7 +55,7 @@ export function Menusor() {
             </li>
             <li className="nav-item">
               <button className="nav-link" style={{ color: "white" }}>
-                ⊕Új munka
+                ⊕ Új munka
               </button>
             </li>
           </ul>
