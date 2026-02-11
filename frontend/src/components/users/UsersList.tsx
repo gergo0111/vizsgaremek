@@ -59,7 +59,7 @@ export function UsersList() {
                                                  <button aria-label={`Szerkesztés ${user.nev}`} onClick={() => navigate(`/felhasznalo-modositas/${user.user_id}`)} >✏️</button>
                                           </td>
                                           <td>
-                                                 <button aria-label={`Jelszó módosítása ${user.nev}`}>🔐</button>
+                                                 <button aria-label={`Jelszó módosítása ${user.nev}`} onClick={() => navigate(`/jelszo-modositas/${user.user_id}`)}>🔐</button>
                                           </td>
                                           <td>
                                                  <button

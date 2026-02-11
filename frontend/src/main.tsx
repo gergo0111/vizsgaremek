@@ -2,13 +2,14 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { MainSite } from "./components/MainSite";
 import Login from "./components/Login";
 import { createRoot } from "react-dom/client";
-import { StrictMode } from "react";
+import { Component, StrictMode } from "react";
 import { UserManagement } from "./components/users/UserManagement";
 import { NewUserAdd } from "./components/users/NewUserAdd";
 import { Tools } from "./components/tools/ToolsList";
 import { newToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
 import { UserPatch } from "./components/users/UserPatch";
+import { NewPass } from "./components/users/NewPass";
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/felhasznalo-modositas/:user_id",
     Component: UserPatch,
+  },
+  {
+    path: "/jelszo-modositas/:user_id",
+    Component: NewPass,
   },
   {
     path: "/eszkozok",

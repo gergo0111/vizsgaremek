@@ -5,14 +5,13 @@ export interface User {
        user_id: number;
        felhasznalonev: string;
        email: string;
+       jelszo: string;
        nev: string;
-       munkakor: string;
-       munkaora: number;
        isActice: boolean;
        isAdmin: boolean;
 }
 
-export function UserPatch() {
+export function NewPass() {
         const navigate = useNavigate();
         const { user_id } = useParams();
         const [user, setUser] = useState<User | null>(null);
@@ -20,6 +19,10 @@ export function UserPatch() {
 
         useEffect(() => {
             const id = Number(user_id);
+            if (!Number.isFinite(id) || id <= 0) {
+                setLoading(false);
+                return;
+            }
 
             const fetchUser = async () => {
                 try {
@@ -39,7 +42,7 @@ export function UserPatch() {
 
         const handleChange = (field: keyof User, value: any) => {
             setUser(prev => {
-                const base = prev ?? { user_id: Number(user_id) || 0, felhasznalonev: '', email: '', nev: '', munkakor: '', munkaora: 0, isActice: false, isAdmin: false };
+                const base = prev ?? { user_id: Number(user_id) || 0, felhasznalonev: '', email: '', jelszo: '', nev: '', isActice: false, isAdmin: false };
                 return { ...base, [field]: value } as User;
             });
         };
@@ -75,26 +78,22 @@ export function UserPatch() {
                               <input type="text" value={user.email} name="email" onChange={(e) => handleChange('email', e.target.value)} /> 
                         </div>
                         <div>
+                                <label>Jelszó: </label> <br />
+                                <input type="text" value={user.jelszo} name="jelszo" onChange={(e) => handleChange('jelszo', e.target.value)} />
+                        </div>
+                        <div>
                               <label>Név: </label> <br />
                               <input type="text" value={user.nev} name="nev" onChange={(e) => handleChange('nev', e.target.value)} /> 
                         </div>
-                        <div>
-                              <label>Munkakör: </label> <br />
-                              <input type="text" value={user.munkakor} name="munkakor" onChange={(e) => handleChange('munkakor', e.target.value)} /> 
-                        </div>
-                        <div>
-                              <label>Munkaóra: </label> <br />
-                              <input type="number" value={user.munkaora} name="munkaora" onChange={(e) => handleChange('munkaora', e.target.value === '' ? 0 : parseInt(e.target.value, 10))} /> 
-                        </div>
 
-                        <br />
 
                         <div>
                               <button type="submit">Módosítás</button>
-                              <button onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
                         </div>
 
                      </form>
                      
+
+                        <button onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
             </>
 }
