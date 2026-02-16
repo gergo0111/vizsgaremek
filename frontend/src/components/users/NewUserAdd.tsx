@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../../designs/NewUserAdd.css";
+import { useNavigate } from "react-router";
 
 
 export function NewUserAdd() {
@@ -14,6 +15,7 @@ export function NewUserAdd() {
        const [errorMsg, setErrorMsg] = useState<string | null>(null);
        const [successMsg, setSuccessMsg] = useState<string | null>(null);
        const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
+       const navigate = useNavigate();
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
@@ -136,6 +138,9 @@ export function NewUserAdd() {
 
                                    <div className="form-group">
                                           <button className="btn btn-primary" type="submit">Felhasználó hozzáadása</button>
+                                   </div>
+                                   <div className="form-group">
+                                          <button onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
                                    </div>
 
                                    {errorMsg && <div className="error-msg">{errorMsg}</div>}
