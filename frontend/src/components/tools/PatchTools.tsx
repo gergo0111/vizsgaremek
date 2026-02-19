@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 interface Eszkoz{
        eszkoz_id: string;
@@ -20,9 +20,11 @@ export function PatchTools() {
        });
        const navigate = useNavigate();
 
+       const { eszkoz_id } = useParams<{ eszkoz_id: string }>();
+
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
-              const response = await fetch(`http://localhost:3000/eszkozok/${id}`, {
+              const response = await fetch(`http://localhost:3000/eszkozok/${eszkoz_id}`, {
                      method: 'PATCH',
                      headers: {
                             'Content-Type': 'application/json',

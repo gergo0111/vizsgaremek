@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Menusor from "../Menusor";
-import "../../designs/ToolsList.css";
+import { Menusor } from "../Menusor";
 
 interface Eszkoz{
        eszkoz_id: string;
@@ -101,7 +100,7 @@ export function Tools() {
               setTools(sortedTools);
        };
        //valamis
-       useEffect(() => {
+              useEffect(() => {
               fetchTools();
        }, []);
 

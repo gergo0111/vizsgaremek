@@ -45,11 +45,6 @@ export function Menusor() {
             </li>
             <li className="nav-item">
               <button className="nav-link" style={{ color: "white" }}>
-                Munkaerő kezelése
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }}>
                 Munkák módosítása
               </button>
             </li>

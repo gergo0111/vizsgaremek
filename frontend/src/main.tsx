@@ -8,13 +8,8 @@ import { NewUserAdd } from "./components/users/NewUserAdd";
 import { Tools } from "./components/tools/ToolsList";
 import { newToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
-<<<<<<< HEAD
 import { UserPatch } from "./components/users/UserPatch";
 import { NewPass } from "./components/users/NewPass";
-
-=======
-import NewWorkAdd from "./components/works/NewWorkAdd";
->>>>>>> 2aa38bd (newWorkAdd de ezt meg modositani kell, igy nem jo)
 
 const router = createBrowserRouter([
   {
