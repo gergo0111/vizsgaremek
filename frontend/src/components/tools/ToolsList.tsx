@@ -100,7 +100,7 @@ export function Tools() {
               const sortedTools = [...tools].sort((a, b) => b.darabszam - a.darabszam);
               setTools(sortedTools);
        };
-
+       //valamis
        useEffect(() => {
               fetchTools();
        }, []);
