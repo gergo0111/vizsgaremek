@@ -49,7 +49,6 @@ export class UserService {
               })
        }
 
-       // Login method
        async login(loginData: LoginUserDto) {
                     const user = await (this.prisma as any).user.findUnique({
                               where: { felhasznalonev: loginData.felhasznalonev }
