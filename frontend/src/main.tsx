@@ -10,6 +10,7 @@ import { newToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
 import { UserPatch } from "./components/users/UserPatch";
 import { NewPass } from "./components/users/NewPass";
+import { NewWorkAdd } from "./components/works/NewWorkAdd";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
   {
     path: "eszkoz-modositas/:eszkoz_id",
     Component: PatchTools,
+  },
+  {
+    path: "/uj-munka",
+    Component: NewWorkAdd,
   }
   
 ]);
