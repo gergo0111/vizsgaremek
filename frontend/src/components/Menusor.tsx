@@ -13,7 +13,7 @@ export function Menusor() {
         className="navbar navbar-expand-lg navbar-light"
         style={{ backgroundColor: "#084885" }}
       >
-        <img src={ptlogo} alt="P&T Pasztik logo" className="logo" />
+        <img src={ptlogo} alt="P&T Pasztik logo" className="logo" onClick={() => navigate('/fooldal')} />
         <button
           className="navbar-toggler"
           type="button"
@@ -49,7 +49,7 @@ export function Menusor() {
               </button>
             </li>
             <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }}>
+              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/uj-munka")}>
                 ⊕ Új munka
               </button>
             </li>
