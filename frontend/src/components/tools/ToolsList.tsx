@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+import Menusor from "../Menusor";
+import "../../designs/ToolsList.css";
 
 interface Eszkoz{
        eszkoz_id: string;
@@ -11,20 +13,23 @@ interface Eszkoz{
 
 export function Tools() {
        const [tools, setTools] = useState<Eszkoz[]>([]);
-       const navigate = useNavigate();
-
-       const fetchTools = async () => {
-              try {
-                     const response = await fetch('http://localhost:3000/eszkozok');
-                     if (!response.ok) {
-                            throw new Error('Hiba történt az eszközök lekérésekor');
-                     }
-                     const data = await response.json();
+       const [allTools, setAllTools] = useState<Eszkoz[]>([]);
+       const [searchTerm, setSearchTerm] = useState<string>('');
+        const navigate = useNavigate();
+ 
+        const fetchTools = async () => {
+               try {
+                      const response = await fetch('http://localhost:3000/eszkozok');
+                      if (!response.ok) {
+                             throw new Error('Hiba történt az eszközök lekérésekor');
+                      }
+                      const data = await response.json();
                      setTools(data);
-              } catch (error) {
-                     console.error('Hiba:', error);
-              }
-       }
+                     setAllTools(data);
+               } catch (error) {
+                      console.error('Hiba:', error);
+               }
+        }
 
        useEffect(() => {
               fetchTools();
@@ -38,8 +43,9 @@ export function Tools() {
                      if (!response.ok) {
                             throw new Error('Hiba történt az eszköz törlésekor');
                      }
-                     setTools(tools.filter(tool => tool.eszkoz_id !== eszkoz_id));
-                     await fetchTools();
+                     else{
+                            
+                     }
               } catch (error) {
                      console.error('Hiba:', error);
               }
@@ -50,69 +56,168 @@ export function Tools() {
               setTools(sortedTools);
        };
 
+       useEffect(() => {
+              fetchTools();
+       }, []);
+
        const sortByToolNameDown = () => {
               const sortedTools = [...tools].sort((a, b) => b.nev.localeCompare(a.nev));
               setTools(sortedTools);
        };
 
-      
+      useEffect(() => {
+              fetchTools();
+       }, []);
 
-       const sortByToolType = () => {
+       const sortByTypeUp = () => {
               const sortedTools = [...tools].sort((a, b) => a.tipus.localeCompare(b.tipus));
+              setTools(sortedTools);
+       };
+
+       useEffect(() => {
+              fetchTools();
+       }, []);
+
+       const sortByTypeDown = () => {
+              const sortedTools = [...tools].sort((a, b) => b.tipus.localeCompare(a.tipus));
               setTools(sortedTools);
        };
        
        useEffect(() => {
-              sortByToolType();
+              fetchTools();
        }, []);
 
-       const sortByQuantity = () => {
+       const sortByQuantityUp = () => {
               const sortedTools = [...tools].sort((a, b) => a.darabszam - b.darabszam);
               setTools(sortedTools);
        };
 
        useEffect(() => {
-              sortByQuantity();
+              fetchTools();
+       }, []);
+       
+       const sortByQuantityDown = () => {
+              const sortedTools = [...tools].sort((a, b) => b.darabszam - a.darabszam);
+              setTools(sortedTools);
+       };
+
+       useEffect(() => {
+              fetchTools();
        }, []);
 
-       const sortByInUse = () => {
+       const sortByInUseUp = () => {
               const sortedTools = [...tools].sort((a, b) => Number(a.hasznalatban) - Number(b.hasznalatban));
               setTools(sortedTools);
        };
 
        useEffect(() => {
-              sortByInUse();
+              fetchTools();
        }, []);
 
+       const sortByInUseDown = () => {
+              const sortedTools = [...tools].sort((a, b) => Number(b.hasznalatban) - Number(a.hasznalatban));
+              setTools(sortedTools);
+       };
+
+       useEffect(() => {
+              fetchTools();
+       }, []);
+
+       const handleSearch = () => {
+              const term = searchTerm.trim().toLowerCase();
+              if (!term) {
+                     setTools(allTools);
+                     return;
+              }
+              const filteredTools = allTools.filter((tool) =>
+                     tool.nev.toLowerCase().includes(term) ||
+                     tool.tipus.toLowerCase().includes(term)
+              );
+              setTools(filteredTools);
+       };
+
+       const handleFilterByType = (e: React.ChangeEvent<HTMLSelectElement>) => {
+              const selectedType = e.target.value;
+              if (!selectedType) {
+                     setTools(allTools);
+                     return;
+              }
+              const filteredTools = allTools.filter((tool) => tool.tipus === selectedType);
+              setTools(filteredTools);
+       };
 
        return (
-              <main>
-                     <h1>Összes eszköz</h1>
-                     <table>
+              <>
+                     <Menusor />
+                     <main className="tools-main">
+                     <div className="tools-left">
+                        <h1 className="tools-title">Összes eszköz</h1>
+                        <div className="tools-card">
+                           <table className="tools-table">
                             <thead>
                                    <tr>
-                                          <th>Eszköz neve</th>
-                                          <th>Típus</th>
-                                          <th>Darabszám</th>
-                                          <th>Használatban</th>
+                                          <th>Eszköz neve <button onClick={sortByToolNameUp}>⬆️</button> <button onClick={sortByToolNameDown}>⬇️</button></th>
+                                          <th>Típus <button onClick={sortByTypeUp}>⬆️</button> <button onClick={sortByTypeDown}>⬇️</button></th>
+                                          <th>Darabszám <button onClick={sortByQuantityUp}>⬆️</button> <button onClick={sortByQuantityDown}>⬇️</button></th>
+                                          <th>Használatban <button onClick={sortByInUseUp}>⬆️</button> <button onClick={sortByInUseDown}>⬇️</button></th>
                                    </tr>
                             </thead>
                             <tbody>
                                    {tools.map((tool) => (
                                           <tr key={tool.eszkoz_id}>
-                                                 <td>{tool.nev}</td>
+                                                 <td>{tool.nev} </td>
                                                  <td>{tool.tipus}</td>
                                                  <td>{tool.darabszam}</td>
                                                  <td>{tool.hasznalatban ? 'Igen' : 'Nem'}</td>
-                                                 <td><button onClick={() => navigate(`eszkoz-modositas/${tool.eszkoz_id}`)}>✏️</button></td>
-                                                 <td><button onClick={() => handleDelete(tool.eszkoz_id)}>🗑️</button></td>
+                                                 <td>
+                                                    <button
+                                                       type="button"
+                                                       onClick={() => navigate(`/eszkoz-modositas/${tool.eszkoz_id}`)}
+                                                    >
+                                                       ✏️
+                                                    </button>
+                                                 </td>
+                                                 <td><button onClick={() => {if (window.confirm(`Biztosan törlöd ${tool.nev} eszközt?`)) {
+                                                                      handleDelete(tool.eszkoz_id);
+                                                               }}}>🗑️</button></td>
                                           </tr>
                                    ))}
-                                   <button onClick={() => navigate('/fooldal')}>Vissza</button>
                             </tbody>
-                     </table>
-                     <button onClick={() => navigate('/uj-eszkoz')}>Új eszköz hozzáadása</button>
-              </main>
+                         </table>
+                        </div>
+                     </div>
+
+                     <aside className="tools-right">
+                        <div className="search-box">
+                            <input
+                                   type="text"
+                                   placeholder="Kereséshez írj be egy nevet vagy típust"
+                                   value={searchTerm}
+                                   onChange={(e) => setSearchTerm(e.target.value)}
+                                   onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                         e.preventDefault();
+                                         handleSearch();
+                                      }
+                                   }}
+                            />
+                            <button className="search-btn" onClick={handleSearch}>🔍</button>
+                        </div>
+
+                        <div className="filter-box">
+                            <label htmlFor="typeFilter">Szűrés típus szerint:</label>
+                            <select id="typeFilter" onChange={handleFilterByType}>
+                                   <option value="">Összes</option>
+                                   {Array.from(new Set(allTools.map((tool) => tool.tipus))).map((type) => (
+                                          <option key={type} value={type}>{type}</option>
+                                   ))}
+                            </select>
+                        </div>
+                        <button className="aside-back" onClick={() => navigate('/fooldal')}>Vissza</button>
+                        <button className="add-btn" onClick={() => navigate('/uj-eszkoz')}>Új eszköz hozzáadása</button>
+                     </aside>
+                     </main>
+              </>
        );
 }
 
