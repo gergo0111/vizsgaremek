@@ -44,6 +44,19 @@ export function NewWorkAdd() {
               fetchTools();
        }, []);
 
+       const PlusUser = () => {
+              //meg egy sectiont nyit a formban ahol tud valasztani meg tobb dolgozot
+
+       }
+
+       const PlusEszkoz = () => {
+              //meg egy sectiont nyit a formban ahol tud valasztani meg tobb eszkozt
+       }
+
+       const PlusFeladat = () => {
+              //meg egy sectiont nyit a formban ahol tud valasztani meg tobb feladatot
+       }
+
        const handleSubmit = () => {
               
        }
@@ -63,13 +76,25 @@ export function NewWorkAdd() {
                      </div>
                      <div>
                             <label>Dolgozó kiválasztása:</label>
-                            <select></select>
-                            <button>Új dolgozó hozzáadása</button>
+                            <select>
+                                   {users.map((user) => (
+                                          <option key={user.user_id} value={user.user_id}>
+                                                 {user.nev}
+                                          </option>
+                                   ))}
+                            </select>
+                            <button onClick={() => PlusUser()}>Új dolgozó hozzáadása</button>
                      </div>
                      <div>
                             <label>Eszközök kiválasztása:</label>
-                            <select></select>
-                            <button>Új eszköz hozzáadása</button>
+                            <select>
+                                   {tools.map((tool) => (
+                                          <option key={tool.tool_id} value={tool.tool_id}>
+                                                 {tool.nev}
+                                          </option>
+                                   ))}
+                            </select>
+                            <button onClick={() => PlusEszkoz()}>Új eszköz hozzáadása</button>
                      </div>
                      <div>
                             <label>Munka kezdeti dátuma:</label>
@@ -82,8 +107,7 @@ export function NewWorkAdd() {
                      <div>
                             <label>Feladatok megadása:</label>
                             <input type="text" />
-                            <button onClick={() => {}}>Új feladat hozzáadása</button>
-
+                            <button onClick={() => PlusFeladat()}>Új feladat hozzáadása</button>
                      </div>
                      <div>
                             <button onClick={() => handleSubmit()}>Munka mentése</button>
