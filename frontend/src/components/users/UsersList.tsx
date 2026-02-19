@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { User } from "../../interfaces/User";
+import { Menusor } from "../Menusor";
 
 export function UsersList() {
        const [users, setUsers] = React.useState<User[]>([]);
@@ -43,6 +44,7 @@ export function UsersList() {
 
        
        return <>
+              <Menusor></Menusor>
               <table>
                      <thead>
                             <tr>
