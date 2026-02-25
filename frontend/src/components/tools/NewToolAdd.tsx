@@ -23,7 +23,7 @@ export function newToolAdd() {
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
-              const response = await fetch('http://localhost:3000/eszkozok', {
+              const response = await fetch('http://localhost:3000/uj-eszkoz', {
                      method: 'POST',
                      headers: {
                             'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export function newToolAdd() {
                                    <input type="checkbox" checked={formState.hasznalatban} onChange={e => setFormState({...formState, hasznalatban: e.target.checked})} />
                             </div>
                             <button type="submit" onClick={handleSubmit}>Hozzáadás</button>
-                            <button onClick={() => navigate('/eszkozok')}>Vissza</button>
+                            <button onClick={() => navigate('/fooldal')}>Vissza</button>
                      </form>
               </main>
        </>
