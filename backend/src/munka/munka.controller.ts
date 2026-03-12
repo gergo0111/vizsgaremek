@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MunkaService } from './munka.service';
-import { CreateMunkaDto } from './dto/create-munka.dto';
 import { UpdateMunkaDto } from './dto/update-munka.dto';
 
 @Controller('munka')
@@ -8,8 +7,8 @@ export class MunkaController {
   constructor(private readonly munkaService: MunkaService) {}
 
   @Post()
-  create(@Body() createMunkaDto: CreateMunkaDto) {
-    return this.munkaService.create(createMunkaDto);
+  create(@Body() body: any) {
+    return this.munkaService.create(body);
   }
 
   @Get()

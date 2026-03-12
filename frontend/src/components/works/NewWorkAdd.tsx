@@ -8,7 +8,7 @@ interface User {
 }
 
 interface Tool {
-       tool_id: number;
+       eszkoz_id: number;
        nev: string;
 }
 
@@ -21,8 +21,8 @@ export function NewWorkAdd() {
        const [leiras, SetLeiras] = useState('');
        const [kezdetiDatum, SetKezdetiDatum] = useState('');
        const [velemenyDatum, SetVelemenyDatum] = useState('');
-       const [selectedUsers, setSelectedUsers] = useState<number[]>([0]);
-       const [selectedTools, setSelectedTools] = useState<number[]>([0]);
+       const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+       const [selectedTools, setSelectedTools] = useState<number[]>([]);
        const [selectedTasks, setSelectedTasks] = useState<string[]>([""]);
 
        useEffect(() => {
@@ -104,17 +104,36 @@ export function NewWorkAdd() {
               });
        }
 
-       const handleSubmit = (e: React.FormEvent) => {
+       const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
               const payload = {
                      nev,
                      leiras,
-                     dolgozok: selectedUsers.filter(id => id),
-                     eszkozok: selectedTools.filter(id => id),
-                     feladatok: selectedTasks.filter(t => t.trim() !== ""),
-                     kezdetiDatum,
-                     velemenyDatum,
+                     dolgozok: selectedUsers.filter(id => id && id !== 0),
+                     eszkozok: selectedTools.filter(id => id && id !== 0),
+                     feladatok: selectedTasks.filter(t => t && t.trim() !== ""),
+                     kezdetiDatum: kezdetiDatum || undefined,
+                     velemenyDatum: velemenyDatum || undefined,
               };
+
+              try {
+                     const res = await fetch('http://localhost:3000/munka', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                     });
+
+                     if (!res.ok) {
+                            const text = await res.text();
+                            console.error('Hiba a mentéskor', text);
+                            return;
+                     }
+
+                     const data = await res.json();
+                     navigate('/fooldal');
+              } catch (err) {
+                     console.error('Hiba:', err);
+              }
        }
 
        return(
@@ -124,7 +143,7 @@ export function NewWorkAdd() {
                             <form onSubmit={handleSubmit}>
                                    <div>
                                           <label>Munka neve:</label>
-                                          <input className="form-control" type="text" />
+                                          <input className="form-control" type="text" value={nev} onChange={(e) => SetNev(e.target.value)} />
                                    </div>
                                    <div>
                                           <label>Leírás:</label>
@@ -137,7 +156,7 @@ export function NewWorkAdd() {
                                                  <div key={idx} className="dynamic-row">
                                                         <select
                                                                value={userId}
-                                                               onChange={(e) => handleUserChange(idx, Number(e.target.value))}
+                                                               onChange={(e) => handleUserChange(idx, parseInt(e.target.value || '0', 10) || 0)}
                                                         >
                                                                <option value={0}>-- válassz --</option>
                                                                {users.map((user) => (
@@ -162,11 +181,11 @@ export function NewWorkAdd() {
                                                  <div key={idx} className="dynamic-row">
                                                         <select
                                                                value={toolId}
-                                                               onChange={(e) => handleToolChange(idx, Number(e.target.value))}
+                                                               onChange={(e) => handleToolChange(idx, parseInt(e.target.value || '0', 10) || 0)}
                                                         >
                                                                <option value={0}>-- válassz --</option>
                                                                {tools.map((tool) => (
-                                                                      <option key={tool.tool_id} value={tool.tool_id}>
+                                                                      <option key={tool.eszkoz_id} value={tool.eszkoz_id}>
                                                                              {tool.nev}
                                                                       </option>
                                                                ))}
