@@ -1,3 +1,5 @@
+import type { Feladat } from "./Feladat";
+
 export interface Munka {
     munka_id: number;
     munka_neve: string;
@@ -5,6 +7,7 @@ export interface Munka {
     user_id: number;
     ertesitesIsActive: boolean;
     isActive: boolean;
-    kezdeti_datum: Date;
-    varhato_befejezes_datuma: Date;
+    kezdeti_datum: string;
+    varhato_befejezes_datuma: string;
+    feladat?: Feladat[];
 }

@@ -7,13 +7,20 @@ import { UpdateMunkaDto } from './dto/update-munka.dto';
 export class MunkaService {
        constructor(private prisma: PrismaService) {}
        async findAll() {
-                    return (this.prisma as any).munka.findMany();
+                                   return (this.prisma as any).munka.findMany({
+                                          include: {
+                                                 feladat: true,
+                                          },
+                                   });
        }
 
        async findOne(id: number) {
-                    return (this.prisma as any).munka.findUnique({ 
-                     where: { munka_id: id } 
-              });
+                                   return (this.prisma as any).munka.findUnique({
+                                          where: { munka_id: id },
+                                          include: {
+                                                 feladat: true,
+                                          },
+                                   });
        }
 
          

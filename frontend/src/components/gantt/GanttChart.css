@@ -1,0 +1,377 @@
+.pt-page {
+	min-height: calc(100vh - 56px);
+	background: #061a46;
+	padding: 18px;
+}
+
+.pt-main {
+	display: grid;
+	grid-template-columns: 320px 1fr;
+	gap: 22px;
+	align-items: start;
+}
+
+.pt-panel {
+	background: #ffffff;
+	border: 3px solid #cfcfcf;
+	border-radius: 26px;
+	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+	overflow: hidden;
+}
+
+.pt-panelHeader {
+	background: #79a914;
+	color: #ffffff;
+	font-weight: 800;
+	font-size: 28px;
+	padding: 18px 22px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+}
+
+.pt-leftList {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.pt-error {
+	background: #ffe6e6;
+	border: 1px solid #ffb3b3;
+	color: #8a0b0b;
+	border-radius: 12px;
+	padding: 10px 12px;
+	font-weight: 700;
+}
+
+.pt-empty {
+	color: #333;
+	font-weight: 700;
+	padding: 6px 2px;
+}
+
+.pt-workCard {
+	padding: 0;
+}
+
+.pt-bar {
+	position: relative;
+	height: 44px;
+	border-radius: 999px;
+	border: 3px solid #000;
+	overflow: hidden;
+}
+
+.pt-barFill {
+	height: 100%;
+	background: rgba(255, 255, 255, 0.25);
+	border-radius: 999px;
+}
+
+.pt-barLabel {
+	position: absolute;
+	left: 14px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #fff;
+	font-weight: 800;
+	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.pt-barKnob {
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	background: #ffffff;
+	border: 3px solid #000;
+}
+
+.pt-bar--planned {
+	background: #0b3e73;
+}
+.pt-bar--done {
+	background: #6f6f6f;
+}
+.pt-bar--late {
+	background: #d02828;
+}
+.pt-bar--p0_25 {
+	background: #1e4f08;
+}
+.pt-bar--p25_50 {
+	background: #2f7a0a;
+}
+.pt-bar--p50_75 {
+	background: #63a80d;
+}
+.pt-bar--p75_100 {
+	background: #a9cf55;
+}
+
+.pt-right {
+	padding-bottom: 12px;
+}
+
+.pt-ganttHeader {
+	padding: 14px 18px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.pt-sortBar {
+	padding: 10px 14px;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 8px;
+	border-bottom: 3px solid #cfcfcf;
+}
+
+.pt-sortBtn {
+	border: 2px solid #cfcfcf;
+	background: #f6f6f6;
+	border-radius: 12px;
+	padding: 8px 10px;
+	font-weight: 800;
+	color: #084885;
+	cursor: pointer;
+}
+
+.pt-viewSelect {
+	border: 2px solid #cfcfcf;
+	border-radius: 12px;
+	padding: 6px 10px;
+	font-weight: 800;
+	color: #084885;
+	background: #ffffff;
+	margin-right: 10px;
+}
+
+.pt-todayBtn {
+	border: 2px solid #7fb10e;
+	background: #eaffb9;
+	border-radius: 12px;
+	padding: 6px 10px;
+	font-weight: 900;
+	color: #2f7a0a;
+	cursor: pointer;
+}
+
+.pt-ganttYearNav {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.pt-year {
+	font-size: 24px;
+	font-weight: 800;
+	color: #7fb10e;
+	min-width: 80px;
+	text-align: center;
+}
+
+.pt-navBtn {
+	width: 38px;
+	height: 38px;
+	border-radius: 999px;
+	border: none;
+	background: transparent;
+	font-size: 18px;
+	color: #7fb10e;
+	cursor: pointer;
+}
+
+.pt-filter {
+	font-weight: 800;
+	color: #7fb10e;
+}
+
+.pt-ganttGrid {
+	padding: 0 14px;
+	border-top: 3px solid #cfcfcf;
+	border-bottom: 3px solid #cfcfcf;
+	display: grid;
+	grid-template-columns: 220px repeat(var(--pt-days, 14), minmax(28px, 1fr));
+	grid-auto-rows: 58px;
+	position: relative;
+	overflow-x: auto;
+}
+
+.pt-col {
+	border-right: 2px solid #e3e3e3;
+	background: #e6f3b9;
+	position: relative;
+}
+
+.pt-col--label {
+	background: #ffffff;
+	font-weight: 800;
+	padding: 18px 12px;
+	border-right: 3px solid #cfcfcf;
+}
+
+.pt-col--weekend {
+	background: #f7f7f7;
+}
+
+.pt-col--today {
+	background: #0b5e8a;
+	color: #fff;
+}
+
+.pt-colTop {
+	padding: 8px 8px;
+	font-weight: 800;
+	font-size: 12px;
+	text-align: center;
+}
+
+.pt-colDate {
+	opacity: 0.95;
+}
+
+.pt-colDow {
+	opacity: 0.95;
+}
+
+.pt-gridRow {
+	grid-column: 1 / -1;
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	align-items: center;
+	position: relative;
+	border-top: 2px solid rgba(0, 0, 0, 0.35);
+}
+
+.pt-rowLabel {
+	padding: 0 12px;
+	font-weight: 800;
+	color: #2a2a2a;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pt-rowTrack {
+	position: relative;
+	height: 58px;
+}
+
+.pt-ganttBar {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 34px;
+	border-radius: 999px;
+	border: 3px solid #000;
+	overflow: hidden;
+	min-width: 44px;
+}
+
+.pt-ganttBarFill {
+	height: 100%;
+	background: rgba(255, 255, 255, 0.25);
+	border-radius: 999px;
+}
+
+.pt-ganttBarLabel {
+	position: absolute;
+	left: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #fff;
+	font-weight: 900;
+	font-size: 12px;
+	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+	white-space: nowrap;
+	max-width: calc(100% - 34px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pt-ganttKnob {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 12px;
+	height: 12px;
+	border-radius: 999px;
+	background: #ffffff;
+	border: 3px solid #000;
+}
+
+.pt-legend {
+	padding: 14px 18px;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 10px 16px;
+	background: #061a46;
+}
+
+.pt-legendItem {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #ffffff;
+	font-weight: 700;
+	background: transparent;
+}
+
+.pt-legendItem input {
+	width: 18px;
+	height: 18px;
+}
+
+.pt-dot {
+	width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	border: 2px solid rgba(255, 255, 255, 0.75);
+}
+
+.pt-dot--p0_25 {
+	background: #1e4f08;
+}
+.pt-dot--p25_50 {
+	background: #2f7a0a;
+}
+.pt-dot--p50_75 {
+	background: #63a80d;
+}
+.pt-dot--p75_100 {
+	background: #a9cf55;
+}
+.pt-dot--late {
+	background: #d02828;
+}
+.pt-dot--done {
+	background: #6f6f6f;
+}
+.pt-dot--planned {
+	background: #0b3e73;
+}
+
+@media (max-width: 980px) {
+	.pt-main {
+		grid-template-columns: 1fr;
+	}
+	.pt-ganttGrid {
+		grid-template-columns: 160px repeat(var(--pt-days, 14), minmax(44px, 1fr));
+	}
+	.pt-gridRow {
+		grid-template-columns: 160px 1fr;
+	}
+	.pt-legend {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}

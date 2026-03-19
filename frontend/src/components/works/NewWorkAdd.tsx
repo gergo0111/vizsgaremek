@@ -137,6 +137,8 @@ export function NewWorkAdd() {
        }
 
        return(
+              <>
+              <Menusor />
               <div className="new-work-page">
                      <div className="new-work-card">
                             <h2 className="new-work-header">Új munka hozzáadása</h2>
@@ -237,8 +239,8 @@ export function NewWorkAdd() {
                             </form>
                      </div>
               </div>
-       )
-
+       </>
+       );
 }
 
 
