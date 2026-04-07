@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./gantt/GanttChart.css";
 import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
+import { useNavigate } from "react-router";
 
 type ViewMode = "week" | "month" | "year";
 
@@ -34,7 +35,7 @@ function progressColorClass(progress: number) {
 
 function startOfWeek(d: Date) {
 	const x = new Date(d);
-	const day = (x.getDay() + 6) % 7; // Monday=0
+	const day = (x.getDay() + 6) % 7; 
 	x.setDate(x.getDate() - day);
 	x.setHours(0, 0, 0, 0);
 	return x;
@@ -116,6 +117,7 @@ export function GanntChart() {
 	const [anchorDate, setAnchorDate] = useState<Date>(() => new Date());
 	const [sortKey, setSortKey] = useState<SortKey>("start");
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+	const [selectedWork, setSelectedWork] = useState<DecoratedWork | null>(null);
 	const [filters, setFilters] = useState<Record<StatusKey, boolean>>({
 		p0_25: true,
 		p25_50: true,
@@ -125,6 +127,7 @@ export function GanntChart() {
 		done: true,
 		planned: true,
 	});
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		let cancelled = false;
@@ -235,6 +238,19 @@ export function GanntChart() {
 			return prev;
 		});
 	}
+
+	function closeModal() {
+		setSelectedWork(null);
+	}
+
+	useEffect(() => {
+		if (!selectedWork) return;
+		function onKey(e: KeyboardEvent) {
+			if (e.key === "Escape") closeModal();
+		}
+		document.addEventListener("keydown", onKey);
+		return () => document.removeEventListener("keydown", onKey);
+	}, [selectedWork]);
 
 	return (
 		<div className="pt-page">
@@ -374,7 +390,7 @@ export function GanntChart() {
 							const widthPct = (span / totalDays) * 100;
 
 							return (
-								<div key={w.munka_id} className="pt-gridRow">
+								<div key={w.munka_id} className="pt-gridRow" onClick={() => setSelectedWork(w)} style={{ cursor: "pointer" }}>
 									<div className="pt-rowLabel">{w.munka_neve}</div>
 									<div className="pt-rowTrack">
 										<div
@@ -394,6 +410,63 @@ export function GanntChart() {
 							);
 						})}
 					</div>
+
+					{selectedWork && (
+						<div
+							role="dialog"
+							aria-modal="true"
+							aria-label="Munka részletek"
+							style={{
+								position: "fixed",
+								top: 0,
+								left: 0,
+								width: "100%",
+								height: "100%",
+								background: "rgba(0,0,0,0.45)",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								zIndex: 9999,
+							}}
+							onClick={(e) => {
+								if (e.target === e.currentTarget) closeModal();
+							}}
+						>
+							<div
+								style={{
+									background: "#fff",
+									borderRadius: 8,
+									padding: "20px",
+									minWidth: 320,
+									boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+								}}
+							>
+								<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+									<h1 style={{ margin: 0 }}>{selectedWork.munka_neve}</h1>
+									<h2>Előrehaladás: </h2>
+									<h2>Feladatok:</h2>
+									<ul>
+										{selectedWork.feladat?.map((f) => (
+											<li key={f.feladat_id}>
+												{f.feladat_neve} {f.isCompleted ? "✓" : "✗"}
+											</li>
+										))}
+									</ul>
+									
+									<div>
+										<button type="button" onClick={closeModal} aria-label="Bezárás">
+											✖
+										</button>
+									</div>
+									<div>
+										<button onClick={() => navigate(`/modify-work/${selectedWork.munka_id}`)}>
+											Módosítás
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
 
 					<div className="pt-legend">
 						<label className="pt-legendItem">
@@ -429,9 +502,10 @@ export function GanntChart() {
 						<label className="pt-legendItem">
 							<input type="checkbox" checked={filters.planned} onChange={(e) => setFilter("planned", e.target.checked)} />
 							<span className="pt-dot pt-dot--planned" />
-							Tervezett
+								Tervezett
 						</label>
 					</div>
+					
 				</div>
 			</div>
 		</div>

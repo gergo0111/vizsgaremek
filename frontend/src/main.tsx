@@ -11,6 +11,8 @@ import { PatchTools } from "./components/tools/PatchTools";
 import { UserPatch } from "./components/users/UserPatch";
 import { NewPass } from "./components/users/NewPass";
 import { NewWorkAdd } from "./components/works/NewWorkAdd";
+import { WorkUpdate } from "./components/WorkUpdate";
+import ModifyWork from "./components/works/ModifyWork";
 
 const router = createBrowserRouter([
   {
@@ -52,8 +54,15 @@ const router = createBrowserRouter([
   {
     path: "/uj-munka",
     Component: NewWorkAdd,
+  },
+  {
+    path: "/munka/:munka_id",
+    Component: WorkUpdate,
+  },
+  {
+    path: "/modify-work/:munka_id",
+    Component: ModifyWork,
   }
-  
 ]);
 
 createRoot(document.getElementById('root')!).render(
