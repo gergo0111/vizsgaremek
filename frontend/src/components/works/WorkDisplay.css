@@ -1,0 +1,98 @@
+:root{
+  --wd-border: #003d66;
+  --wd-bg1: #7fd07f;
+  --wd-bg2: #a8d5a8;
+}
+
+.work-display-content {
+  background: linear-gradient(135deg, var(--wd-bg1) 0%, var(--wd-bg2) 100%);
+  border-radius: 12px;
+  border: 3px solid var(--wd-border);
+  color: #003d66;
+  max-width: 540px;
+  width: 95%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+
+.wd-title{
+  color: var(--wd-border);
+  font-weight: 700;
+}
+
+.wd-section{
+  margin-bottom: 12px;
+}
+
+.wd-subtitle{
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+  color: var(--wd-border);
+}
+
+.wd-progress {
+  height: 28px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.wd-tasks{
+  background: rgba(255,255,255,0.85);
+  border-radius: 8px;
+  padding: 8px;
+  border: 2px solid var(--wd-border);
+  min-height: 110px;
+}
+
+.wd-no-tasks{
+  text-align: center;
+  color: var(--wd-border);
+  padding: 18px 0;
+}
+
+.wd-taskItem{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wd-taskItem .form-check-label{
+  margin-left: 6px;
+}
+
+.wd-done{
+  margin-left: auto;
+  color: #00aa00;
+  font-weight: 700;
+}
+
+.wd-pagination .wd-pageInfo{
+  color: var(--wd-border);
+}
+
+.wd-deadline{
+  background: rgba(255,255,255,0.85);
+  border-radius: 8px;
+  padding: 10px;
+  border: 2px solid var(--wd-border);
+}
+
+.wd-deadline-label{
+  font-weight: 700;
+  color: var(--wd-border);
+}
+
+.wd-deadline-date{
+  font-weight: 700;
+}
+
+.wd-bell{
+  font-size: 20px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px){
+  .work-display-content{ padding: 8px; }
+  .wd-progress{ height: 22px; }
+  .wd-taskItem{ font-size: 0.95rem; }
+  .wd-deadline{ padding: 8px; }
+}

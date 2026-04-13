@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./gantt/GanttChart.css";
 import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
-import { useNavigate } from "react-router";
+import { WorkDisplay } from "./works/WorkDisplay";
 
 type ViewMode = "week" | "month" | "year";
 
@@ -127,7 +127,6 @@ export function GanntChart() {
 		done: true,
 		planned: true,
 	});
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		let cancelled = false;
@@ -412,60 +411,7 @@ export function GanntChart() {
 					</div>
 
 					{selectedWork && (
-						<div
-							role="dialog"
-							aria-modal="true"
-							aria-label="Munka részletek"
-							style={{
-								position: "fixed",
-								top: 0,
-								left: 0,
-								width: "100%",
-								height: "100%",
-								background: "rgba(0,0,0,0.45)",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
-								zIndex: 9999,
-							}}
-							onClick={(e) => {
-								if (e.target === e.currentTarget) closeModal();
-							}}
-						>
-							<div
-								style={{
-									background: "#fff",
-									borderRadius: 8,
-									padding: "20px",
-									minWidth: 320,
-									boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-								}}
-							>
-								<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-									<h1 style={{ margin: 0 }}>{selectedWork.munka_neve}</h1>
-									<h2>Előrehaladás: </h2>
-									<h2>Feladatok:</h2>
-									<ul>
-										{selectedWork.feladat?.map((f) => (
-											<li key={f.feladat_id}>
-												{f.feladat_neve} {f.isCompleted ? "✓" : "✗"}
-											</li>
-										))}
-									</ul>
-									
-									<div>
-										<button type="button" onClick={closeModal} aria-label="Bezárás">
-											✖
-										</button>
-									</div>
-									<div>
-										<button onClick={() => navigate(`/modify-work/${selectedWork.munka_id}`)}>
-											Módosítás
-										</button>
-									</div>
-								</div>
-							</div>
-						</div>
+						<WorkDisplay work={selectedWork} onClose={closeModal} />
 					)}
 
 					<div className="pt-legend">

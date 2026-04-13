@@ -1,5 +1,24 @@
-import { useEffect, useState } from "react";
+/*import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+interface Munka {
+       munka_id: number;
+       munka_neve: string;
+       eszkoz_id: number;
+       user_id: number;
+       ertesitesIsActive: boolean;
+       isActive: boolean;
+       kezdeti_datum: string;
+       varhato_befejezesi_datum: string;
+}
+
+interface Feladat {
+       feladat_id: number;
+       munka_id: number;
+       leiras: string;
+       isCompleted: boolean;
+       isActive: boolean;
+}
 
 export function WorkUpdate() {
 
@@ -41,9 +60,53 @@ export function WorkUpdate() {
 
        return (
               <div>
-                     <h1>{munka?.munka_neve}</h1>
-                     <h2>Előrehaladás</h2>
-                     
+                     <form></form>
+                            <label>
+                                   Munka neve:
+                                   <input
+                                          type="text"
+                                          value={munka?.munka_neve || ""}
+                                          onChange={(e) => setMunka({...munka, munka_neve: e.target.value})}
+                                   />
+                            </label>
+                            <br />
+                            <label>
+                                   Kezdeti dátum:
+                                   <input
+                                          type="date"
+                                          value={munka?.kezdeti_datum || ""}
+                                          onChange={(e) => setMunka({...munka, kezdeti_datum: e.target.value})}
+                                   />
+                            </label>
+                            <br />
+                            <label>
+                                   Várható befejezési dátum:
+                                   <input
+                                          type="date"
+                                          value={munka?.varhato_befejezesi_datum || ""}
+                                          onChange={(e) => setMunka({...munka, varhato_befejezesi_datum: e.target.value})}
+                                   />
+                            </label>
+                            <label>
+                                   Aktív:
+                                   <input
+                                          type="checkbox"
+                                          checked={munka?.isActive || false}
+                                          onChange={(e) => setMunka({...munka, isActive: e.target.checked})}
+                                   />
+                            </label>
+                            <label>
+                                   Értesítés aktív:
+                                   <input
+                                          type="checkbox"
+                                          checked={munka?.ertesitesIsActive || false}
+                                          onChange={(e) => setMunka({...munka, ertesitesIsActive: e.target.checked})}
+                                   />
+                            </label>
+                            <label>
+                                   
+                            </label>
+                     </form>
               </div>
        );
-}
+}*/
