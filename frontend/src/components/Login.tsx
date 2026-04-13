@@ -119,12 +119,6 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="text-end mb-4">
-            <a href="#" className="forgot-password-link">
-              Elfelejtett jelszó?
-            </a>
-          </div>
-
           <button type="submit" className="btn btn-primary login-submit-btn w-100">
             Belépés
           </button>

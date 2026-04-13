@@ -375,14 +375,6 @@ export function GanntChart() {
 							);
 							const visibleEnd = new Date(Math.min(w.end.getTime(), rangeEnd.getTime()));
 							const isOutside = visibleEnd.getTime() < rangeStart.getTime() || visibleStart.getTime() > rangeEnd.getTime();
-							if (isOutside) {
-								return (
-									<div key={w.munka_id} className="pt-gridRow">
-										<div className="pt-rowLabel">{w.munka_neve}</div>
-										<div className="pt-rowTrack" />
-									</div>
-								);
-							}
 							const startOffset = clamp(daysBetweenInclusive(rangeStart, visibleStart) - 1, 0, totalDays - 1);
 							const span = clamp(daysBetweenInclusive(visibleStart, visibleEnd), 1, totalDays);
 							const leftPct = (startOffset / totalDays) * 100;
@@ -390,7 +382,7 @@ export function GanntChart() {
 
 							return (
 								<div key={w.munka_id} className="pt-gridRow" onClick={() => setSelectedWork(w)} style={{ cursor: "pointer" }}>
-									<div className="pt-rowLabel">{w.munka_neve}</div>
+									<div></div>
 									<div className="pt-rowTrack">
 										<div
 											className={`pt-ganttBar ${progressColorClass(w.progress)} ${

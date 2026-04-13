@@ -89,7 +89,6 @@
   font-size: 20px;
 }
 
-/* Responsive tweaks */
 @media (max-width: 480px){
   .work-display-content{ padding: 8px; }
   .wd-progress{ height: 22px; }
