@@ -27,7 +27,6 @@ export class CreateUserDto {
 
        @IsNumber()
        @IsNotEmpty()
-       @Min(2)
        munkaora: number;
 
        @IsOptional()

@@ -35,10 +35,6 @@ const router = createBrowserRouter([
     Component: UserPatch,
   },
   {
-    path: "/jelszo-modositas/:user_id",
-    Component: NewPass,
-  },
-  {
     path: "/eszkozok",
     Component: Tools,
   },

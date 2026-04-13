@@ -60,10 +60,6 @@ export function newToolAdd() {
                                    <label>Darabszám:</label>
                                    <input type="number" value={formState.darabszam} onChange={e => setFormState({...formState, darabszam: Number(e.target.value)})} />
                             </div>
-                            <div>
-                                   <label>Használatban:</label>
-                                   <input type="checkbox" checked={formState.hasznalatban} onChange={e => setFormState({...formState, hasznalatban: e.target.checked})} />
-                            </div>
                             <button type="submit" onClick={handleSubmit}>Hozzáadás</button>
                             <button onClick={() => navigate('/eszkozok')}>Vissza</button>
                      </form>
