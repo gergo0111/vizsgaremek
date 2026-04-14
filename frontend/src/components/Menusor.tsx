@@ -7,6 +7,11 @@ export function Menusor() {
   
        const navigate = useNavigate();
 
+       const handleLogout = () => {
+              localStorage.removeItem('user');
+              navigate('/');
+       };
+
        return (
     <>
       <nav
@@ -54,6 +59,17 @@ export function Menusor() {
               </button>
             </li>
           </ul>
+
+          <div className="ml-auto d-flex align-items-center">
+            <button
+              className="btn btn-link"
+              onClick={handleLogout}
+              style={{ color: "white", textDecoration: 'none' }}
+              aria-label="Kijelentkezés"
+            >
+              Kijelentkezés
+            </button>
+          </div>
         </div>
       </nav>
     </>
