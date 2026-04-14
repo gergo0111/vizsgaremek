@@ -55,6 +55,7 @@ export class MunkaService {
                                           const munka = await (this.prisma as any).munka.create({
                                                  data: {
                                                         munka_neve: munkaNeve,
+                                                        leiras: data.leiras || '',
                                                         eszkoz_id,
                                                         user_id,
                                                         kezdeti_datum: data.kezdetiDatum ? new Date(data.kezdetiDatum) : undefined,
