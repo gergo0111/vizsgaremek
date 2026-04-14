@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { User } from "../../interfaces/User";
 import { Menusor } from "../Menusor";
+import { apiGet, apiDelete } from "../../lib/api";
 
 export function UsersList() {
        const [users, setUsers] = React.useState<User[]>([]);
@@ -10,11 +11,7 @@ export function UsersList() {
        useEffect(() => {
               const fetchUsers = async () => {
                      try {
-                            const response = await fetch('http://localhost:3000/users');
-                            if (!response.ok) {
-                                   throw new Error('Hiba történt a felhasználók lekérésekor');
-                            }
-                            const data = await response.json();
+                            const data = await apiGet<User[]>('/users');
                             setUsers(data);
                      } catch (error) {
                             console.error('Hiba:', error);
@@ -30,12 +27,7 @@ export function UsersList() {
                      return;
               }
               try {
-                     const response = await fetch(`http://localhost:3000/users/${userId}`, {
-                            method: 'DELETE',
-                     });
-                     if (!response.ok) {
-                            throw new Error('Hiba történt a felhasználó törlésekor');
-                     }
+                     await apiDelete(`/users/${userId}`);
                      setUsers(prev => prev.filter(user => user.user_id !== userId));
               } catch (error) {
                      console.error('Hiba:', error);

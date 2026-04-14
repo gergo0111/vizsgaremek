@@ -51,6 +51,7 @@ model Feladat {
 model Munka {
   munka_id                 Int       @id @default(autoincrement())
   munka_neve               String    @unique
+  leiras                   String    @db.Text
   eszkoz_id                Int
   user_id                  Int
   ertesitesIsActive        Boolean   @default(false)

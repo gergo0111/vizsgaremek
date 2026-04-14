@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { MunkaService } from './munka.service';
 import { UpdateMunkaDto } from './dto/update-munka.dto';
 
@@ -12,8 +13,11 @@ export class MunkaController {
   }
 
   @Get()
-  findAll() {
-    return this.munkaService.findAll();
+  findAll(@Req() req: Request) {
+    const user = (req as any).user;
+    const isAdmin = user?.isAdmin === true;
+    const userId = user?.user_id ?? user?.id;
+    return this.munkaService.findAll(isAdmin, userId);
   }
 
   @Get(':id')

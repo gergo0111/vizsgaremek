@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { apiPatch } from "../../lib/api";
 
 interface Eszkoz{
        eszkoz_id: string;
@@ -24,15 +25,8 @@ export function PatchTools() {
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
-              const response = await fetch(`http://localhost:3000/eszkozok/${eszkoz_id}`, {
-                     method: 'PATCH',
-                     headers: {
-                            'Content-Type': 'application/json',
-                     },
-                     body: JSON.stringify(formState),
-              });
-              if (response.ok) {
-                     const updatedTool = await response.json();
+              try {
+                     const updatedTool = await apiPatch<Eszkoz>(`/eszkozok/${eszkoz_id}`, formState);
                      setTools(tools.map(tool => tool.eszkoz_id === updatedTool.eszkoz_id ? updatedTool : tool));
                      setFormState({
                             nev: '',
@@ -41,8 +35,8 @@ export function PatchTools() {
                             hasznalatban: false,
                      });
                      navigate('/eszkozok');
-              } else {
-                     console.error('Hiba történt az eszköz módosításakor');
+              } catch (error) {
+                     console.error('Hiba történt az eszköz módosításakor:', error);
               }
        };
 

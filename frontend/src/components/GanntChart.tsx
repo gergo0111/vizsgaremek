@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./gantt/GanttChart.css";
 import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
+import { getUser } from "../lib/auth";
 import { WorkDisplay } from "./works/WorkDisplay";
 
 type ViewMode = "week" | "month" | "year";
@@ -111,6 +112,9 @@ function computeStatus(progress: number, start: Date, end: Date): StatusKey {
 }
 
 export function GanntChart() {
+	const user = getUser();
+	const isAdmin = user?.isAdmin === true;
+	const currentUserId = user?.user_id ?? user?.id;
 	const [works, setWorks] = useState<Munka[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [viewMode, setViewMode] = useState<ViewMode>("week");
@@ -134,7 +138,11 @@ export function GanntChart() {
 			try {
 				setError(null);
 				const data = await apiGet<Munka[]>("/munka");
-				if (!cancelled) setWorks(Array.isArray(data) ? data : []);
+				let filtered = Array.isArray(data) ? data : [];
+				if (!isAdmin && currentUserId) {
+					filtered = filtered.filter((w) => w.user_id === currentUserId);
+				}
+				if (!cancelled) setWorks(filtered);
 			} catch (e) {
 				if (!cancelled) {
 					setError(e instanceof Error ? e.message : "Hiba történt");
@@ -144,7 +152,7 @@ export function GanntChart() {
 		return () => {
 			cancelled = true;
 		};
-	}, []);
+	}, [isAdmin, currentUserId]);
 
 	const decoratedAll = useMemo<DecoratedWork[]>(() => {
 		return works

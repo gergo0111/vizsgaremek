@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
+import { apiGet, apiPost } from "../../lib/api";
 
 interface User {
        user_id: number;
@@ -28,11 +29,7 @@ export function NewWorkAdd() {
        useEffect(() => {
               const fetchUsers = async () => {
                      try {
-                            const response = await fetch('http://localhost:3000/users');
-                            if (!response.ok) {
-                                   throw new Error('Hiba történt a felhasználók lekérésekor');
-                            }
-                            const data = await response.json();
+                            const data = await apiGet<User[]>('/users');
                             SetUsers(data);
                      } catch (error) {
                             console.error('Hiba:', error);
@@ -41,11 +38,7 @@ export function NewWorkAdd() {
 
               const fetchTools = async () => {
                      try {
-                            const response = await fetch('http://localhost:3000/eszkozok');
-                            if (!response.ok) {
-                                   throw new Error('Hiba történt az eszközök lekérésekor');
-                            }
-                            const data = await response.json();
+                            const data = await apiGet<Tool[]>('/eszkozok');
                             SetTools(data);
                      } catch (error) {
                             console.error('Hiba:', error);
@@ -117,19 +110,7 @@ export function NewWorkAdd() {
               };
 
               try {
-                     const res = await fetch('http://localhost:3000/munka', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                     });
-
-                     if (!res.ok) {
-                            const text = await res.text();
-                            console.error('Hiba a mentéskor', text);
-                            return;
-                     }
-
-                     const data = await res.json();
+                     await apiPost('/munka', payload);
                      navigate('/fooldal');
               } catch (err) {
                      console.error('Hiba:', err);

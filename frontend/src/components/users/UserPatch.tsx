@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
+import { apiGet, apiPatch } from "../../lib/api";
 import "../../designs/NewUserAdd.css";
 
 export interface User {
@@ -33,9 +34,7 @@ export function UserPatch() {
 
             const fetchUser = async () => {
                 try {
-                    const res = await fetch(`http://localhost:3000/users/${id}`);
-                    if (!res.ok) throw new Error('Hiba a felhasználó lekérésekor');
-                    const data: User = await res.json();
+                    const data = await apiGet<User>(`/users/${id}`);
                     setFelhasznalonev(data.felhasznalonev);
                     setEmail(data.email);
                     setNev(data.nev);
@@ -83,21 +82,7 @@ export function UserPatch() {
             };
 
             try {
-                const res = await fetch(`http://localhost:3000/users/${user_id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedUser),
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    const msg = Array.isArray(errorData.message)
-                        ? errorData.message.join(', ')
-                        : (errorData.message ?? JSON.stringify(errorData));
-                    setErrorMsg(String(msg));
-                    throw new Error('Hiba a módosítás során');
-                }
-
+                await apiPatch(`/users/${user_id}`, updatedUser);
                 setSuccessMsg('Felhasználó sikeresen módosítva.');
                 setTimeout(() => navigate('/felhasznalok-kezelese'), 1500);
             } catch (err) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
+import { apiGet, apiDelete } from "../../lib/api";
 
 interface Eszkoz{
        eszkoz_id: string;
@@ -18,11 +19,7 @@ export function Tools() {
  
         const fetchTools = async () => {
                try {
-                      const response = await fetch('http://localhost:3000/eszkozok');
-                      if (!response.ok) {
-                             throw new Error('Hiba történt az eszközök lekérésekor');
-                      }
-                      const data = await response.json();
+                      const data = await apiGet<Eszkoz[]>('/eszkozok');
                      setTools(data);
                      setAllTools(data);
                } catch (error) {
@@ -36,15 +33,9 @@ export function Tools() {
 
        const handleDelete = async (eszkoz_id: string) => {
               try {
-                     const response = await fetch(`http://localhost:3000/eszkozok/${eszkoz_id}`, {
-                            method: 'DELETE',
-                     });
-                     if (!response.ok) {
-                            throw new Error('Hiba történt az eszköz törlésekor');
-                     }
-                     else{
-                            
-                     }
+                     await apiDelete(`/eszkozok/${eszkoz_id}`);
+                     setTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkoz_id));
+                     setAllTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkoz_id));
               } catch (error) {
                      console.error('Hiba:', error);
               }

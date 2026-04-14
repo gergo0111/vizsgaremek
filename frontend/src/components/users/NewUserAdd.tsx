@@ -48,24 +48,8 @@ export function NewUserAdd() {
               }
 
               try {
-                     const response = await fetch('http://localhost:3000/users', {
-                            method: 'POST',
-                            headers: {
-                                   'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(newUser),
-                     });    
-
-                     if (!response.ok) {
-                            const errorData = await response.json();
-                            const msg = Array.isArray(errorData.message)
-                                   ? errorData.message.join(', ')
-                                   : (errorData.message ?? JSON.stringify(errorData));
-                            setErrorMsg(String(msg));
-                            throw new Error('Hiba történt a felhasználó hozzáadásakor');
-                     }
-
-                     const data = await response.json();
+                     const { apiPost } = await import('../../lib/api');
+                     const data = await apiPost('/users', newUser);
                      console.log('Felhasználó sikeresen hozzáadva:', data);
                      setSuccessMsg('Felhasználó sikeresen hozzáadva.');
                      setFieldErrors({});
@@ -79,6 +63,8 @@ export function NewUserAdd() {
                      setIsAdmin(false);
 
               } catch (error) {
+                     const errorData = error instanceof Error ? error.message : String(error);
+                     setErrorMsg(errorData);
                      console.error('Hiba:', error);
               }
        };

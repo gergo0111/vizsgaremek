@@ -6,12 +6,14 @@ import { UpdateMunkaDto } from './dto/update-munka.dto';
 @Injectable()
 export class MunkaService {
        constructor(private prisma: PrismaService) {}
-       async findAll() {
-                                   return (this.prisma as any).munka.findMany({
-                                          include: {
-                                                 feladat: true,
-                                          },
-                                   });
+       async findAll(isAdmin?: boolean, userId?: number) {
+              const where = !isAdmin && userId ? { user_id: userId } : undefined;
+              return (this.prisma as any).munka.findMany({
+                     where,
+                     include: {
+                            feladat: true,
+                     },
+              });
        }
 
        async findOne(id: number) {

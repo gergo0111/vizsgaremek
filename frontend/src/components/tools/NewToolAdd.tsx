@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { apiPost } from "../../lib/api";
 
 
 interface Eszkoz{
@@ -23,15 +24,8 @@ export function newToolAdd() {
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
-              const response = await fetch('http://localhost:3000/eszkozok', {
-                     method: 'POST',
-                     headers: {
-                            'Content-Type': 'application/json',
-                     },
-                     body: JSON.stringify(formState),
-              });
-              if (response.ok) {
-                     const newTool = await response.json();
+              try {
+                     const newTool = await apiPost<Eszkoz>('/eszkozok', formState);
                      setTools([...tools, newTool]);
                      setFormState({
                             nev: '',
@@ -39,8 +33,8 @@ export function newToolAdd() {
                             darabszam: 0,
                             hasznalatban: false,
                      });
-              } else {
-                     console.error('Hiba történt az eszköz hozzáadásakor');
+              } catch (error) {
+                     console.error('Hiba történt az eszköz hozzáadásakor:', error);
               }
        };
 

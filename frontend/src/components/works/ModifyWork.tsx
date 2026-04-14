@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Menusor } from "../Menusor";
+import { apiGet, apiPatch } from "../../lib/api";
 
 interface User {
   user_id: number;
@@ -47,11 +48,7 @@ export function ModifyWork() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch("http://localhost:3000/users");
-        if (!response.ok) {
-          throw new Error("Hiba történt a felhasználók lekérésekor");
-        }
-        const data = await response.json();
+        const data = await apiGet<User[]>("/users");
         setUsers(data);
       } catch (error) {
         console.error("Hiba:", error);
@@ -60,11 +57,7 @@ export function ModifyWork() {
 
     const fetchTools = async () => {
       try {
-        const response = await fetch("http://localhost:3000/eszkozok");
-        if (!response.ok) {
-          throw new Error("Hiba történt az eszközök lekérésekor");
-        }
-        const data = await response.json();
+        const data = await apiGet<Tool[]>("/eszkozok");
         setTools(data);
       } catch (error) {
         console.error("Hiba:", error);
@@ -73,11 +66,7 @@ export function ModifyWork() {
 
     const fetchWorkData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/munka/${munka_id}`);
-        if (!response.ok) {
-          throw new Error("Hiba történt a munka adatainak lekérésekor");
-        }
-        const data = await response.json();
+        const data = await apiGet<WorkData>(`/munka/${munka_id}`);
         
         const kezdeti = data.kezdeti_datum 
           ? new Date(data.kezdeti_datum).toISOString().split('T')[0] 
@@ -176,18 +165,7 @@ export function ModifyWork() {
     };
 
     try {
-      const res = await fetch(`http://localhost:3000/munka/${munka_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Hiba a mentéskor", text);
-        return;
-      }
-
+      await apiPatch(`/munka/${munka_id}`, payload);
       navigate("/fooldal");
     } catch (err) {
       console.error("Hiba:", err);

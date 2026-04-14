@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { logout } from "../lib/auth";
+import { logout, getUser } from "../lib/auth";
 import ptlogo from "../assets/ptlogo.svg";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export function Menusor() {
-  
-       const navigate = useNavigate();
+  const user = getUser();
+  const isAdmin = user?.isAdmin === true;
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -33,32 +34,36 @@ export function Menusor() {
         </button>
         <div className="collapse navbar-collapse" id="navbarText">
           <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <button
-                className="nav-link"
-                style={{ color: "white" }}
-                onClick={() => navigate("/felhasznalok-kezelese")}
-              >
-                Felhasználók kezelése
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link" 
-              style={{ color: "white" }}
-              onClick={() => navigate("/eszkozok")}>
-                Gépek kezelése
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }}>
-                Munkák módosítása
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/uj-munka")}>
-                ⊕ Új munka
-              </button>
-            </li>
+            {isAdmin && (
+              <>
+                <li className="nav-item active">
+                  <button
+                    className="nav-link"
+                    style={{ color: "white" }}
+                    onClick={() => navigate("/felhasznalok-kezelese")}
+                  >
+                    Felhasználók kezelése
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" 
+                  style={{ color: "white" }}
+                  onClick={() => navigate("/eszkozok")}>
+                    Gépek kezelése
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" style={{ color: "white" }}>
+                    Munkák módosítása
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/uj-munka")}>
+                    ⊕ Új munka
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
 
           <div className="ml-auto d-flex align-items-center">

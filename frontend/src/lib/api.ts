@@ -55,3 +55,42 @@ export async function apiPatch<T>(path: string, data: Record<string, any>): Prom
 
 	return (await res.json()) as T;
 }
+
+export async function apiPost<T>(path: string, data: Record<string, any>): Promise<T> {
+	const res = await fetch(`${API_BASE_URL}${path}`, {
+		method: "POST",
+		headers: getAuthHeaders(),
+		body: JSON.stringify(data),
+	});
+
+	if (!res.ok) {
+		let message = `HTTP ${res.status}`;
+		try {
+			const jsonData = await res.json();
+			message = jsonData?.message ?? message;
+		} catch {
+		}
+		throw new Error(message);
+	}
+
+	return (await res.json()) as T;
+}
+
+export async function apiDelete<T>(path: string): Promise<T> {
+	const res = await fetch(`${API_BASE_URL}${path}`, {
+		method: "DELETE",
+		headers: getAuthHeaders(),
+	});
+
+	if (!res.ok) {
+		let message = `HTTP ${res.status}`;
+		try {
+			const jsonData = await res.json();
+			message = jsonData?.message ?? message;
+		} catch {
+		}
+		throw new Error(message);
+	}
+
+	return (await res.json()) as T;
+}
