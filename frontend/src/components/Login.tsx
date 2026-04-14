@@ -30,10 +30,10 @@ export default function Login() {
         throw new Error(errorData.message || 'Bejelentkezési hiba');
       }
 
-      const data = await response.json();
-      console.log('Sikeres bejelentkezés:', data);
-      
-  setUser(data.user);
+    const data = await response.json();
+    console.log('Sikeres bejelentkezés:', data);
+
+    setUser({ ...(data.user || {}), token: data.token });
       navigate('/fooldal');
       
     } catch (err) {

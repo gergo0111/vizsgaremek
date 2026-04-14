@@ -66,11 +66,12 @@ export class UserService {
                     }
 
                     const { jelszo, ...userWithoutPassword } = user;
-                    
-                    return {
-                              message: 'Sikeres bejelentkezés',
-                              user: userWithoutPassword
-                    };
+                                  const tokenObj = await this.createToken((user as any).user_id ?? (user as any).id);
+                                  return {
+                                            message: 'Sikeres bejelentkezés',
+                                            user: userWithoutPassword,
+                                            token: tokenObj?.token || null,
+                                  };
        }
               async findByEmail(email: string) {
                      return (this.prisma as any).user.findUnique({

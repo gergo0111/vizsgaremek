@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import path from 'node:path';
 import { ValidationPipe } from '@nestjs/common';
+import { TokenAuthGuard } from './auth/token-auth.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
@@ -17,6 +18,9 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe());
+
+  const globalAuthGuard = app.get(TokenAuthGuard);
+  app.useGlobalGuards(globalAuthGuard);
 
   app.useStaticAssets(path.join(__dirname, '..', '..', 'public'));
   app.setBaseViewsDir(path.join(__dirname, '..', '..', 'views'));
