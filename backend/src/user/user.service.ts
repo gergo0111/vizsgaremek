@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
+import { randomUUID } from 'crypto';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
@@ -71,6 +72,21 @@ export class UserService {
                               user: userWithoutPassword
                     };
        }
+              async findByEmail(email: string) {
+                     return (this.prisma as any).user.findUnique({
+                            where: { email },
+                     });
+              }
+
+              async createToken(userId: number) {
+                     const token = randomUUID();
+                     return (this.prisma as any).token.create({
+                            data: {
+                                   token,
+                                   user_id: userId,
+                            },
+                     });
+              }
 
        async verifyPassword(plainTextPassword: string, hashedPassword: string): Promise<boolean> {
                     return bcrypt.compare(plainTextPassword, hashedPassword);
