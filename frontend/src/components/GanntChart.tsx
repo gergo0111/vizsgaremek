@@ -250,6 +250,12 @@ export function GanntChart() {
 		setSelectedWork(null);
 	}
 
+	function handleWorkSave(updatedWork: Munka) {
+		setWorks((prev) =>
+			prev.map((w) => (w.munka_id === updatedWork.munka_id ? updatedWork : w))
+		);
+	}
+
 	useEffect(() => {
 		if (!selectedWork) return;
 		function onKey(e: KeyboardEvent) {
@@ -410,11 +416,11 @@ export function GanntChart() {
 						})}
 					</div>
 
-					{selectedWork && (
-						<WorkDisplay work={selectedWork} onClose={closeModal} />
-					)}
+			{selectedWork && (
+				<WorkDisplay work={selectedWork} onClose={closeModal} onSave={handleWorkSave} />
+			)}
 
-					<div className="pt-legend">
+			<div className="pt-legend">
 						<label className="pt-legendItem">
 							<input type="checkbox" checked={filters.p0_25} onChange={(e) => setFilter("p0_25", e.target.checked)} />
 							<span className="pt-dot pt-dot--p0_25" />

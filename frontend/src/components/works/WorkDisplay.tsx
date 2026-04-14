@@ -8,11 +8,13 @@ import "./WorkDisplay.css";
 interface WorkDisplayProps {
 	work: Munka;
 	onClose: () => void;
+	onSave?: (updatedWork: Munka) => void;
 }
 
-export function WorkDisplay({ work, onClose }: WorkDisplayProps) {
+export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [tasks, setTasks] = useState<Feladat[]>(work.feladat || []);
+	const [isSaving, setIsSaving] = useState(false);
 	const TASKS_PER_PAGE = 5;
 
 	const totalTasks = tasks.length;
@@ -27,31 +29,57 @@ export function WorkDisplay({ work, onClose }: WorkDisplayProps) {
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
 			if (e.key === "Escape") {
-				onClose();
+				handleClose();
 			}
 		}
 
 		document.addEventListener("keydown", handleKeyDown);
 		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, [onClose]);
+	}, []);
 
 	async function toggleTask(taskId: number) {
 		const updatedTasks = tasks.map((t) =>
 			t.feladat_id === taskId ? { ...t, isCompleted: !t.isCompleted } : t
 		);
 		setTasks(updatedTasks);
+	}
 
-		const taskToUpdate = updatedTasks.find((t) => t.feladat_id === taskId);
-		if (taskToUpdate) {
-			try {
-				await apiPatch(`/feladatok/${taskId}`, {
-					isCompleted: taskToUpdate.isCompleted,
-				});
-			} catch (error) {
-				console.error("Hiba a feladat frissítésekor:", error);
-				setTasks(tasks);
+	async function handleSave() {
+		setIsSaving(true);
+		try {
+			const savePromises = tasks.map((task) => {
+				const originalTask = work.feladat?.find((f) => f.feladat_id === task.feladat_id);
+				if (originalTask && task.isCompleted !== originalTask.isCompleted) {
+					return apiPatch(`/feladatok/${task.feladat_id}`, {
+						isCompleted: task.isCompleted,
+					});
+				}
+				return Promise.resolve(null);
+			});
+
+			await Promise.all(savePromises);
+
+			const updatedWork: Munka = {
+				...work,
+				feladat: tasks,
+			};
+
+			if (onSave) {
+				onSave(updatedWork);
 			}
+
+			onClose();
+		} catch (error) {
+			console.error("Hiba az adatok mentésekor:", error);
+		} finally {
+			setIsSaving(false);
 		}
+	}
+
+	function handleClose() {
+		// Bez­árás gomb: elveti az összes módosítást
+		setTasks(work.feladat || []);
+		onClose();
 	}
 
 	function prevPage() {
@@ -63,7 +91,7 @@ export function WorkDisplay({ work, onClose }: WorkDisplayProps) {
 	}
 
 	return (
-		<Modal show onHide={onClose} centered contentClassName="work-display-content">
+		<Modal show onHide={handleClose} centered contentClassName="work-display-content">
 			<Modal.Header closeButton>
 				<Modal.Title className="wd-title">{work.munka_neve}</Modal.Title>
 			</Modal.Header>
@@ -118,11 +146,13 @@ export function WorkDisplay({ work, onClose }: WorkDisplayProps) {
 				<div className="wd-deadline d-flex align-items-center justify-content-between mt-3">
 					<div className="wd-deadline-label">Határidő:</div>
 					<div className="wd-deadline-date text-danger">{new Date(work.varhato_befejezes_datuma).toLocaleDateString("hu-HU")}</div>
-					<div className="wd-bell">🔔</div>
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="secondary" onClick={onClose}>Bezárás</Button>
+				<Button variant="secondary" onClick={handleClose}>Bezárás</Button>
+				<Button variant="primary" onClick={handleSave} disabled={isSaving}>
+					{isSaving ? "Mentés..." : "Mentés"}
+				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
