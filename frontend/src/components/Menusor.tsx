@@ -34,6 +34,7 @@ export function Menusor() {
         </button>
         <div className="collapse navbar-collapse" id="navbarText">
           <ul className="navbar-nav mr-auto">
+<<<<<<< HEAD
             {isAdmin && (
               <>
                 <li className="nav-item active">
@@ -64,6 +65,34 @@ export function Menusor() {
                 </li>
               </>
             )}
+=======
+            <li className="nav-item active">
+              <button
+                className="nav-link"
+                style={{ color: "white" }}
+                onClick={() => navigate("/felhasznalok-kezelese")}
+              >
+                Felhasználók kezelése
+              </button>
+            </li>
+            <li className="nav-item">
+              <button className="nav-link" 
+              style={{ color: "white" }}
+              onClick={() => navigate("/eszkozok")}>
+                Gépek kezelése
+              </button>
+            </li>
+            <li className="nav-item">
+              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/munka-lista")}>
+                Munkák módosítása
+              </button>
+            </li>
+            <li className="nav-item">
+              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/uj-munka")}>
+                ⊕ Új munka
+              </button>
+            </li>
+>>>>>>> e0e3f4e (Munka modositasa, alapok)
           </ul>
 
           <div className="ml-auto d-flex align-items-center">

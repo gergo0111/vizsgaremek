@@ -9,9 +9,9 @@ import { Tools } from "./components/tools/ToolsList";
 import { newToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
 import { UserPatch } from "./components/users/UserPatch";
-import { NewPass } from "./components/users/NewPass";
 import { NewWorkAdd } from "./components/works/NewWorkAdd";
 import ModifyWork from "./components/works/ModifyWork";
+import { WorkList } from "./components/works/WorkList";
 
 const router = createBrowserRouter([
   {
@@ -51,7 +51,11 @@ const router = createBrowserRouter([
     Component: NewWorkAdd,
   },
   {
-    path: "/modify-work/:munka_id",
+    path: "/munka-lista",
+    Component: WorkList,
+  },
+  {
+    path: "/munka-modositas/:munka_id",
     Component: ModifyWork,
   }
 ]);

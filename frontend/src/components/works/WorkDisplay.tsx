@@ -127,3 +127,5 @@ export function WorkDisplay({ work, onClose }: WorkDisplayProps) {
 		</Modal>
 	);
 }
+
+export default WorkDisplay;
