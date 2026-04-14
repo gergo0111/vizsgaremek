@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../designs/Login.css';
 import ptlogo from '../assets/ptlogo.svg';
+import { setUser } from '../lib/auth';
 
 export default function Login() {
   const [felhasznalonev, setFelhasznalonev] = useState('');
@@ -32,7 +33,7 @@ export default function Login() {
       const data = await response.json();
       console.log('Sikeres bejelentkezés:', data);
       
-      localStorage.setItem('user', JSON.stringify(data.user));
+  setUser(data.user);
       navigate('/fooldal');
       
     } catch (err) {

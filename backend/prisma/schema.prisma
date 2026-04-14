@@ -20,6 +20,7 @@ model User {
   isAdmin        Boolean   @default(false)
   comment        Comment[]
   munka          Munka[]
+  token           Token[]
 
   @@map("user")
 }
@@ -80,4 +81,12 @@ model Comment {
   @@index([munka_id], map: "comment_munka_id_fkey")
   @@index([user_id], map: "comment_user_id_fkey")
   @@map("comment")
+}
+
+model Token {
+  token   String @id
+  user_id Int
+  user    User   @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@map("token")
 }

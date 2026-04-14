@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../lib/auth";
 import ptlogo from "../assets/ptlogo.svg";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -7,10 +8,10 @@ export function Menusor() {
   
        const navigate = useNavigate();
 
-       const handleLogout = () => {
-              localStorage.removeItem('user');
-              navigate('/');
-       };
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
        return (
     <>
