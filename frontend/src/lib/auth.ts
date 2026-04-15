@@ -26,3 +26,16 @@ export function setUser(u: UserShape) {
 export function logout() {
   localStorage.removeItem('user');
 }
+
+export function isAdmin(): boolean {
+  const user = getUser();
+  return user?.isAdmin === true;
+}
+
+export function getCurrentUser(): UserShape | null {
+  return getUser();
+}
+
+export function getCurrentUserRole(): 'admin' | 'user' {
+  return isAdmin() ? 'admin' : 'user';
+}

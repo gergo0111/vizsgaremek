@@ -11,7 +11,7 @@ interface Eszkoz{
        hasznalatban: boolean;
 }
 
-export function Tools() {
+export function ToolsList() {
        const [tools, setTools] = useState<Eszkoz[]>([]);
        const [allTools, setAllTools] = useState<Eszkoz[]>([]);
        const [searchTerm, setSearchTerm] = useState<string>('');
@@ -211,5 +211,5 @@ export function Tools() {
        );
 }
 
-
+export default ToolsList;
 

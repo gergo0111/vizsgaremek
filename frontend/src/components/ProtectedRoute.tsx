@@ -1,23 +1,27 @@
-import { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { isAuthenticated } from '../lib/auth';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { isAuthenticated, isAdmin } from '../lib/auth';
 
 interface ProtectedRouteProps {
   children: ReactNode;
+  adminOnly?: boolean;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, adminOnly = false }: ProtectedRouteProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate]);
 
   if (!isAuthenticated()) {
-    return null;
+    return <Navigate to="/login" />;
+  }
+
+  if (adminOnly && !isAdmin()) {
+    return <Navigate to="/" />;
   }
 
   return <>{children}</>;

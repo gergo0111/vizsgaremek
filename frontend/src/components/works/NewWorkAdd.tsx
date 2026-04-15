@@ -5,6 +5,7 @@ import { apiGet, apiPost } from "../../lib/api";
 
 interface User {
        user_id: number;
+       felhasznalonev: string;
        nev: string;
 }
 
@@ -18,6 +19,7 @@ export function NewWorkAdd() {
        
        const [users, SetUsers] = useState<User[]>([]);
        const [tools, SetTools] = useState<Tool[]>([]);
+       const [felhasznalonev, SetFelhasznalonev] = useState('');
        const [nev, SetNev] = useState('');
        const [leiras, SetLeiras] = useState('');
        const [kezdetiDatum, SetKezdetiDatum] = useState('');
@@ -30,7 +32,8 @@ export function NewWorkAdd() {
               const fetchUsers = async () => {
                      try {
                             const data = await apiGet<User[]>('/users');
-                            SetUsers(data);
+                            const filteredUsers = data.filter(user => user.felhasznalonev !== 'admin');
+                            SetUsers(filteredUsers);
                      } catch (error) {
                             console.error('Hiba:', error);
                      }   

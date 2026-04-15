@@ -1,24 +1,19 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './components/Login';
-import MainSite from './components/MainSite';
-import ProtectedRoute from './components/ProtectedRoute';
-import { UsersList } from './components/users/UsersList';
-import { Tools } from './components/tools/ToolsList';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Login } from './components/Login';
+import { MainSite } from './components/MainSite';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { UserManagement } from './components/users/UserManagement';
+import { ToolsList } from './components/tools/ToolsList';
 import { NewWorkAdd } from './components/works/NewWorkAdd';
-import { NewUserAdd } from './components/users/NewUserAdd';
-import { UserPatch } from './components/users/UserPatch';
-import { newToolAdd as NewToolAdd } from './components/tools/NewToolAdd';
-import { PatchTools } from './components/tools/PatchTools';
-import { ModifyWork } from './components/works/ModifyWork';
 
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route
-          path="/fooldal"
+          path="/"
           element={
             <ProtectedRoute>
               <MainSite />
@@ -26,88 +21,34 @@ function App() {
           }
         />
         <Route
-          path="/felhasznalok-kezelese"
+          path="/users"
           element={
-            <ProtectedRoute>
-              <UsersList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/eszkozok"
-          element={
-            <ProtectedRoute>
-              <Tools />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/uj-munka"
-          element={
-            <ProtectedRoute>
-              <NewWorkAdd />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/uj-felhasznalo"
-          element={
-            <ProtectedRoute>
-              <NewUserAdd />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/felhasznalo-modositas/:user_id"
-          element={
-            <ProtectedRoute>
-              <UserPatch />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/uj-eszkoz"
-          element={
-            <ProtectedRoute>
-              <NewToolAdd />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/eszkoz-modositas/:eszkoz_id"
-          element={
-            <ProtectedRoute>
-              <PatchTools />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/munka-lista"
-          element={
-            <ProtectedRoute>
-              <MainSite />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/munka-modositas/:munka_id"
-          element={
-            <ProtectedRoute>
-              <ModifyWork />
+            <ProtectedRoute adminOnly>
+              <UserManagement />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="*"
+          path="/tools"
           element={
-            <ProtectedRoute>
-              <MainSite />
+            <ProtectedRoute adminOnly>
+              <ToolsList />
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/works/new"
+          element={
+            <ProtectedRoute adminOnly>
+              <NewWorkAdd />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 

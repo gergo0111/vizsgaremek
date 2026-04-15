@@ -5,7 +5,7 @@ import '../designs/Login.css';
 import ptlogo from '../assets/ptlogo.svg';
 import { setUser } from '../lib/auth';
 
-export default function Login() {
+export function Login() {
   const [felhasznalonev, setFelhasznalonev] = useState('');
   const [jelszo, setJelszo] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -128,3 +128,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default Login;

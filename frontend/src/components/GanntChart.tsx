@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./gantt/GanttChart.css";
 import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
-import { getUser } from "../lib/auth";
+import { isAdmin, getUser } from "../lib/auth";
 import { WorkDisplay } from "./works/WorkDisplay";
 
 type ViewMode = "week" | "month" | "year";
@@ -113,7 +113,7 @@ function computeStatus(progress: number, start: Date, end: Date): StatusKey {
 
 export function GanntChart() {
 	const user = getUser();
-	const isAdmin = user?.isAdmin === true;
+	const isAdminUser = isAdmin();
 	const currentUserId = user?.user_id ?? user?.id;
 	const [works, setWorks] = useState<Munka[]>([]);
 	const [error, setError] = useState<string | null>(null);
@@ -139,7 +139,8 @@ export function GanntChart() {
 				setError(null);
 				const data = await apiGet<Munka[]>("/munka");
 				let filtered = Array.isArray(data) ? data : [];
-				if (!isAdmin && currentUserId) {
+				// Ha nem admin, akkor csak a rá rendelt munkákat mutassa
+				if (!isAdminUser && currentUserId) {
 					filtered = filtered.filter((w) => w.user_id === currentUserId);
 				}
 				if (!cancelled) setWorks(filtered);
@@ -152,7 +153,7 @@ export function GanntChart() {
 		return () => {
 			cancelled = true;
 		};
-	}, [isAdmin, currentUserId]);
+	}, [isAdminUser, currentUserId]);
 
 	const decoratedAll = useMemo<DecoratedWork[]>(() => {
 		return works
