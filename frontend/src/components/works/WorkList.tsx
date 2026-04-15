@@ -117,6 +117,24 @@ export function WorkList() {
     setAllWorks(works);
   }, [works]);
 
+  const sortByEszkozNameUp = () => {
+    const sortedMunka = [...tools].sort((a, b) => a.nev.localeCompare(b.nev));
+    setAllWorks(sortedMunka);
+  };
+
+  useEffect(() => {
+    fetchWorks();
+  }, []);
+
+  const sortByEszkozNameDown = () => {
+    const sortedMunka = [...tools].sort((a, b) => b.nev.localeCompare(a.nev));
+    setAllWorks(sortedMunka);
+  };
+
+  useEffect(() => {
+    fetchTools();
+  }, []);
+
   return (
     <>
       <Menusor />
@@ -141,6 +159,25 @@ export function WorkList() {
             🔍
           </button>
         </div>
+
+        <tr>
+          <th>
+            Munka neve <button onClick={sortByEszkozNameUp}>⏶</button>{" "}
+            <button onClick={sortByEszkozNameDown}>⏷</button>
+          </th>
+          <th>
+            Alkalmazott <button onClick={sortByAlkalmazottUp}>⏶</button>{" "}
+            <button onClick={sortByAlkalmazottDown}>⏷</button>
+          </th>
+          <th>
+            Eszköz <button onClick={sortByEszkozUp}>⏶</button>{" "}
+            <button onClick={sortByEszkozDown}>⏷</button>
+          </th>
+          <th>
+            Dátum <button onClick={sortByIdoUp}>⏶</button>{" "}
+            <button onClick={sortByIdoDown}>⏷</button>
+          </th>
+        </tr>
 
         {loading ? (
           <p>Betöltés...</p>
@@ -201,7 +238,7 @@ export function WorkList() {
                       Várható befejezés: {work.varhato_befejezes_datuma || "-"}
                     </li>
                   </ul>
-                  
+
                   <div className="card-body">
                     <button
                       className="btn btn-primary"

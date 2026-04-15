@@ -303,7 +303,7 @@ export function ModifyWork() {
             </button>
             <button
               type="button"
-              onClick={() => navigate("/fooldal")}
+              onClick={() => navigate("/munka-lista")}
               style={{ backgroundColor: "#6c757d" }}
             >
               Mégse
