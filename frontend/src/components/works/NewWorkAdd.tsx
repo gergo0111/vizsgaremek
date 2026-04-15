@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
 import { apiGet, apiPost } from "../../lib/api";
 import { ToastContainer } from "../common/Toast";
-import { FormField } from "../common/FormField";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
+import "../../designs/WorkForm.css";
 
 interface Toast {
   id: string;
@@ -184,146 +185,203 @@ export function NewWorkAdd() {
        return(
               <>
               <Menusor />
-              <div className="new-work-page">
-                     <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
-                     <div className="new-work-card">
-                            <h2 className="new-work-header">Új munka hozzáadása</h2>
-                            <form onSubmit={handleSubmit}>
-                                   <FormField
-                                          label="Munka neve"
-                                          helpText="A munkafeladat egyedi nevét adjuk meg"
-                                          required
-                                          error={errors.nev}
-                                   >
-                                          <input
-                                                 className="form-control"
-                                                 type="text"
-                                                 value={nev}
-                                                 onChange={(e) => SetNev(e.target.value)}
-                                                 placeholder="pl. Terasz készítés kraftmarketnak"
-                                          />
-                                   </FormField>
-
-                                   <FormField
-                                          label="Leírás"
-                                          helpText="A munka részletes leírása, hogy mit kell elvégezni"
-                                   >
-                                          <input
-                                                 className="form-control"
-                                                 type="text"
-                                                 value={leiras}
-                                                 onChange={(e) => SetLeiras(e.target.value)}
-                                                 placeholder="pl. Teljes kivitelezés"
-                                          />
-                                   </FormField>
-
-                                   <FormField
-                                          label="Dolgozó kiválasztása"
-                                          required
-                                          error={errors.selectedUsers}
-                                   >
-                                          <div>
-                                                 {selectedUsers.map((userId, idx) => (
-                                                        <div key={idx} className="dynamic-row">
-                                                               <select
-                                                                      value={userId}
-                                                                      onChange={(e) => handleUserChange(idx, parseInt(e.target.value || '0', 10) || 0)}
-                                                               >
-                                                                      <option value={0}>-- válassz --</option>
-                                                                      {users.map((user) => (
-                                                                             <option key={user.user_id} value={user.user_id}>
-                                                                                    {user.nev}
-                                                                             </option>
-                                                                      ))}
-                                                               </select>
-                                                               <button type="button" onClick={() => removeUser(idx)}>
-                                                                      Törlés
-                                                               </button>
-                                                        </div>
-                                                 ))}
-                                                 <button type="button" onClick={PlusUser}>
-                                                        + Új dolgozó hozzáadása
-                                                 </button>
-                                          </div>
-                                   </FormField>
-
-                                   <FormField
-                                          label="Eszközök kiválasztása"
-                                   >
-                                          <div>
-                                                 {selectedTools.map((toolId, idx) => (
-                                                        <div key={idx} className="dynamic-row">
-                                                               <select
-                                                                      value={toolId}
-                                                                      onChange={(e) => handleToolChange(idx, parseInt(e.target.value || '0', 10) || 0)}
-                                                               >
-                                                                      <option value={0}>-- válassz --</option>
-                                                                      {tools.map((tool) => (
-                                                                             <option key={tool.eszkoz_id} value={tool.eszkoz_id}>
-                                                                                    {tool.nev}
-                                                                             </option>
-                                                                      ))}
-                                                               </select>
-                                                               <button type="button" onClick={() => removeTool(idx)}>
-                                                                      Törlés
-                                                               </button>
-                                                        </div>
-                                                 ))}
-                                                 <button type="button" onClick={PlusEszkoz}>
-                                                        + Új eszköz hozzáadása
-                                                 </button>
-                                          </div>
-                                   </FormField>
-
-                                   <FormField
-                                          label="Munka kezdeti dátuma"
-                                          error={errors.kezdetiDatum}
-                                   >
-                                          <input type="date" value={kezdetiDatum} onChange={(e) => SetKezdetiDatum(e.target.value)} />
-                                   </FormField>
-
-                                   <FormField
-                                          label="Munka várható befejezési dátuma"
-                                          error={errors.velemenyDatum}
-                                   >
-                                          <input type="date" value={velemenyDatum} onChange={(e) => SetVelemenyDatum(e.target.value)} />
-                                   </FormField>
-
-                                   <FormField
-                                          label="Feladatok megadása"
-                                          helpText="Részfeladatok megadása, amelyek elvégzendők a munka során"
-                                   >
-                                          <div>
-                                                 {selectedTasks.map((task, idx) => (
-                                                        <div key={idx} className="dynamic-row">
-                                                               <input
-                                                                      className="form-control"
+              <Container fluid className="new-work-page">
+                     <Row>
+                            <Col lg={10} md={12} className="mx-auto">
+                                   <Card className="new-work-card">
+                                          <Card.Body>
+                                                 <Card.Title className="new-work-header">Új munka hozzáadása</Card.Title>
+                                                 <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
+                                                 
+                                                 <Form onSubmit={handleSubmit}>
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Munka neve *</Form.Label>
+                                                               <Form.Text className="d-block mb-2 text-muted">
+                                                                      A munkafeladat egyedi nevét adjuk meg
+                                                               </Form.Text>
+                                                               <Form.Control
                                                                       type="text"
-                                                                      value={task}
-                                                                      onChange={(e) => handleTaskChange(idx, e.target.value)}
-                                                                      placeholder="pl. Felmérés"
+                                                                      value={nev}
+                                                                      onChange={(e) => SetNev(e.target.value)}
+                                                                      placeholder="pl. Terasz készítés kraftmarketnak"
+                                                                      isInvalid={!!errors.nev}
                                                                />
-                                                               <button type="button" onClick={() => removeTask(idx)}>
-                                                                      Törlés
-                                                               </button>
-                                                        </div>
-                                                 ))}
-                                                 <button type="button" onClick={PlusFeladat}>
-                                                        + Új feladat hozzáadása
-                                                 </button>
-                                          </div>
-                                   </FormField>
+                                                               <Form.Control.Feedback type="invalid">
+                                                                      {errors.nev}
+                                                               </Form.Control.Feedback>
+                                                        </Form.Group>
 
-                                   <div className="form-group">
-                                          <button type="submit" className="btn btn-primary">Munka mentése</button>
-                                   </div>
-                                   <div className="form-group">
-                                          <button type="button" onClick={() => navigate("/fooldal")}>Vissza</button>
-                                   </div>
-                            </form>
-                     </div>
-              </div>
-       </>
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Leírás</Form.Label>
+                                                               <Form.Text className="d-block mb-2 text-muted">
+                                                                      A munka részletes leírása, hogy mit kell elvégezni
+                                                               </Form.Text>
+                                                               <Form.Control
+                                                                      type="text"
+                                                                      value={leiras}
+                                                                      onChange={(e) => SetLeiras(e.target.value)}
+                                                                      placeholder="pl. Teljes kivitelezés"
+                                                               />
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Dolgozó kiválasztása *</Form.Label>
+                                                               {errors.selectedUsers && (
+                                                                      <div className="error-message">{errors.selectedUsers}</div>
+                                                               )}
+                                                               <div>
+                                                                      {selectedUsers.map((userId, idx) => (
+                                                                             <div key={idx} className="dynamic-row">
+                                                                                    <Form.Select
+                                                                                           value={userId}
+                                                                                           onChange={(e) => handleUserChange(idx, parseInt(e.target.value || '0', 10) || 0)}
+                                                                                    >
+                                                                                           <option value={0}>-- válassz --</option>
+                                                                                           {users.map((user) => (
+                                                                                                  <option key={user.user_id} value={user.user_id}>
+                                                                                                         {user.nev}
+                                                                                                  </option>
+                                                                                           ))}
+                                                                                    </Form.Select>
+                                                                                    <Button 
+                                                                                           variant="danger" 
+                                                                                           size="sm"
+                                                                                           onClick={() => removeUser(idx)}
+                                                                                    >
+                                                                                           Törlés
+                                                                                    </Button>
+                                                                             </div>
+                                                                      ))}
+                                                                      <Button 
+                                                                             variant="primary" 
+                                                                             size="sm"
+                                                                             onClick={PlusUser}
+                                                                             className="mt-2"
+                                                                      >
+                                                                             + Új dolgozó hozzáadása
+                                                                      </Button>
+                                                               </div>
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Eszközök kiválasztása</Form.Label>
+                                                               <div>
+                                                                      {selectedTools.map((toolId, idx) => (
+                                                                             <div key={idx} className="dynamic-row">
+                                                                                    <Form.Select
+                                                                                           value={toolId}
+                                                                                           onChange={(e) => handleToolChange(idx, parseInt(e.target.value || '0', 10) || 0)}
+                                                                                    >
+                                                                                           <option value={0}>-- válassz --</option>
+                                                                                           {tools.map((tool) => (
+                                                                                                  <option key={tool.eszkoz_id} value={tool.eszkoz_id}>
+                                                                                                         {tool.nev}
+                                                                                                  </option>
+                                                                                           ))}
+                                                                                    </Form.Select>
+                                                                                    <Button 
+                                                                                           variant="danger" 
+                                                                                           size="sm"
+                                                                                           onClick={() => removeTool(idx)}
+                                                                                    >
+                                                                                           Törlés
+                                                                                    </Button>
+                                                                             </div>
+                                                                      ))}
+                                                                      <Button 
+                                                                             variant="primary" 
+                                                                             size="sm"
+                                                                             onClick={PlusEszkoz}
+                                                                             className="mt-2"
+                                                                      >
+                                                                             + Új eszköz hozzáadása
+                                                                      </Button>
+                                                               </div>
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Munka kezdeti dátuma</Form.Label>
+                                                               <Form.Control 
+                                                                      type="date" 
+                                                                      value={kezdetiDatum} 
+                                                                      onChange={(e) => SetKezdetiDatum(e.target.value)}
+                                                                      isInvalid={!!errors.kezdetiDatum}
+                                                               />
+                                                               <Form.Control.Feedback type="invalid">
+                                                                      {errors.kezdetiDatum}
+                                                               </Form.Control.Feedback>
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Munka várható befejezési dátuma</Form.Label>
+                                                               <Form.Control 
+                                                                      type="date" 
+                                                                      value={velemenyDatum} 
+                                                                      onChange={(e) => SetVelemenyDatum(e.target.value)}
+                                                                      isInvalid={!!errors.velemenyDatum}
+                                                               />
+                                                               <Form.Control.Feedback type="invalid">
+                                                                      {errors.velemenyDatum}
+                                                               </Form.Control.Feedback>
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mb-3">
+                                                               <Form.Label>Feladatok megadása</Form.Label>
+                                                               <Form.Text className="d-block mb-2 text-muted">
+                                                                      Részfeladatok megadása, amelyek elvégzendők a munka során
+                                                               </Form.Text>
+                                                               <div>
+                                                                      {selectedTasks.map((task, idx) => (
+                                                                             <div key={idx} className="dynamic-row">
+                                                                                    <Form.Control
+                                                                                           type="text"
+                                                                                           value={task}
+                                                                                           onChange={(e) => handleTaskChange(idx, e.target.value)}
+                                                                                           placeholder="pl. Felmérés"
+                                                                                    />
+                                                                                    <Button 
+                                                                                           variant="danger" 
+                                                                                           size="sm"
+                                                                                           onClick={() => removeTask(idx)}
+                                                                                    >
+                                                                                           Törlés
+                                                                                    </Button>
+                                                                             </div>
+                                                                      ))}
+                                                                      <Button 
+                                                                             variant="primary" 
+                                                                             size="sm"
+                                                                             onClick={PlusFeladat}
+                                                                             className="mt-2"
+                                                                      >
+                                                                             + Új feladat hozzáadása
+                                                                      </Button>
+                                                               </div>
+                                                        </Form.Group>
+
+                                                        <Form.Group className="mt-4">
+                                                               <Button 
+                                                                      type="submit" 
+                                                                      variant="primary"
+                                                                      className="me-2"
+                                                               >
+                                                                      Munka mentése
+                                                               </Button>
+                                                               <Button 
+                                                                      type="button" 
+                                                                      variant="outline-primary"
+                                                                      onClick={() => navigate("/fooldal")}
+                                                               >
+                                                                      ← Vissza
+                                                               </Button>
+                                                        </Form.Group>
+                                                 </Form>
+                                          </Card.Body>
+                                   </Card>
+                            </Col>
+                     </Row>
+              </Container>
+              </>
        );
 }
 
