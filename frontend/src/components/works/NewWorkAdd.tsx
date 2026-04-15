@@ -31,10 +31,18 @@ export function NewWorkAdd() {
        const [leiras, SetLeiras] = useState('');
        const [kezdetiDatum, SetKezdetiDatum] = useState('');
        const [velemenyDatum, SetVelemenyDatum] = useState('');
-       const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+       const [selectedUsers, setSelectedUsers] = useState<number[]>([0]);
        const [selectedTools, setSelectedTools] = useState<number[]>([]);
        const [selectedTasks, setSelectedTasks] = useState<string[]>([""]);
        const [toasts, setToasts] = useState<Toast[]>([]);
+
+       // Error state-ek
+       const [errors, setErrors] = useState<{
+              nev?: string;
+              selectedUsers?: string;
+              kezdetiDatum?: string;
+              velemenyDatum?: string;
+       }>({});
 
        const addToast = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
               const id = Date.now().toString();
@@ -119,22 +127,46 @@ export function NewWorkAdd() {
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
               
-              if (!nev.trim()) {
-                     addToast('A munka neve kötelező!', 'error');
+              setErrors({});
+              const newErrors: typeof errors = {};
+              
+              if (!nev || !nev.trim()) {
+                     newErrors.nev = 'A munka neve kötelező!';
+              }
+
+              const selectedUserIds = selectedUsers.filter(id => id && id !== 0);
+              if (selectedUserIds.length === 0) {
+                     newErrors.selectedUsers = 'Legalább egy dolgozót ki kell választani!';
+              }
+
+              if (kezdetiDatum && velemenyDatum) {
+                     const kezdeDate = new Date(kezdetiDatum);
+                     const vegleDate = new Date(velemenyDatum);
+                     if (kezdeDate > vegleDate) {
+                            newErrors.velemenyDatum = 'A kezdeti dátum nem lehet később, mint a várható befejezési dátum!';
+                     }
+              }
+
+              if (velemenyDatum && !kezdetiDatum) {
+                     newErrors.kezdetiDatum = 'Adjon meg kezdeti dátumot, ha megad várható befejezési dátumot!';
+              }
+
+              if (Object.keys(newErrors).length > 0) {
+                     setErrors(newErrors);
+                     addToast('Kérjük, javítsa ki az alábbi hibákat!', 'error');
                      return;
               }
 
-              if (selectedUsers.filter(id => id && id !== 0).length === 0) {
-                     addToast('Legalább egy dolgozót ki kell választani!', 'error');
-                     return;
-              }
+              const selectedToolIds = selectedTools.filter(id => id && id !== 0);
+
+              const selectedTasksList = selectedTasks.filter(t => t && t.trim() !== "");
 
               const payload = {
                      nev,
                      leiras,
-                     dolgozok: selectedUsers.filter(id => id && id !== 0),
-                     eszkozok: selectedTools.filter(id => id && id !== 0),
-                     feladatok: selectedTasks.filter(t => t && t.trim() !== ""),
+                     dolgozok: selectedUserIds,
+                     eszkozok: selectedToolIds,
+                     feladatok: selectedTasksList,
                      kezdetiDatum: kezdetiDatum || undefined,
                      velemenyDatum: velemenyDatum || undefined,
               };
@@ -162,6 +194,7 @@ export function NewWorkAdd() {
                                           label="Munka neve"
                                           helpText="A munkafeladat egyedi nevét adjuk meg"
                                           required
+                                          error={errors.nev}
                                    >
                                           <input
                                                  className="form-control"
@@ -188,6 +221,7 @@ export function NewWorkAdd() {
                                    <FormField
                                           label="Dolgozó kiválasztása"
                                           required
+                                          error={errors.selectedUsers}
                                    >
                                           <div>
                                                  {selectedUsers.map((userId, idx) => (
@@ -244,14 +278,16 @@ export function NewWorkAdd() {
 
                                    <FormField
                                           label="Munka kezdeti dátuma"
+                                          error={errors.kezdetiDatum}
                                    >
-                                          <input type="date" onChange={(e) => SetKezdetiDatum(e.target.value)} />
+                                          <input type="date" value={kezdetiDatum} onChange={(e) => SetKezdetiDatum(e.target.value)} />
                                    </FormField>
 
                                    <FormField
                                           label="Munka várható befejezési dátuma"
+                                          error={errors.velemenyDatum}
                                    >
-                                          <input type="date" onChange={(e) => SetVelemenyDatum(e.target.value)} />
+                                          <input type="date" value={velemenyDatum} onChange={(e) => SetVelemenyDatum(e.target.value)} />
                                    </FormField>
 
                                    <FormField

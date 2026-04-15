@@ -59,7 +59,7 @@ export function Menusor() {
               </button>
             </li>
           </ul>
-
+      
           <div className="navbar-nav">
             <button
               className="nav-link text-white border-0 bg-transparent"
