@@ -4,35 +4,32 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Admin felhasználó inicializálása...');
 
   const adminUsername = 'admin';
   const adminEmail = 'admin@example.com';
   const adminPassword = 'Admin123';
   const adminName = 'Administrator';
+  const userPassword = 'felhasznalo123';
+  const saltRounds = 10;
 
   try {
-    const existingAdmin = await prisma.user.findUnique({
-      where: { felhasznalonev: adminUsername },
-    });
 
-    if (existingAdmin) {
-      console.log('⚠️  Admin felhasználó már létezik, törlésre kerül...');
-      await prisma.user.delete({
-        where: { user_id: existingAdmin.user_id },
-      });
-      console.log('✅ Admin felhasználó sikeresen törölve');
-    }
+    console.log('Meglévő adatok törlése...');
+    await prisma.comment.deleteMany({});
+    await prisma.feladat.deleteMany({});
+    await prisma.munka.deleteMany({});
+    await prisma.eszkoz.deleteMany({});
+    await prisma.user.deleteMany({});
+    console.log('✅ Meglévő adatok törölve\n');
 
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(adminPassword, saltRounds);
-
+    console.log('Admin felhasználó létrehozása...');
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, saltRounds);
 
     const admin = await prisma.user.create({
       data: {
         felhasznalonev: adminUsername,
         email: adminEmail,
-        jelszo: hashedPassword,
+        jelszo: hashedAdminPassword,
         nev: adminName,
         munkakor: 'Administrator',
         munkaora: 8,
@@ -45,9 +42,66 @@ async function main() {
     console.log(`   Felhasználónév: ${admin.felhasznalonev}`);
     console.log(`   E-mail: ${admin.email}`);
     console.log(`   Jelszó: ${adminPassword}`);
-    console.log(`   Admin jogosultság: Igen`);
+    console.log(`   Admin jogosultság: Igen\n`);
+
+  
+    console.log('10 felhasználó létrehozása...');
+    const hashedUserPassword = await bcrypt.hash(userPassword, saltRounds);
+    const users: any[] = [];
+
+    for (let i = 1; i <= 10; i++) {
+      const user = await prisma.user.create({
+        data: {
+          felhasznalonev: `felhasznalo${i}`,
+          email: `felhasznalo${i}@example.com`,
+          jelszo: hashedUserPassword,
+          nev: `Felhasználó ${i}`,
+          munkakor: `Munkakör ${i}`,
+          munkaora: 8,
+          isActive: true,
+          isAdmin: false,
+        },
+      });
+      users.push(user);
+    }
+    console.log(`✅ 10 felhasználó sikeresen létrehozva\n`);
+
+    console.log('10 eszköz létrehozása...');
+    const eszkozok: any[] = [];
+
+    for (let i = 1; i <= 10; i++) {
+      const eszkoz = await prisma.eszkoz.create({
+        data: {
+          nev: `Eszköz ${i}`,
+          tipus: `Típus ${i}`,
+          darabszam: i,
+          hasznalatban: i % 2 === 0,
+        },
+      });
+      eszkozok.push(eszkoz);
+    }
+    console.log(`✅ 10 eszköz sikeresen létrehozva\n`);
+
+    console.log('10 munka létrehozása...');
+
+    for (let i = 1; i <= 10; i++) {
+      const varhato_datum = new Date(2026, Math.floor((i - 1) / 2), (i % 28) + 1);
+      await prisma.munka.create({
+        data: {
+          munka_neve: `Munka ${i}`,
+          leiras: `Ez a munka ${i} leírása`,
+          eszkoz_id: eszkozok[(i - 1) % 10].eszkoz_id,
+          user_id: users[(i - 1) % 10].user_id,
+          ertesitesIsActive: i % 2 === 0,
+          isActive: true,
+          varhato_befejezes_datuma: varhato_datum,
+        },
+      });
+    }
+    console.log(`✅ 10 munka sikeresen létrehozva\n`);
+
   } catch (error) {
-    console.error('❌ Hiba a seeding során:', error);
+    console.error('Hiba a seeding során:', error);
     throw error;
   }
 }
@@ -55,7 +109,7 @@ async function main() {
 main()
   .then(async () => {
     await prisma.$disconnect();
-    console.log('✅ Seeding befejezve\n');
+    console.log('Seeding befejezve\n');
   })
   .catch(async (e) => {
     console.error(e);

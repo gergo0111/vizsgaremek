@@ -8,7 +8,7 @@ import { EszkozModule } from './eszkoz/eszkoz.module';
 import { FeladatModule } from './feladat/feladat.module';
 import { MunkaModule } from './munka/munka.module';
 import { CommentModule } from './comment/comment.module';
-import { AdminInitializationService } from './admin-initialization.service';
+import { SeedInitializationService } from './seed-initialization.service';
 import { PrismaService } from './prisma.service';
 
 @Module({
@@ -16,6 +16,6 @@ import { PrismaService } from './prisma.service';
     isGlobal: true,
   }), AuthModule, UserModule, EszkozModule, FeladatModule, MunkaModule, CommentModule],
   controllers: [AppController],
-  providers: [AppService, AdminInitializationService, PrismaService],
+  providers: [AppService, SeedInitializationService, PrismaService],
 })
 export class AppModule {}
