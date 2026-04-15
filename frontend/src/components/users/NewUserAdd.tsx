@@ -1,6 +1,14 @@
 import { useState } from "react";
 import "../../designs/NewUserAdd.css";
 import { useNavigate } from "react-router";
+import { ToastContainer } from "../common/Toast";
+import { FormField } from "../common/FormField";
+
+interface Toast {
+  id: string;
+  message: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+}
 
 
 export function NewUserAdd() {
@@ -12,16 +20,23 @@ export function NewUserAdd() {
        const [munkaora, setMunkaora] = useState(0);
        const [isAdmin, setIsAdmin] = useState(false);
 
-       const [errorMsg, setErrorMsg] = useState<string | null>(null);
-       const [successMsg, setSuccessMsg] = useState<string | null>(null);
+       const [toasts, setToasts] = useState<Toast[]>([]);
        const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
        const navigate = useNavigate();
+
+       const addToast = (message: string, type: 'success' | 'error' | 'info' | 'warning') => {
+              const id = Date.now().toString();
+              setToasts(prev => [...prev, { id, message, type }]);
+       };
+
+       const removeToast = (id: string) => {
+              setToasts(prev => prev.filter(t => t.id !== id));
+       };
 
        const handleSubmit = async (e: React.FormEvent) => {
               e.preventDefault();
 
-              setErrorMsg(null);
-              setSuccessMsg(null);
+              setFieldErrors({});
 
               const newUser = {
                      felhasznalonev,
@@ -43,7 +58,7 @@ export function NewUserAdd() {
 
               if (Object.keys(errors).length) {
                      setFieldErrors(errors);
-                     setErrorMsg('Kérlek javítsd a jelzett mezőket.');
+                     addToast('Kérlek javítsd a jelzett mezőket.', 'error');
                      return;
               }
 
@@ -51,7 +66,7 @@ export function NewUserAdd() {
                      const { apiPost } = await import('../../lib/api');
                      const data = await apiPost('/users', newUser);
                      console.log('Felhasználó sikeresen hozzáadva:', data);
-                     setSuccessMsg('Felhasználó sikeresen hozzáadva.');
+                     addToast('Felhasználó sikeresen hozzáadva!', 'success');
                      setFieldErrors({});
                      
                      setFelhasznalonev('');
@@ -62,9 +77,10 @@ export function NewUserAdd() {
                      setMunkaora(0);
                      setIsAdmin(false);
 
+                     setTimeout(() => navigate("/felhasznalok-kezelese"), 2000);
               } catch (error) {
                      const errorData = error instanceof Error ? error.message : String(error);
-                     setErrorMsg(errorData);
+                     addToast(`Hiba a felhasználó hozzáadásakor: ${errorData}`, 'error');
                      console.error('Hiba:', error);
               }
        };
@@ -72,65 +88,137 @@ export function NewUserAdd() {
 
        return (
               <div className="new-user-page">
+                     <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
                      <div className="new-user-card">
                             <h2 className="new-user-header">Új felhasználó hozzáadása</h2>
                             <form onSubmit={handleSubmit} noValidate>
-                                   <div className="form-group">
-                                          <label htmlFor="username">Felhasználónév:</label>
-                                          <input className="form-control" type="text" id="username" name="username" value={felhasznalonev} onChange={e => setFelhasznalonev(e.target.value)} placeholder="pl. kovacs.janos" />
-                                          {fieldErrors.felhasznalonev && <div className="field-error">{fieldErrors.felhasznalonev}</div>}
-                                   </div>
+                                   <FormField
+                                          label="Felhasználónév"
+                                          error={fieldErrors.felhasznalonev}
+                                          required
+                                   >
+                                          <input
+                                                 className="form-control"
+                                                 type="text"
+                                                 id="username"
+                                                 name="username"
+                                                 value={felhasznalonev}
+                                                 onChange={e => setFelhasznalonev(e.target.value)}
+                                                 placeholder="pl. kovacs.janos"
+                                          />
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="email">Email:</label>
-                                          <input className="form-control" type="email" id="email" name="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@pelda.hu" />
-                                          {fieldErrors.email && <div className="field-error">{fieldErrors.email}</div>}
-                                   </div>
+                                   <FormField
+                                          label="Email"
+                                          error={fieldErrors.email}
+                                          required
+                                   >
+                                          <input
+                                                 className="form-control"
+                                                 type="email"
+                                                 id="email"
+                                                 name="email"
+                                                 value={email}
+                                                 onChange={e => setEmail(e.target.value)}
+                                                 placeholder="email@pelda.hu"
+                                          />
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="password">Jelszó:</label>
-                                          <input className="form-control" type="password" id="password" name="password" value={jelszo} onChange={e => setJelszo(e.target.value)} placeholder="Legalább 8 karakter" />
-                                          {fieldErrors.jelszo && <div className="field-error">{fieldErrors.jelszo}</div>}
-                                   </div>
+                                   <FormField
+                                          label="Jelszó"
+                                          error={fieldErrors.jelszo}
+                                          helpText="Minimum 8 karakter hosszú jelszó, amely tartalmaz nagybetűt, kisbetűt, számot vagy speciális karaktert"
+                                          required
+                                   >
+                                          <input
+                                                 className="form-control"
+                                                 type="password"
+                                                 id="password"
+                                                 name="password"
+                                                 value={jelszo}
+                                                 onChange={e => setJelszo(e.target.value)}
+                                          />
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="name">Teljes név:</label>
-                                          <input className="form-control" type="text" id="name" name="name" value={nev} onChange={e => setNev(e.target.value)} placeholder="Kovács János" />
-                                          {fieldErrors.nev && <div className="field-error">{fieldErrors.nev}</div>}
-                                   </div>
+                                   <FormField
+                                          label="Teljes név"
+                                          error={fieldErrors.nev}
+                                          required
+                                   >
+                                          <input
+                                                 className="form-control"
+                                                 type="text"
+                                                 id="name"
+                                                 name="name"
+                                                 value={nev}
+                                                 onChange={e => setNev(e.target.value)}
+                                                 placeholder="Kovács János"
+                                          />
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="munkakor">Munkakör:</label>
-                                          <input className="form-control" type="text" id="munkakor" name="munkakor" value={munkakor} onChange={e => setMunkakor(e.target.value)} placeholder="pl. hegesztő" />
-                                          {fieldErrors.munkakor && <div className="field-error">{fieldErrors.munkakor}</div>}
-                                   </div>
+                                   <FormField
+                                          label="Munkakör"
+                                          error={fieldErrors.munkakor}
+                                          required
+                                   >
+                                          <input
+                                                 className="form-control"
+                                                 type="text"
+                                                 id="munkakor"
+                                                 name="munkakor"
+                                                 value={munkakor}
+                                                 onChange={e => setMunkakor(e.target.value)}
+                                                 placeholder="pl. hegesztő"
+                                          />
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="munkaora">Munkaóra: <span className="muted">({munkaora} óra)</span></label>
+                                   <FormField
+                                          label={`Munkaóra: ${munkaora} óra`}
+                                          error={fieldErrors.munkaora}
+                                          required
+                                   >
                                           <div className="range-row">
-                                                 <input className="range-input" type="range" min={0} max={12} value={munkaora} onChange={e => setMunkaora(Number(e.target.value))} />
-                                                 <input className="number-input" type="number" min={0} max={12} value={munkaora} onChange={e => setMunkaora(Number(e.target.value))} />
+                                                 <input
+                                                        className="range-input"
+                                                        type="range"
+                                                        min={0}
+                                                        max={12}
+                                                        value={munkaora}
+                                                        onChange={e => setMunkaora(Number(e.target.value))}
+                                                 />
+                                                 <input
+                                                        className="number-input"
+                                                        type="number"
+                                                        min={0}
+                                                        max={12}
+                                                        value={munkaora}
+                                                        onChange={e => setMunkaora(Number(e.target.value))}
+                                                 />
                                           </div>
-                                          {fieldErrors.munkaora && <div className="field-error">{fieldErrors.munkaora}</div>}
-                                   </div>
+                                   </FormField>
 
-                                   <div className="form-group">
-                                          <label htmlFor="permission">Jogosultság:</label>
-                                          <select className="form-control" id="permission" name="permission" value={String(isAdmin)} onChange={e => setIsAdmin(e.target.value === 'true')} required>
-                                                 <option value="true">Admin</option>
+                                   <FormField
+                                          label="Jogosultság"
+                                          required
+                                   >
+                                          <select
+                                                 className="form-control"
+                                                 id="permission"
+                                                 name="permission"
+                                                 value={String(isAdmin)}
+                                                 onChange={e => setIsAdmin(e.target.value === 'true')}
+                                          >
                                                  <option value="false">Felhasználó</option>
+                                                 <option value="true">Admin</option>
                                           </select>
-                                   </div>
+                                   </FormField>
 
                                    <div className="form-group">
                                           <button className="btn btn-primary" type="submit">Felhasználó hozzáadása</button>
                                    </div>
                                    <div className="form-group">
-                                          <button onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
+                                          <button type="button" onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
                                    </div>
-
-                                   {errorMsg && <div className="error-msg">{errorMsg}</div>}
-                                   {successMsg && <div className="success-msg">{successMsg}</div>}
                             </form>
                      </div>
               </div>
