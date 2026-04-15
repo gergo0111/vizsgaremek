@@ -6,7 +6,7 @@ import { StrictMode } from "react";
 import { UserManagement } from "./components/users/UserManagement";
 import { NewUserAdd } from "./components/users/NewUserAdd";
 import Tools from "./components/tools/ToolsList";
-import { newToolAdd } from "./components/tools/NewToolAdd";
+import { NewToolAdd } from "./components/tools/NewToolAdd";
 import { PatchTools } from "./components/tools/PatchTools";
 import { UserPatch } from "./components/users/UserPatch";
 import { NewWorkAdd } from "./components/works/NewWorkAdd";
@@ -40,10 +40,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/uj-eszkoz",
-    Component: newToolAdd,
+    Component: NewToolAdd,
   },
   {
-    path: "eszkoz-modositas/:eszkoz_id",
+    path: "/eszkoz-modositas/:eszkoz_id",
     Component: PatchTools,
   },
   {

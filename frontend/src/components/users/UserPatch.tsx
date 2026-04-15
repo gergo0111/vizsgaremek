@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { apiGet, apiPatch } from "../../lib/api";
-import "../../designs/NewUserAdd.css";
+import "../../designs/UserForm.css";
 import { ToastContainer } from "../common/Toast";
-import { FormField } from "../common/FormField";
+import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 
 interface Toast {
   id: string;
@@ -106,127 +106,153 @@ export function UserPatch() {
             }
         };
 
-        if (loading) return <div className="new-user-page"><div className="new-user-card">Betöltés...</div></div>;
+        if (loading) {
+            return (
+                <div className="user-form-page">
+                    <Container className="user-form-container-wide">
+                        <Row className="justify-content-center">
+                            <Col lg={10} md={12} sm={12}>
+                                <Card className="user-form-card">
+                                    <Card.Body style={{ textAlign: 'center' }}>
+                                        <p>Betöltés...</p>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+            );
+        }
 
         return (
-            <div className="new-user-page">
+            <div className="user-form-page">
                 <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
-                <div className="new-user-card">
-                    <h2 className="new-user-header">Felhasználó módosítása</h2>
-                    <form onSubmit={handleSubmit} noValidate>
-                        <FormField
-                            label="Felhasználónév"
-                            error={fieldErrors.felhasznalonev}
-                            required
-                        >
-                            <input
-                                className="form-control"
-                                type="text"
-                                id="username"
-                                name="username"
-                                value={felhasznalonev}
-                                onChange={e => setFelhasznalonev(e.target.value)}
-                                placeholder="pl. kovacs.janos"
-                            />
-                        </FormField>
+                <Container className="user-form-container-wide">
+                    <Row className="justify-content-center">
+                        <Col lg={10} md={12} sm={12}>
+                            <Card className="user-form-card">
+                                <Card.Body>
+                                    <h2 className="user-form-title">Felhasználó módosítása</h2>
+                                    
+                                    <Form onSubmit={handleSubmit} noValidate>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">Felhasználónév:</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Pl.: Szabolcs"
+                                                value={felhasznalonev}
+                                                onChange={e => setFelhasznalonev(e.target.value)}
+                                                isInvalid={!!fieldErrors.felhasznalonev}
+                                                className="form-control-custom"
+                                            />
+                                            {fieldErrors.felhasznalonev && (
+                                                <Form.Control.Feedback type="invalid" className="d-block">
+                                                    {fieldErrors.felhasznalonev}
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </Form.Group>
 
-                        <FormField
-                            label="Email"
-                            error={fieldErrors.email}
-                            required
-                        >
-                            <input
-                                className="form-control"
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                                placeholder="email@pelda.hu"
-                            />
-                        </FormField>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">Email:</Form.Label>
+                                            <Form.Control
+                                                type="email"
+                                                placeholder="email@domain.hu"
+                                                value={email}
+                                                onChange={e => setEmail(e.target.value)}
+                                                isInvalid={!!fieldErrors.email}
+                                                className="form-control-custom"
+                                            />
+                                            {fieldErrors.email && (
+                                                <Form.Control.Feedback type="invalid" className="d-block">
+                                                    {fieldErrors.email}
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </Form.Group>
 
-                        <FormField
-                            label="Teljes név"
-                            error={fieldErrors.nev}
-                            required
-                        >
-                            <input
-                                className="form-control"
-                                type="text"
-                                id="name"
-                                name="name"
-                                value={nev}
-                                onChange={e => setNev(e.target.value)}
-                                placeholder="Kovács János"
-                            />
-                        </FormField>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">Teljes név:</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Pl.: Szabolcs Nagy"
+                                                value={nev}
+                                                onChange={e => setNev(e.target.value)}
+                                                isInvalid={!!fieldErrors.nev}
+                                                className="form-control-custom"
+                                            />
+                                            {fieldErrors.nev && (
+                                                <Form.Control.Feedback type="invalid" className="d-block">
+                                                    {fieldErrors.nev}
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </Form.Group>
 
-                        <FormField
-                            label="Munkakör"
-                            error={fieldErrors.munkakor}
-                            required
-                        >
-                            <input
-                                className="form-control"
-                                type="text"
-                                id="munkakor"
-                                name="munkakor"
-                                value={munkakor}
-                                onChange={e => setMunkakor(e.target.value)}
-                                placeholder="pl. hegesztő"
-                            />
-                        </FormField>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">Munkakör:</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Pl.: Hegesztő"
+                                                value={munkakor}
+                                                onChange={e => setMunkakor(e.target.value)}
+                                                isInvalid={!!fieldErrors.munkakor}
+                                                className="form-control-custom"
+                                            />
+                                            {fieldErrors.munkakor && (
+                                                <Form.Control.Feedback type="invalid" className="d-block">
+                                                    {fieldErrors.munkakor}
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </Form.Group>
 
-                        <FormField
-                            label={`Munkaóra: ${munkaora} óra`}
-                            error={fieldErrors.munkaora}
-                            required
-                        >
-                            <div className="range-row">
-                                <input
-                                    className="range-input"
-                                    type="range"
-                                    min={0}
-                                    max={12}
-                                    value={munkaora}
-                                    onChange={e => setMunkaora(Number(e.target.value))}
-                                />
-                                <input
-                                    className="number-input"
-                                    type="number"
-                                    min={0}
-                                    max={12}
-                                    value={munkaora}
-                                    onChange={e => setMunkaora(Number(e.target.value))}
-                                />
-                            </div>
-                        </FormField>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">
+                                                Munkaóra: <span className="munkaora-value">{munkaora} óra</span>
+                                            </Form.Label>
+                                            <Form.Range
+                                                min={0}
+                                                max={12}
+                                                value={munkaora}
+                                                onChange={e => setMunkaora(Number(e.target.value))}
+                                                className="range-input-custom"
+                                            />
+                                            {fieldErrors.munkaora && (
+                                                <Form.Control.Feedback type="invalid" className="d-block">
+                                                    {fieldErrors.munkaora}
+                                                </Form.Control.Feedback>
+                                            )}
+                                        </Form.Group>
 
-                        <FormField
-                            label="Jogosultság"
-                            required
-                        >
-                            <select
-                                className="form-control"
-                                id="permission"
-                                name="permission"
-                                value={String(isAdmin)}
-                                onChange={e => setIsAdmin(e.target.value === 'true')}
-                            >
-                                <option value="false">Felhasználó</option>
-                                <option value="true">Admin</option>
-                            </select>
-                        </FormField>
+                                        <Form.Group className="form-group-custom">
+                                            <Form.Label className="form-label-custom">Jogosultság:</Form.Label>
+                                            <Form.Select
+                                                value={isAdmin ? 'admin' : 'user'}
+                                                onChange={e => setIsAdmin(e.target.value === 'admin')}
+                                                className="form-control-custom"
+                                            >
+                                                <option value="user">Felhasználó</option>
+                                                <option value="admin">Admin</option>
+                                            </Form.Select>
+                                        </Form.Group>
 
-                        <div className="form-group">
-                            <button className="btn btn-primary" type="submit">Módosítás</button>
-                        </div>
-                        <div className="form-group">
-                            <button type="button" onClick={() => navigate("/felhasznalok-kezelese")}>Vissza</button>
-                        </div>
-                    </form>
-                </div>
+                                        <div className="button-group">
+                                            <Button 
+                                                className="btn-submit"
+                                                type="submit"
+                                            >
+                                                Módosítás
+                                            </Button>
+                                            <Button 
+                                                className="btn-back-secondary"
+                                                onClick={() => navigate("/felhasznalok-kezelese")}
+                                            >
+                                                Vissza
+                                            </Button>
+                                        </div>
+                                    </Form>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                </Container>
             </div>
         );
 }

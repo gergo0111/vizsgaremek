@@ -2,211 +2,207 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
 import { apiGet, apiDelete } from "../../lib/api";
+import { Container, Row, Col, Form, InputGroup, Table, Button, Card } from "react-bootstrap";
+import "../users/UsersList.css";
 
-interface Eszkoz{
+interface Eszkoz {
        eszkoz_id: string;
        nev: string;
        tipus: string;
-       darabszam: number;
-       hasznalatban: boolean;
+       darabszam: number
 }
 
 export function ToolsList() {
        const [tools, setTools] = useState<Eszkoz[]>([]);
-       const [allTools, setAllTools] = useState<Eszkoz[]>([]);
-       const [searchTerm, setSearchTerm] = useState<string>('');
-        const navigate = useNavigate();
- 
-        const fetchTools = async () => {
-               try {
-                      const data = await apiGet<Eszkoz[]>('/eszkozok');
-                     setTools(data);
-                     setAllTools(data);
-               } catch (error) {
-                      console.error('Hiba:', error);
-               }
-        }
+       const [filteredTools, setFilteredTools] = useState<Eszkoz[]>([]);
+       const [searchTerm, setSearchTerm] = useState('');
+       const [sortBy, setSortBy] = useState<'name' | 'type' | 'quantity' | 'none'>('name');
+       const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+       const navigate = useNavigate();
 
        useEffect(() => {
+              const fetchTools = async () => {
+                     try {
+                            const data = await apiGet<Eszkoz[]>('/eszkozok');
+                            setTools(data);
+                            setFilteredTools(data);
+                     } catch (error) {
+                            console.error('Hiba:', error);
+                     }
+              };
+
               fetchTools();
        }, []);
 
-       const handleDelete = async (eszkoz_id: string) => {
+       useEffect(() => {
+              let filtered = tools.filter(tool =>
+                     tool.nev.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                     tool.tipus.toLowerCase().includes(searchTerm.toLowerCase())
+              );
+
+              if (sortBy === 'name') {
+                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              } else if (sortBy === 'type') {
+                     filtered.sort((a, b) => a.tipus.localeCompare(b.tipus, 'hu'));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              } else if (sortBy === 'quantity') {
+                     filtered.sort((a, b) => a.darabszam - b.darabszam);
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              }
+
+              setFilteredTools(filtered);
+       }, [searchTerm, sortBy, sortOrder, tools]);
+
+       const deleteTool = async (eszkozId: string) => {
               try {
-                     await apiDelete(`/eszkozok/${eszkoz_id}`);
-                     setTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkoz_id));
-                     setAllTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkoz_id));
+                     await apiDelete(`/eszkozok/${eszkozId}`);
+                     setTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkozId));
               } catch (error) {
                      console.error('Hiba:', error);
               }
        };
-       
-       const sortByToolNameUp = () => {
-              const sortedTools = [...tools].sort((a, b) => a.nev.localeCompare(b.nev));
-              setTools(sortedTools);
-       };
-
-       useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByToolNameDown = () => {
-              const sortedTools = [...tools].sort((a, b) => b.nev.localeCompare(a.nev));
-              setTools(sortedTools);
-       };
-
-      useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByTypeUp = () => {
-              const sortedTools = [...tools].sort((a, b) => a.tipus.localeCompare(b.tipus));
-              setTools(sortedTools);
-       };
-
-       useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByTypeDown = () => {
-              const sortedTools = [...tools].sort((a, b) => b.tipus.localeCompare(a.tipus));
-              setTools(sortedTools);
-       };
-       
-       useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByQuantityUp = () => {
-              const sortedTools = [...tools].sort((a, b) => a.darabszam - b.darabszam);
-              setTools(sortedTools);
-       };
-
-       useEffect(() => {
-              fetchTools();
-       }, []);
-       
-       const sortByQuantityDown = () => {
-              const sortedTools = [...tools].sort((a, b) => b.darabszam - a.darabszam);
-              setTools(sortedTools);
-       };
-       //valamis
-              useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByInUseUp = () => {
-              const sortedTools = [...tools].sort((a, b) => Number(a.hasznalatban) - Number(b.hasznalatban));
-              setTools(sortedTools);
-       };
-
-       useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const sortByInUseDown = () => {
-              const sortedTools = [...tools].sort((a, b) => Number(b.hasznalatban) - Number(a.hasznalatban));
-              setTools(sortedTools);
-       };
-
-       useEffect(() => {
-              fetchTools();
-       }, []);
-
-       const handleSearch = () => {
-              const term = searchTerm.trim().toLowerCase();
-              if (!term) {
-                     setTools(allTools);
-                     return;
-              }
-              const filteredTools = allTools.filter((tool) =>
-                     tool.nev.toLowerCase().includes(term) ||
-                     tool.tipus.toLowerCase().includes(term)
-              );
-              setTools(filteredTools);
-       };
-
-       const handleFilterByType = (e: React.ChangeEvent<HTMLSelectElement>) => {
-              const selectedType = e.target.value;
-              if (!selectedType) {
-                     setTools(allTools);
-                     return;
-              }
-              const filteredTools = allTools.filter((tool) => tool.tipus === selectedType);
-              setTools(filteredTools);
-       };
 
        return (
               <>
-                     <Menusor />
-                     <main className="tools-main">
-                     <div className="tools-left">
-                        <h1 className="tools-title">Összes eszköz</h1>
-                        <div className="tools-card">
-                           <table className="tools-table">
-                            <thead>
-                                   <tr>
-                                          <th>Eszköz neve <button onClick={sortByToolNameUp}>⬆️</button> <button onClick={sortByToolNameDown}>⬇️</button></th>
-                                          <th>Típus <button onClick={sortByTypeUp}>⬆️</button> <button onClick={sortByTypeDown}>⬇️</button></th>
-                                          <th>Darabszám <button onClick={sortByQuantityUp}>⬆️</button> <button onClick={sortByQuantityDown}>⬇️</button></th>
-                                          <th>Használatban <button onClick={sortByInUseUp}>⬆️</button> <button onClick={sortByInUseDown}>⬇️</button></th>
-                                   </tr>
-                            </thead>
-                            <tbody>
-                                   {tools.map((tool) => (
-                                          <tr key={tool.eszkoz_id}>
-                                                 <td>{tool.nev} </td>
-                                                 <td>{tool.tipus}</td>
-                                                 <td>{tool.darabszam}</td>
-                                                 <td>{tool.hasznalatban ? 'Igen' : 'Nem'}</td>
-                                                 <td>
-                                                    <button
-                                                       type="button"
-                                                       onClick={() => navigate(`/eszkoz-modositas/${tool.eszkoz_id}`)}
-                                                    >
-                                                       ✏️
-                                                    </button>
-                                                 </td>
-                                                 <td><button onClick={() => {if (window.confirm(`Biztosan törlöd ${tool.nev} eszközt?`)) {
-                                                                      handleDelete(tool.eszkoz_id);
-                                                               }}}>🗑️</button></td>
-                                          </tr>
-                                   ))}
-                            </tbody>
-                         </table>
-                        </div>
-                     </div>
+              <Menusor />
+              <Container fluid className="users-list-container">
+                     <Row className="users-header">
+                            <Col md={6}>
+                                   <h2>Eszközök kezelése</h2>
+                            </Col>
+                            <Col md={6} className="text-end">
+                                   <Button 
+                                          className="btn-new-user"
+                                          onClick={() => navigate('/uj-eszkoz')}
+                                   >
+                                          + Új eszköz
+                                   </Button>
+                                   <Button 
+                                          className="btn-back"
+                                          onClick={() => navigate('/fooldal')}
+                                   >
+                                          ← Vissza
+                                   </Button>
+                            </Col>
+                     </Row>
 
-                     <aside className="tools-right">
-                        <div className="search-box">
-                            <input
-                                   type="text"
-                                   placeholder="Kereséshez írj be egy nevet vagy típust"
-                                   value={searchTerm}
-                                   onChange={(e) => setSearchTerm(e.target.value)}
-                                   onKeyDown={(e) => {
-                                      if (e.key === 'Enter') {
-                                         e.preventDefault();
-                                         handleSearch();
-                                      }
-                                   }}
-                            />
-                            <button className="search-btn" onClick={handleSearch}>🔍</button>
-                        </div>
+                     <Row className="users-content">
+                            <Col md={9} className="users-table-column">
+                                   <Card className="users-table-card">
+                                          <Table responsive hover className="users-table">
+                                                 <thead>
+                                                        <tr>
+                                                               <th>Eszköz neve</th>
+                                                               <th>Típus</th>
+                                                               <th>Darabszám</th>
+                                                               <th>Használatban</th>
+                                                               <th colSpan={2} className="text-center">Műveletek</th>
+                                                        </tr>
+                                                 </thead>
+                                                 <tbody>
+                                                        {filteredTools.length > 0 ? (
+                                                               filteredTools.map((tool) => (
+                                                                      <tr key={tool.eszkoz_id} className="user-row">
+                                                                             <td className="user-name">{tool.nev}</td>
+                                                                             <td className="user-department">{tool.tipus}</td>
+                                                                             <td className="text-center">{tool.darabszam}</td>
+                                                                             
+                                                                             <td className="action-cell">
+                                                                                    <button 
+                                                                                           className="action-btn edit-btn"
+                                                                                           aria-label={`Szerkesztés ${tool.nev}`}
+                                                                                           onClick={() => navigate(`/eszkoz-modositas/${tool.eszkoz_id}`)}
+                                                                                           title="Szerkesztés"
+                                                                                    >
+                                                                                           ✏️
+                                                                                    </button>
+                                                                             </td>
+                                                                             <td className="action-cell">
+                                                                                    <button
+                                                                                           className="action-btn delete-btn"
+                                                                                           aria-label={`Törlés ${tool.nev}`}
+                                                                                           onClick={() => {
+                                                                                                  if (window.confirm(`Biztosan törlöd ${tool.nev} eszközt?`)) {
+                                                                                                         deleteTool(tool.eszkoz_id);
+                                                                                                  }
+                                                                                           }}
+                                                                                           title="Törlés"
+                                                                                    >
+                                                                                           ❌
+                                                                                    </button>
+                                                                             </td>
+                                                                      </tr>
+                                                               ))
+                                                        ) : (
+                                                               <tr>
+                                                                      <td colSpan={6} className="text-center text-muted">
+                                                                             Nincs találat
+                                                                      </td>
+                                                               </tr>
+                                                        )}
+                                                 </tbody>
+                                          </Table>
+                                   </Card>
+                            </Col>
 
-                        <div className="filter-box">
-                            <label htmlFor="typeFilter">Szűrés típus szerint:</label>
-                            <select id="typeFilter" onChange={handleFilterByType}>
-                                   <option value="">Összes</option>
-                                   {Array.from(new Set(allTools.map((tool) => tool.tipus))).map((type) => (
-                                          <option key={type} value={type}>{type}</option>
-                                   ))}
-                            </select>
-                        </div>
-                        <button className="aside-back" onClick={() => navigate('/fooldal')}>Vissza</button>
-                        <button className="add-btn" onClick={() => navigate('/uj-eszkoz')}>Új eszköz hozzáadása</button>
-                     </aside>
-                     </main>
+                            <Col md={3} className="users-sidebar">
+                                   <Card className="search-filter-card">
+                                          <Card.Body>
+                                                 <h5>Keresés és szűrés</h5>
+                                                 
+                                                 <InputGroup className="mb-3">
+                                                        <Form.Control
+                                                               placeholder="Keresés név vagy típus alapján..."
+                                                               value={searchTerm}
+                                                               onChange={(e) => setSearchTerm(e.target.value)}
+                                                               className="search-input"
+                                                        />
+                                                 </InputGroup>
+
+                                                 <Form.Group className="mb-3">
+                                                        <Form.Label className="filter-label">Rendezés:</Form.Label>
+                                                        <Form.Select 
+                                                               value={sortBy} 
+                                                               onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'quantity' | 'none')}
+                                                               className="sort-select"
+                                                        >
+                                                               <option value="none">Nincs rendezés</option>
+                                                               <option value="name">Eszköz neve</option>
+                                                               <option value="type">Típus</option>
+                                                               <option value="quantity">Darabszám</option>
+                                                        </Form.Select>
+                                                 </Form.Group>
+
+                                                 <div className="sort-order-buttons">
+                                                        <Button 
+                                                               size="sm" 
+                                                               variant={sortOrder === 'asc' ? 'primary' : 'outline-primary'}
+                                                               onClick={() => setSortOrder('asc')}
+                                                               className="order-btn"
+                                                        >
+                                                               ⬆️ Növekvő
+                                                        </Button>
+                                                        <Button 
+                                                               size="sm" 
+                                                               variant={sortOrder === 'desc' ? 'primary' : 'outline-primary'}
+                                                               onClick={() => setSortOrder('desc')}
+                                                               className="order-btn"
+                                                        >
+                                                               ⬇️ Csökkenő
+                                                        </Button>
+                                                 </div>
+                                          </Card.Body>
+                                   </Card>
+                            </Col>
+                     </Row>
+              </Container>
               </>
        );
 }

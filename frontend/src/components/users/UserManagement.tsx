@@ -8,7 +8,5 @@ export function UserManagement() {
 
        return <>
               <UsersList />
-              <button onClick={() => navigate("/uj-felhasznalo")}>⊕ Új felhasználó</button>
-              <button onClick={() => navigate("/fooldal")}>Vissza</button>
        </>
 }
