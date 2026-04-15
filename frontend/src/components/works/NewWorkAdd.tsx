@@ -36,7 +36,6 @@ export function NewWorkAdd() {
        const [selectedTasks, setSelectedTasks] = useState<string[]>([""]);
        const [toasts, setToasts] = useState<Toast[]>([]);
 
-       // Error state-ek
        const [errors, setErrors] = useState<{
               nev?: string;
               selectedUsers?: string;
