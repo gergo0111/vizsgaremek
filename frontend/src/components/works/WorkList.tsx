@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
-import { apiGet, apiPatch } from "../../lib/api";
+import { apiGet } from "../../lib/api";
+import { apiDelete } from "../../lib/api";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-
-interface User {
-  user_id: number;
-  nev: string;
-}
-
-interface Tool {
-  eszkoz_id: number;
-  nev: string;
-}
 
 interface WorkData {
   munka_id: number;
@@ -27,127 +17,124 @@ interface WorkData {
 }
 
 export function WorkList() {
-  const { munka_id } = useParams<{ munka_id: string }>();
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [tools, setTools] = useState<Tool[]>([]);
-  const [workData, setWorkData] = useState<WorkData>({
-    munka_id: 0,
-    munka_neve: "",
-    leiras: "",
-    kezdeti_datum: "",
-    varhato_befejezes_datuma: "",
-    user_id: undefined,
-    eszkoz_id: undefined,
-    feladat: [],
-  });
+  const [works, setWorks] = useState<WorkData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [selectedTools, setSelectedTools] = useState<number[]>([]);
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([""]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchWorks = async () => {
       try {
-        const data = await apiGet<User[]>("/users");
-        setUsers(data);
+        const data = await apiGet<WorkData[]>("/munka");
+        const normalized = data.map((work) => ({
+          ...work,
+          kezdeti_datum: work.kezdeti_datum
+            ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+            : "",
+          varhato_befejezes_datuma: work.varhato_befejezes_datuma
+            ? new Date(work.varhato_befejezes_datuma)
+                .toISOString()
+                .split("T")[0]
+            : "",
+        }));
+        setWorks(normalized);
       } catch (error) {
         console.error("Hiba:", error);
-      }
-    };
-
-    const fetchTools = async () => {
-      try {
-        const data = await apiGet<Tool[]>("/eszkozok");
-        setTools(data);
-      } catch (error) {
-        console.error("Hiba:", error);
-      }
-    };
-
-    const fetchWorkData = async () => {
-      try {
-        const data = await apiGet<WorkData>(`/munka/${munka_id}`);
-
-        const kezdeti = data.kezdeti_datum
-          ? new Date(data.kezdeti_datum).toISOString().split("T")[0]
-          : "";
-        const varhato = data.varhato_befejezes_datuma
-          ? new Date(data.varhato_befejezes_datuma).toISOString().split("T")[0]
-          : "";
-
-        setWorkData({
-          ...data,
-          kezdeti_datum: kezdeti,
-          varhato_befejezes_datuma: varhato,
-        });
-
-        setSelectedUsers(data.user_id ? [data.user_id] : []);
-        setSelectedTools(data.eszkoz_id ? [data.eszkoz_id] : []);
-        setSelectedTasks(
-          data.feladat ? data.feladat.map((f: any) => f.leiras) : [""],
-        );
-        setLoading(false);
-      } catch (error) {
-        console.error("Hiba:", error);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
-    fetchTools();
-    fetchWorkData();
-  }, [munka_id]);
+    fetchWorks();
+  }, []);
+
+  const deleteWork = async (workId: number) => {
+    if (!Number.isFinite(workId) || workId <= 0) {
+      console.warn("Invalid workId, skip delete:", workId);
+      return;
+    }
+    try {
+      await apiDelete(`/munka/${workId}`);
+      setWorks((prev) => prev.filter((work) => work.munka_id !== workId));
+    } catch (error) {
+      console.error("Hiba:", error);
+    }
+  };
+
+  
 
   return (
     <>
-      <Menusor></Menusor>
-      {workData.map((workdata) => (
-        <div key={workData.munka_id}>
-      <div className="card" style={{ width: "18rem" }}>
-        <div className="card-body">
-          <h5 className="card-title">{workData.munka_neve}</h5>
-          <p className="card-text">{workData.leiras}</p>
-        </div>
-        <ul className="list-group list-group-flush">
-          <li className="list-group-item">{workData.kezdeti_datum}</li>
-          <li className="list-group-item">
-            {workData.varhato_befejezes_datuma}
-          </li>
-        </ul>
-        <div className="card-body">
-          <a>
-            <td>
-              <button
-                aria-label={`Szerkesztés ${workData.munka_neve}`}
-                onClick={() =>
-                  navigate(`/munka-modositas/${workData.munka_id}`)
-                }
-              >
-                ✏️
-              </button>
-            </td>
-            <td>
-              <button
-                aria-label={`Törlés ${workData.munka_neve}`}
-                onClick={() => {
-                  if (
-                    window.confirm(`Biztosan törlöd ${workData.munka_neve} munkát?`)
-                  ) {
-                    deleteWork(workData.munka_id);
-                  }
-                }}
-              >
-                ❌
-              </button>
-            </td>
-          </a>
-        </div>
+      <Menusor />
+
+      <div className="container py-4">
+        <h2 className="mb-4">Munkák</h2>
+       
+
+
+        {loading ? (
+          <p>Betöltés...</p>
+        ) : works.length === 0 ? (
+          <p>Nincsenek megjeleníthető munkák.</p>
+        ) : (
+          <div className="row gy-4">
+            {works.map((work) => (
+              <div key={work.munka_id} className="col-12 col-md-6 col-lg-4">
+                <div className="card h-100">
+                  <div className="card-body">
+                    <h5 className="card-title">{work.munka_neve}</h5>
+                    <p className="card-text">{work.leiras || "Nincs leírás"}</p>
+                  </div>
+                  <ul className="list-group list-group-flush">
+                    <li className="list-group-item">
+                      Kezdete: {work.kezdeti_datum || "-"}
+                    </li>
+                    <li className="list-group-item">
+                      Várható befejezés: {work.varhato_befejezes_datuma || "-"}
+                    </li>
+                  </ul>
+                  {work.feladat && work.feladat.length > 0 && (
+                    <div className="card-body">
+                      <h6>Feladatok:</h6>
+                      <ul className="mb-0">
+                        {work.feladat.map((task) => (
+                          <li key={task.feladat_id}>{task.leiras}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="card-body">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() =>
+                        navigate(`/munka-modositas/${work.munka_id}`)
+                      }
+                    >
+                      Szerkesztés
+                    </button>
+
+                    <button
+                      className="btn btn-danger ms-2"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            `Biztosan törlöd ${work.munka_neve} munkát?`,
+                          )
+                        ) {
+                          deleteWork(work.munka_id);
+                        }
+                      }}
+                    >
+                      Törlés
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-       </div>
-      ))}
     </>
-)};
+  );
+}
 
 export default WorkList;
