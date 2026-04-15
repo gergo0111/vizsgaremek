@@ -6,76 +6,71 @@ import 'bootstrap/dist/css/bootstrap.min.css';
  
 export function Menusor() {
   const user = getUser();
-  const isAdmin = user?.isAdmin === true;
   const navigate = useNavigate();
- 
+
   const handleLogout = () => {
     logout();
     navigate('/');
   };
- 
-       return (
-    <>
-      <nav
-        className="navbar navbar-expand-lg navbar-light"
-        style={{ backgroundColor: "#084885" }}
-      >
-        <img src={ptlogo} alt="P&T Pasztik logo" className="logo" onClick={() => navigate('/fooldal')} />
+
+  return (
+    <nav
+      className="navbar navbar-expand-lg navbar-dark"
+      style={{ backgroundColor: "#084885" }}
+    >
+      <div className="container-fluid">
+        <img 
+          src={ptlogo} 
+          alt="P&T Pasztik logo" 
+          className="logo navbar-brand"
+          style={{ cursor: 'pointer' }}
+          onClick={() => navigate('/fooldal')} 
+        />
+        
         <button
           className="navbar-toggler"
           type="button"
-          data-toggle="collapse"
-          data-target="#navbarText"
-          aria-controls="navbarText"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarText"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarText">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <button
-                className="nav-link"
-                style={{ color: "white" }}
-                onClick={() => navigate("/felhasznalok-kezelese")}
-              >
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0"> 
+            <li className="nav-item">
+              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/felhasznalok-kezelese")}>
                 Felhasználók kezelése
               </button>
             </li>
             <li className="nav-item">
-              <button className="nav-link"
-              style={{ color: "white" }}
-              onClick={() => navigate("/eszkozok")}>
+              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/eszkozok")}>
                 Gépek kezelése
               </button>
             </li>
             <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/munka-lista")}>
+              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/munka-lista")}>
                 Munkák módosítása
               </button>
             </li>
             <li className="nav-item">
-              <button className="nav-link" style={{ color: "white" }} onClick={() => navigate("/uj-munka")}>
+              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/uj-munka")}>
                 ⊕ Új munka
               </button>
             </li>
           </ul>
- 
-          <div className="ml-auto d-flex align-items-center">
+
+          <div className="navbar-nav">
             <button
-              className="btn btn-link"
+              className="nav-link text-white border-0 bg-transparent"
               onClick={handleLogout}
-              style={{ color: "white", textDecoration: 'none' }}
-              aria-label="Kijelentkezés"
+              style={{ textDecoration: 'none' }}
             >
               Kijelentkezés
             </button>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }
- 
- 
