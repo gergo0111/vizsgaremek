@@ -44,6 +44,8 @@ export function WorkList() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, SetUsers] = useState<UserData[]>([]);
   const [tools, SetTools] = useState<EszkozData[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<
     "name" | "user" | "tool" | "date" | "none"
@@ -112,6 +114,7 @@ export function WorkList() {
     }
 
     setFilteredWorks(filtered);
+    setCurrentPage(1);
   }, [searchTerm, sortBy, sortOrder, tools, works]);
 
   useEffect(() => {
@@ -159,6 +162,23 @@ export function WorkList() {
   const getDateValue = (dateString?: string) =>
     dateString ? new Date(dateString).getTime() : 0;
 
+  const totalPages = Math.ceil(filteredWorks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentWorks = filteredWorks.slice(startIndex, endIndex);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <>
       <Menusor />
@@ -185,8 +205,8 @@ export function WorkList() {
 
         <Row className="users-content">
           <Col md={9} className="users-table-column">
-            <Card className="users-table-card">
-              <Table responsive hover className="users-table">
+            <Card className="users-table-card work-list-card">
+              <Table responsive hover className="users-table work-table">
                 <thead>
                   <tr>
                     <th>Munka neve</th>
@@ -206,7 +226,7 @@ export function WorkList() {
                       </td>
                     </tr>
                   ) : filteredWorks.length > 0 ? (
-                    filteredWorks.map((work) => (
+                    currentWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
                         <td className="user-name">{work.munka_neve}</td>
                         <td className="user-department">
@@ -258,6 +278,27 @@ export function WorkList() {
                 </tbody>
               </Table>
             </Card>
+            <div className="pagination-controls">
+              <button 
+                className="pagination-btn"
+                onClick={goToPrevPage}
+                disabled={currentPage === 1}
+                title="Előző oldal"
+              >
+                ← Előző
+              </button>
+              <span className="pagination-info">
+                Oldal {currentPage} / {totalPages || 1}
+              </span>
+              <button 
+                className="pagination-btn"
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages || totalPages === 0}
+                title="Következő oldal"
+              >
+                Következő →
+              </button>
+            </div>
           </Col>
 
           <Col md={3} className="users-sidebar">
@@ -272,13 +313,14 @@ export function WorkList() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
                   />
+                  <InputGroup.Text>🔍</InputGroup.Text>
                 </InputGroup>
 
-                <Form.Group className="mb-3">
-                  <Form.Label className="filter-label">Rendezés:</Form.Label>
+                <div className="filter-section">
+                  <h6>Rendezés módja</h6>
                   <Form.Select
                     value={sortBy}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setSortBy(
                         e.target.value as
                           | "name"
@@ -286,35 +328,34 @@ export function WorkList() {
                           | "tool"
                           | "date"
                           | "none"
-                      )
-                    }
+                      );
+                      setSortOrder('asc');
+                    }}
                     className="sort-select"
                   >
-                    <option value="none">Nincs rendezés</option>
                     <option value="name">Munka neve</option>
                     <option value="user">Alkalmazott</option>
                     <option value="tool">Eszköz</option>
                     <option value="date">Dátum</option>
                   </Form.Select>
-                </Form.Group>
+                </div>
 
-                <div className="sort-order-buttons">
-                  <Button
-                    size="sm"
-                    variant={sortOrder === "asc" ? "primary" : "outline-primary"}
-                    onClick={() => setSortOrder("asc")}
-                    className="order-btn"
-                  >
-                    ⬆️ Növekvő
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={sortOrder === "desc" ? "primary" : "outline-primary"}
-                    onClick={() => setSortOrder("desc")}
-                    className="order-btn"
-                  >
-                    ⬇️ Csökkenő
-                  </Button>
+                <div className="filter-section">
+                  <h6>Rendezési sorrend</h6>
+                  <div className="sort-order-buttons">
+                    <button
+                      className={`sort-order-btn ${sortOrder === "asc" ? "active" : ""}`}
+                      onClick={() => setSortOrder("asc")}
+                    >
+                      ▲ Növekvő
+                    </button>
+                    <button
+                      className={`sort-order-btn ${sortOrder === "desc" ? "active" : ""}`}
+                      onClick={() => setSortOrder("desc")}
+                    >
+                      ▼ Csökkenő
+                    </button>
+                  </div>
                 </div>
               </Card.Body>
             </Card>

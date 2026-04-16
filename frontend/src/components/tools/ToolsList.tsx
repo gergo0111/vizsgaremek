@@ -18,6 +18,8 @@ export function ToolsList() {
        const [searchTerm, setSearchTerm] = useState('');
        const [sortBy, setSortBy] = useState<'name' | 'type' | 'quantity' | 'none'>('name');
        const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+       const [currentPage, setCurrentPage] = useState(1);
+       const itemsPerPage = 5;
        const navigate = useNavigate();
 
        useEffect(() => {
@@ -58,6 +60,7 @@ export function ToolsList() {
               }
 
               setFilteredTools(filtered);
+              setCurrentPage(1);
        }, [searchTerm, sortBy, sortOrder, tools]);
 
        const deleteTool = async (eszkozId: string) => {
@@ -66,6 +69,23 @@ export function ToolsList() {
                      setTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkozId));
               } catch (error) {
                      console.error('Hiba:', error);
+              }
+       };
+
+       const totalPages = Math.ceil(filteredTools.length / itemsPerPage);
+       const startIndex = (currentPage - 1) * itemsPerPage;
+       const endIndex = startIndex + itemsPerPage;
+       const currentTools = filteredTools.slice(startIndex, endIndex);
+
+       const goToNextPage = () => {
+              if (currentPage < totalPages) {
+                     setCurrentPage(currentPage + 1);
+              }
+       };
+
+       const goToPrevPage = () => {
+              if (currentPage > 1) {
+                     setCurrentPage(currentPage - 1);
               }
        };
 
@@ -96,19 +116,18 @@ export function ToolsList() {
                      <Row className="users-content">
                             <Col md={9} className="users-table-column">
                                    <Card className="users-table-card">
-                                          <Table responsive hover className="users-table">
+                                          <Table responsive hover className="users-table tools-table">
                                                  <thead>
                                                         <tr>
                                                                <th>Eszköz neve</th>
                                                                <th>Típus</th>
                                                                <th>Darabszám</th>
-                                                               <th>Használatban</th>
                                                                <th colSpan={2} className="text-center">Műveletek</th>
                                                         </tr>
                                                  </thead>
                                                  <tbody>
-                                                        {filteredTools.length > 0 ? (
-                                                               filteredTools.map((tool) => (
+                                                        {currentTools.length > 0 ? (
+                                                               currentTools.map((tool) => (
                                                                       <tr key={tool.eszkoz_id} className="user-row">
                                                                              <td className="user-name">{tool.nev}</td>
                                                                              <td className="user-department">{tool.tipus}</td>
@@ -150,6 +169,27 @@ export function ToolsList() {
                                                  </tbody>
                                           </Table>
                                    </Card>
+                                   <div className="pagination-controls">
+                                          <button 
+                                                 className="pagination-btn"
+                                                 onClick={goToPrevPage}
+                                                 disabled={currentPage === 1}
+                                                 title="Előző oldal"
+                                          >
+                                                 ← Előző
+                                          </button>
+                                          <span className="pagination-info">
+                                                 Oldal {currentPage} / {totalPages || 1}
+                                          </span>
+                                          <button 
+                                                 className="pagination-btn"
+                                                 onClick={goToNextPage}
+                                                 disabled={currentPage === totalPages || totalPages === 0}
+                                                 title="Következő oldal"
+                                          >
+                                                 Következő →
+                                          </button>
+                                   </div>
                             </Col>
 
                             <Col md={3} className="users-sidebar">
@@ -164,39 +204,41 @@ export function ToolsList() {
                                                                onChange={(e) => setSearchTerm(e.target.value)}
                                                                className="search-input"
                                                         />
+                                                        <InputGroup.Text>🔍</InputGroup.Text>
                                                  </InputGroup>
 
-                                                 <Form.Group className="mb-3">
-                                                        <Form.Label className="filter-label">Rendezés:</Form.Label>
+                                                 <div className="filter-section">
+                                                        <h6>Rendezés módja</h6>
                                                         <Form.Select 
                                                                value={sortBy} 
-                                                               onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'quantity' | 'none')}
+                                                               onChange={(e) => {
+                                                                      setSortBy(e.target.value as 'name' | 'type' | 'quantity' | 'none');
+                                                                      setSortOrder('asc');
+                                                               }}
                                                                className="sort-select"
                                                         >
-                                                               <option value="none">Nincs rendezés</option>
                                                                <option value="name">Eszköz neve</option>
                                                                <option value="type">Típus</option>
                                                                <option value="quantity">Darabszám</option>
                                                         </Form.Select>
-                                                 </Form.Group>
+                                                 </div>
 
-                                                 <div className="sort-order-buttons">
-                                                        <Button 
-                                                               size="sm" 
-                                                               variant={sortOrder === 'asc' ? 'primary' : 'outline-primary'}
-                                                               onClick={() => setSortOrder('asc')}
-                                                               className="order-btn"
-                                                        >
-                                                               ⬆️ Növekvő
-                                                        </Button>
-                                                        <Button 
-                                                               size="sm" 
-                                                               variant={sortOrder === 'desc' ? 'primary' : 'outline-primary'}
-                                                               onClick={() => setSortOrder('desc')}
-                                                               className="order-btn"
-                                                        >
-                                                               ⬇️ Csökkenő
-                                                        </Button>
+                                                 <div className="filter-section">
+                                                        <h6>Rendezési sorrend</h6>
+                                                        <div className="sort-order-buttons">
+                                                               <button
+                                                                      className={`sort-order-btn ${sortOrder === 'asc' ? 'active' : ''}`}
+                                                                      onClick={() => setSortOrder('asc')}
+                                                               >
+                                                                      ▲ Növekvő
+                                                               </button>
+                                                               <button
+                                                                      className={`sort-order-btn ${sortOrder === 'desc' ? 'active' : ''}`}
+                                                                      onClick={() => setSortOrder('desc')}
+                                                               >
+                                                                      ▼ Csökkenő
+                                                               </button>
+                                                        </div>
                                                  </div>
                                           </Card.Body>
                                    </Card>
