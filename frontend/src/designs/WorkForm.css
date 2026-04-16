@@ -10,11 +10,11 @@
 .new-work-card {
   background: rgba(255, 255, 255, 0.95);
   border: 2px solid #0066cc;
-  border-radius: 12px;
+  border-radius: 12px;                                                    
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   width: 100%;
-  max-width: 900px;
+  max-width: 1300px;
   padding: 2rem;
 }
 
@@ -24,6 +24,16 @@
   font-weight: 700;
   margin-bottom: 1.5rem;
   text-align: center;
+}
+
+.work-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.work-form-full {
+  grid-column: 1 / -1;
 }
 
 .form-group {
@@ -94,12 +104,18 @@
   flex: 1;
   border: 1px solid #0066cc;
   border-radius: 8px;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   font-size: 0.95rem;
   background-color: white;
   color: #001f4d;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.form-select {
+  padding: 0.75rem 2.5rem 0.75rem 1rem !important;
+  min-height: 40px !important;
 }
 
 .dynamic-row select:focus {
@@ -183,8 +199,15 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+  flex: 1;
+  min-width: 150px;
+}
+
+.form-group.work-form-full button[type="submit"],
+.form-group.work-form-full button[type="button"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .form-group button[type="submit"] {
@@ -243,6 +266,15 @@ input[type="date"]:focus {
 
   .new-work-header {
     font-size: 1.5rem;
+  }
+
+  .work-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .work-form-full {
+    grid-column: 1;
   }
 
   .dynamic-row {
