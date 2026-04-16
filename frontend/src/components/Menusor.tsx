@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export function Menusor() {
   const user = getUser();
   const navigate = useNavigate();
+  const isAdmin = user?.jogosultsag === 'Admin';
 
   const handleLogout = () => {
     logout();
@@ -37,27 +38,31 @@ export function Menusor() {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarText">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0"> 
-            <li className="nav-item">
-              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/felhasznalok-kezelese")}>
-                Felhasználók kezelése
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/eszkozok")}>
-                Gépek kezelése
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/munka-lista")}>
-                Munkák módosítása
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/uj-munka")}>
-                ⊕ Új munka
-              </button>
-            </li>
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            {isAdmin && (
+              <>
+                <li className="nav-item">
+                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/felhasznalok-kezelese")}>
+                    Felhasználók kezelése
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/eszkozok")}>
+                    Gépek kezelése
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/munka-lista")}>
+                    Munkák módosítása
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/uj-munka")}>
+                    ⊕ Új munka
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
       
           <div className="navbar-nav">
