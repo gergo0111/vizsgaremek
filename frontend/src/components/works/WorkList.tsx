@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
 import { apiGet } from "../../lib/api";
 import { apiDelete } from "../../lib/api";
+import {
+  Container,
+  Col,
+  Form,
+  InputGroup,
+  Button,
+  Card,
+  Row,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 interface WorkData {
@@ -28,14 +37,16 @@ interface EszkozData {
 
 export function WorkList() {
   const [works, setWorks] = useState<WorkData[]>([]);
+  const [filteredWorks, setFilteredWorks] = useState<WorkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [allWorks, setAllWorks] = useState<WorkData[]>([]);
   const [users, SetUsers] = useState<UserData[]>([]);
   const [tools, SetTools] = useState<EszkozData[]>([]);
-  const [nev, SetNev] = useState("");
-  const [leiras, SetLeiras] = useState("");
   const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState<
+    "name" | "user" | "tool" | "date" | "none"
+  >("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     const fetchWorks = async () => {
@@ -62,6 +73,44 @@ export function WorkList() {
 
     fetchWorks();
   }, []);
+
+  useEffect(() => {
+    let filtered = works.filter(
+      (work) =>
+        work.munka_neve.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        work.leiras?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    if (sortBy === "name") {
+      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu"));
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "user") {
+      filtered.sort((a, b) =>
+        getUserName(a.user_id).localeCompare(getUserName(b.user_id), "hu"),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "tool") {
+      filtered.sort((a, b) =>
+        getToolName(a.eszkoz_id).localeCompare(getToolName(b.eszkoz_id), "hu"),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "date") {
+      filtered.sort(
+        (a, b) => getDateValue(a.kezdeti_datum) - getDateValue(b.kezdeti_datum),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    }
+
+    setFilteredWorks(filtered);
+  }, [searchTerm, sortBy, sortOrder, tools]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -99,24 +148,6 @@ export function WorkList() {
     }
   };
 
-  const handleSearch = () => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) {
-      setWorks(allWorks);
-      return;
-    }
-    const filteredWorks = allWorks.filter(
-      (work) =>
-        work.munka_neve.toLowerCase().includes(term) ||
-        work.leiras?.toLowerCase().includes(term),
-    );
-    setWorks(filteredWorks);
-  };
-
-  useEffect(() => {
-    setAllWorks(works);
-  }, [works]);
-
   const getUserName = (userId?: number) =>
     users.find((user) => user.user_id === userId)?.nev ?? "";
 
@@ -126,202 +157,179 @@ export function WorkList() {
   const getDateValue = (dateString?: string) =>
     dateString ? new Date(dateString).getTime() : 0;
 
-  const updateSortedWorks = (sortedWorks: WorkData[]) => {
-    setWorks(sortedWorks);
-    setAllWorks(sortedWorks);
-  };
-
-  const sortByMunkaNameUp = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      a.munka_neve.localeCompare(b.munka_neve),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByMunkaNameDown = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      b.munka_neve.localeCompare(a.munka_neve),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByAlkalmazottUp = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      getUserName(a.user_id).localeCompare(getUserName(b.user_id)),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByAlkalmazottDown = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      getUserName(b.user_id).localeCompare(getUserName(a.user_id)),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByEszkozUp = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      getToolName(a.eszkoz_id).localeCompare(getToolName(b.eszkoz_id)),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByEszkozDown = () => {
-    const sortedMunka = [...works].sort((a, b) =>
-      getToolName(b.eszkoz_id).localeCompare(getToolName(a.eszkoz_id)),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByIdoUp = () => {
-    const sortedMunka = [...works].sort(
-      (a, b) => getDateValue(a.kezdeti_datum) - getDateValue(b.kezdeti_datum),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
-  const sortByIdoDown = () => {
-    const sortedMunka = [...works].sort(
-      (a, b) => getDateValue(b.kezdeti_datum) - getDateValue(a.kezdeti_datum),
-    );
-    updateSortedWorks(sortedMunka);
-  };
-
   return (
     <>
       <Menusor />
+      <Container fluid className="users-list-container">
+        <Row className="users-header">
+          <Col md={6}>
+            <h2>Munkák kezelése</h2>
+          </Col>
+          <Col md={6} className="text-end">
+            <Button className="btn-back" onClick={() => navigate("/fooldal")}>
+              ← Vissza
+            </Button>
+          </Col>
+        </Row>
 
-      <div className="container py-4">
-        <h2 className="mb-4">Munkák</h2>
+          <Col md={3} className="users-sidebar">
+            <Card className="search-filter-card">
+              <Card.Body>
+                <h5>Keresés és szűrés</h5>
 
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Kereséshez írj be egy nevet vagy típust"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSearch();
-              }
-            }}
-          />
-          <button className="search-btn" onClick={handleSearch}>
-            🔍
-          </button>
-        </div>
+                <InputGroup className="mb-3">
+                  <Form.Control
+                    placeholder="Keresés név vagy típus alapján..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                  />
+                </InputGroup>
 
-        <tr>
-          <th>
-            Munka neve <button onClick={sortByMunkaNameUp}>⏶</button>{" "}
-            <button onClick={sortByMunkaNameDown}>⏷</button>
-          </th>
-          <th>
-            Alkalmazott <button onClick={sortByAlkalmazottUp}>⏶</button>{" "}
-            <button onClick={sortByAlkalmazottDown}>⏷</button>
-          </th>
-          <th>
-            Eszköz <button onClick={sortByEszkozUp}>⏶</button>{" "}
-            <button onClick={sortByEszkozDown}>⏷</button>
-          </th>
-          <th>
-            Dátum <button onClick={sortByIdoUp}>⏶</button>{" "}
-            <button onClick={sortByIdoDown}>⏷</button>
-          </th>
-        </tr>
+                <Form.Group className="mb-3">
+                  <Form.Label className="filter-label">Rendezés:</Form.Label>
+                  <Form.Select
+                    value={sortBy}
+                    onChange={(e) =>
+                      setSortBy(
+                        e.target.value as
+                          | "name"
+                          | "user"
+                          | "tool"
+                          | "date"
+                          | "none",
+                      )
+                    }
+                    className="sort-select"
+                  >
+                    <option value="none">Nincs rendezés</option>
+                    <option value="name">Munka neve</option>
+                    <option value="user">Alkalmazott</option>
+                    <option value="tool">Eszköz</option>
+                    <option value="date">Dátum</option>
+                  </Form.Select>
+                </Form.Group>
 
-        {loading ? (
-          <p>Betöltés...</p>
-        ) : works.length === 0 ? (
-          <p>Nincsenek megjeleníthető munkák.</p>
-        ) : (
-          <div className="row gy-4">
-            {works.map((work) => (
-              <div key={work.munka_id} className="col-12 col-md-6 col-lg-4">
-                <div className="card h-100">
-                  <div className="card-body">
-                    <h5 className="card-title">{work.munka_neve}</h5>
-                    <p className="card-text">{work.leiras || "Nincs leírás"}</p>
-                  </div>
+                <div className="sort-order-buttons">
+                  <Button
+                    size="sm"
+                    variant={
+                      sortOrder === "asc" ? "primary" : "outline-primary"
+                    }
+                    onClick={() => setSortOrder("asc")}
+                    className="order-btn"
+                  >
+                    ⬆️ Növekvő
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={
+                      sortOrder === "desc" ? "primary" : "outline-primary"
+                    }
+                    onClick={() => setSortOrder("desc")}
+                    className="order-btn"
+                  >
+                    ⬇️ Csökkenő
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
 
-                  <ul className="list-group list-group-flush">
+          {loading ? (
+            <p>Betöltés...</p>
+          ) : works.length === 0 ? (
+            <p>Nincsenek megjeleníthető munkák.</p>
+          ) : (
+            <div className="row gy-4">
+              {works.map((work) => (
+                <div key={work.munka_id} className="col-12 col-md-6 col-lg-4">
+                  <div className="card h-100">
                     <div className="card-body">
-                      <h6>Alkalmazottak:</h6>
-                      <ul className="mb-0">
-                        {users
-                          .filter((user) => work.user_id === user.user_id)
-                          .map((user) => (
-                            <li key={user.user_id}>{user.nev}</li>
+                      <h5 className="card-title">{work.munka_neve}</h5>
+                      <p className="card-text">
+                        {work.leiras || "Nincs leírás"}
+                      </p>
+                    </div>
+
+                    <ul className="list-group list-group-flush">
+                      <div className="card-body">
+                        <h6>Alkalmazottak:</h6>
+                        <ul className="mb-0">
+                          {users
+                            .filter((user) => work.user_id === user.user_id)
+                            .map((user) => (
+                              <li key={user.user_id}>{user.nev}</li>
+                            ))}
+                        </ul>
+                      </div>
+                    </ul>
+
+                    <ul className="list-group list-group-flush">
+                      <div className="card-body">
+                        <h6>Eszközök:</h6>
+                        <ul className="mb-0">
+                          {tools
+                            .filter((tool) => work.eszkoz_id === tool.eszkoz_id)
+                            .map((tool) => (
+                              <li key={tool.eszkoz_id}>{tool.nev}</li>
+                            ))}
+                        </ul>
+                      </div>
+                    </ul>
+
+                    {work.feladat && work.feladat.length > 0 && (
+                      <div className="card-body">
+                        <h6>Feladatok:</h6>
+                        <ul className="mb-0">
+                          {work.feladat.map((task) => (
+                            <li key={task.feladat_id}>{task.leiras}</li>
                           ))}
-                      </ul>
-                    </div>
-                  </ul>
+                        </ul>
+                      </div>
+                    )}
 
-                  <ul className="list-group list-group-flush">
+                    <ul className="list-group list-group-flush">
+                      <li className="list-group-item">
+                        Kezdete: {work.kezdeti_datum || "-"}
+                      </li>
+                      <li className="list-group-item">
+                        Várható befejezés:{" "}
+                        {work.varhato_befejezes_datuma || "-"}
+                      </li>
+                    </ul>
+
                     <div className="card-body">
-                      <h6>Eszközök:</h6>
-                      <ul className="mb-0">
-                        {tools
-                          .filter((tool) => work.eszkoz_id === tool.eszkoz_id)
-                          .map((tool) => (
-                            <li key={tool.eszkoz_id}>{tool.nev}</li>
-                          ))}
-                      </ul>
-                    </div>
-                  </ul>
-
-                  {work.feladat && work.feladat.length > 0 && (
-                    <div className="card-body">
-                      <h6>Feladatok:</h6>
-                      <ul className="mb-0">
-                        {work.feladat.map((task) => (
-                          <li key={task.feladat_id}>{task.leiras}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <ul className="list-group list-group-flush">
-                    <li className="list-group-item">
-                      Kezdete: {work.kezdeti_datum || "-"}
-                    </li>
-                    <li className="list-group-item">
-                      Várható befejezés: {work.varhato_befejezes_datuma || "-"}
-                    </li>
-                  </ul>
-
-                  <div className="card-body">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() =>
-                        navigate(`/munka-modositas/${work.munka_id}`)
-                      }
-                    >
-                      Szerkesztés
-                    </button>
-
-                    <button
-                      className="btn btn-danger ms-2"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `Biztosan törlöd ${work.munka_neve} munkát?`,
-                          )
-                        ) {
-                          deleteWork(work.munka_id);
+                      <button
+                        className="btn btn-primary"
+                        onClick={() =>
+                          navigate(`/munka-modositas/${work.munka_id}`)
                         }
-                      }}
-                    >
-                      Törlés
-                    </button>
+                      >
+                        Szerkesztés
+                      </button>
+
+                      <button
+                        className="btn btn-danger ms-2"
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Biztosan törlöd ${work.munka_neve} munkát?`,
+                            )
+                          ) {
+                            deleteWork(work.munka_id);
+                          }
+                        }}
+                      >
+                        Törlés
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+      </Container>
     </>
   );
 }
