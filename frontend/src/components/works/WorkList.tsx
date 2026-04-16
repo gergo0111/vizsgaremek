@@ -11,8 +11,10 @@ import {
   Button,
   Card,
   Row,
+  Table,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../users/UsersList.css";
 
 interface WorkData {
   munka_id: number;
@@ -110,7 +112,7 @@ export function WorkList() {
     }
 
     setFilteredWorks(filtered);
-  }, [searchTerm, sortBy, sortOrder, tools]);
+  }, [searchTerm, sortBy, sortOrder, tools, works]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -166,11 +168,97 @@ export function WorkList() {
             <h2>Munkák kezelése</h2>
           </Col>
           <Col md={6} className="text-end">
-            <Button className="btn-back" onClick={() => navigate("/fooldal")}>
+            <Button 
+              className="btn-new-user"
+              onClick={() => navigate('/uj-munka')}
+            >
+              + Új munka
+            </Button>
+            <Button 
+              className="btn-back"
+              onClick={() => navigate('/fooldal')}
+            >
               ← Vissza
             </Button>
           </Col>
         </Row>
+
+        <Row className="users-content">
+          <Col md={9} className="users-table-column">
+            <Card className="users-table-card">
+              <Table responsive hover className="users-table">
+                <thead>
+                  <tr>
+                    <th>Munka neve</th>
+                    <th>Leírás</th>
+                    <th>Alkalmazott</th>
+                    <th>Eszköz</th>
+                    <th>Kezdete</th>
+                    <th>Befejezés</th>
+                    <th colSpan={2} className="text-center">Műveletek</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={8} className="text-center">
+                        Betöltés...
+                      </td>
+                    </tr>
+                  ) : filteredWorks.length > 0 ? (
+                    filteredWorks.map((work) => (
+                      <tr key={work.munka_id} className="user-row">
+                        <td className="user-name">{work.munka_neve}</td>
+                        <td className="user-department">
+                          {work.leiras || "-"}
+                        </td>
+                        <td>{getUserName(work.user_id) || "-"}</td>
+                        <td>{getToolName(work.eszkoz_id) || "-"}</td>
+                        <td>{work.kezdeti_datum || "-"}</td>
+                        <td>{work.varhato_befejezes_datuma || "-"}</td>
+                        <td className="action-cell">
+                          <button
+                            className="action-btn edit-btn"
+                            aria-label={`Szerkesztés ${work.munka_neve}`}
+                            onClick={() =>
+                              navigate(`/munka-modositas/${work.munka_id}`)
+                            }
+                            title="Szerkesztés"
+                          >
+                            ✏️
+                          </button>
+                        </td>
+                        <td className="action-cell">
+                          <button
+                            className="action-btn delete-btn"
+                            aria-label={`Törlés ${work.munka_neve}`}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Biztosan törlöd ${work.munka_neve} munkát?`
+                                )
+                              ) {
+                                deleteWork(work.munka_id);
+                              }
+                            }}
+                            title="Törlés"
+                          >
+                            ❌
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="text-center text-muted">
+                        Nincs találat
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </Card>
+          </Col>
 
           <Col md={3} className="users-sidebar">
             <Card className="search-filter-card">
@@ -179,7 +267,7 @@ export function WorkList() {
 
                 <InputGroup className="mb-3">
                   <Form.Control
-                    placeholder="Keresés név vagy típus alapján..."
+                    placeholder="Keresés név alapján..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="search-input"
@@ -197,7 +285,7 @@ export function WorkList() {
                           | "user"
                           | "tool"
                           | "date"
-                          | "none",
+                          | "none"
                       )
                     }
                     className="sort-select"
@@ -213,9 +301,7 @@ export function WorkList() {
                 <div className="sort-order-buttons">
                   <Button
                     size="sm"
-                    variant={
-                      sortOrder === "asc" ? "primary" : "outline-primary"
-                    }
+                    variant={sortOrder === "asc" ? "primary" : "outline-primary"}
                     onClick={() => setSortOrder("asc")}
                     className="order-btn"
                   >
@@ -223,9 +309,7 @@ export function WorkList() {
                   </Button>
                   <Button
                     size="sm"
-                    variant={
-                      sortOrder === "desc" ? "primary" : "outline-primary"
-                    }
+                    variant={sortOrder === "desc" ? "primary" : "outline-primary"}
                     onClick={() => setSortOrder("desc")}
                     className="order-btn"
                   >
@@ -235,100 +319,7 @@ export function WorkList() {
               </Card.Body>
             </Card>
           </Col>
-
-          {loading ? (
-            <p>Betöltés...</p>
-          ) : works.length === 0 ? (
-            <p>Nincsenek megjeleníthető munkák.</p>
-          ) : (
-            <div className="row gy-4">
-              {works.map((work) => (
-                <div key={work.munka_id} className="col-12 col-md-6 col-lg-4">
-                  <div className="card h-100">
-                    <div className="card-body">
-                      <h5 className="card-title">{work.munka_neve}</h5>
-                      <p className="card-text">
-                        {work.leiras || "Nincs leírás"}
-                      </p>
-                    </div>
-
-                    <ul className="list-group list-group-flush">
-                      <div className="card-body">
-                        <h6>Alkalmazottak:</h6>
-                        <ul className="mb-0">
-                          {users
-                            .filter((user) => work.user_id === user.user_id)
-                            .map((user) => (
-                              <li key={user.user_id}>{user.nev}</li>
-                            ))}
-                        </ul>
-                      </div>
-                    </ul>
-
-                    <ul className="list-group list-group-flush">
-                      <div className="card-body">
-                        <h6>Eszközök:</h6>
-                        <ul className="mb-0">
-                          {tools
-                            .filter((tool) => work.eszkoz_id === tool.eszkoz_id)
-                            .map((tool) => (
-                              <li key={tool.eszkoz_id}>{tool.nev}</li>
-                            ))}
-                        </ul>
-                      </div>
-                    </ul>
-
-                    {work.feladat && work.feladat.length > 0 && (
-                      <div className="card-body">
-                        <h6>Feladatok:</h6>
-                        <ul className="mb-0">
-                          {work.feladat.map((task) => (
-                            <li key={task.feladat_id}>{task.leiras}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item">
-                        Kezdete: {work.kezdeti_datum || "-"}
-                      </li>
-                      <li className="list-group-item">
-                        Várható befejezés:{" "}
-                        {work.varhato_befejezes_datuma || "-"}
-                      </li>
-                    </ul>
-
-                    <div className="card-body">
-                      <button
-                        className="btn btn-primary"
-                        onClick={() =>
-                          navigate(`/munka-modositas/${work.munka_id}`)
-                        }
-                      >
-                        Szerkesztés
-                      </button>
-
-                      <button
-                        className="btn btn-danger ms-2"
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              `Biztosan törlöd ${work.munka_neve} munkát?`,
-                            )
-                          ) {
-                            deleteWork(work.munka_id);
-                          }
-                        }}
-                      >
-                        Törlés
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        </Row>
       </Container>
     </>
   );
