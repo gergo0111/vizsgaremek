@@ -117,23 +117,75 @@ export function WorkList() {
     setAllWorks(works);
   }, [works]);
 
-  const sortByEszkozNameUp = () => {
-    const sortedMunka = [...tools].sort((a, b) => a.nev.localeCompare(b.nev));
-    setAllWorks(sortedMunka);
+  const getUserName = (userId?: number) =>
+    users.find((user) => user.user_id === userId)?.nev ?? "";
+
+  const getToolName = (eszkozId?: number) =>
+    tools.find((tool) => tool.eszkoz_id === eszkozId)?.nev ?? "";
+
+  const getDateValue = (dateString?: string) =>
+    dateString ? new Date(dateString).getTime() : 0;
+
+  const updateSortedWorks = (sortedWorks: WorkData[]) => {
+    setWorks(sortedWorks);
+    setAllWorks(sortedWorks);
   };
 
-  useEffect(() => {
-    fetchWorks();
-  }, []);
-
-  const sortByEszkozNameDown = () => {
-    const sortedMunka = [...tools].sort((a, b) => b.nev.localeCompare(a.nev));
-    setAllWorks(sortedMunka);
+  const sortByMunkaNameUp = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      a.munka_neve.localeCompare(b.munka_neve),
+    );
+    updateSortedWorks(sortedMunka);
   };
 
-  useEffect(() => {
-    fetchTools();
-  }, []);
+  const sortByMunkaNameDown = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      b.munka_neve.localeCompare(a.munka_neve),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByAlkalmazottUp = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      getUserName(a.user_id).localeCompare(getUserName(b.user_id)),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByAlkalmazottDown = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      getUserName(b.user_id).localeCompare(getUserName(a.user_id)),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByEszkozUp = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      getToolName(a.eszkoz_id).localeCompare(getToolName(b.eszkoz_id)),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByEszkozDown = () => {
+    const sortedMunka = [...works].sort((a, b) =>
+      getToolName(b.eszkoz_id).localeCompare(getToolName(a.eszkoz_id)),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByIdoUp = () => {
+    const sortedMunka = [...works].sort(
+      (a, b) => getDateValue(a.kezdeti_datum) - getDateValue(b.kezdeti_datum),
+    );
+    updateSortedWorks(sortedMunka);
+  };
+
+  const sortByIdoDown = () => {
+    const sortedMunka = [...works].sort(
+      (a, b) => getDateValue(b.kezdeti_datum) - getDateValue(a.kezdeti_datum),
+    );
+    updateSortedWorks(sortedMunka);
+  };
 
   return (
     <>
@@ -162,8 +214,8 @@ export function WorkList() {
 
         <tr>
           <th>
-            Munka neve <button onClick={sortByEszkozNameUp}>⏶</button>{" "}
-            <button onClick={sortByEszkozNameDown}>⏷</button>
+            Munka neve <button onClick={sortByMunkaNameUp}>⏶</button>{" "}
+            <button onClick={sortByMunkaNameDown}>⏷</button>
           </th>
           <th>
             Alkalmazott <button onClick={sortByAlkalmazottUp}>⏶</button>{" "}
