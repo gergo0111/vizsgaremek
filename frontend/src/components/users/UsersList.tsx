@@ -12,6 +12,8 @@ export function UsersList() {
        const [searchTerm, setSearchTerm] = useState('');
        const [sortBy, setSortBy] = useState<'name' | 'department' | 'none'>('name');
        const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+       const [currentPage, setCurrentPage] = useState(1);
+       const itemsPerPage = 5;
        const navigate = useNavigate();
 
        useEffect(() => {
@@ -47,6 +49,7 @@ export function UsersList() {
               }
 
               setFilteredUsers(filtered);
+              setCurrentPage(1);
        }, [searchTerm, sortBy, sortOrder, users]);
 
        const deleteUser = async (userId: number) => {
@@ -59,6 +62,23 @@ export function UsersList() {
                      setUsers(prev => prev.filter(user => user.user_id !== userId));
               } catch (error) {
                      console.error('Hiba:', error);
+              }
+       };
+
+       const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+       const startIndex = (currentPage - 1) * itemsPerPage;
+       const endIndex = startIndex + itemsPerPage;
+       const currentUsers = filteredUsers.slice(startIndex, endIndex);
+
+       const goToNextPage = () => {
+              if (currentPage < totalPages) {
+                     setCurrentPage(currentPage + 1);
+              }
+       };
+
+       const goToPrevPage = () => {
+              if (currentPage > 1) {
+                     setCurrentPage(currentPage - 1);
               }
        };
 
@@ -99,8 +119,8 @@ export function UsersList() {
                                                         </tr>
                                                  </thead>
                                                  <tbody>
-                                                        {filteredUsers.length > 0 ? (
-                                                               filteredUsers.map((user) => (
+                                                        {currentUsers.length > 0 ? (
+                                                               currentUsers.map((user) => (
                                                                       <tr key={user.user_id} className="user-row">
                                                                              <td className="user-name">{user.nev}</td>
                                                                              <td className="user-department">{user.munkakor}</td>
@@ -140,6 +160,27 @@ export function UsersList() {
                                                  </tbody>
                                           </Table>
                                    </Card>
+                                   <div className="pagination-controls">
+                                          <button 
+                                                 className="pagination-btn"
+                                                 onClick={goToPrevPage}
+                                                 disabled={currentPage === 1}
+                                                 title="Előző oldal"
+                                          >
+                                                 ← Előző
+                                          </button>
+                                          <span className="pagination-info">
+                                                 Oldal {currentPage} / {totalPages || 1}
+                                          </span>
+                                          <button 
+                                                 className="pagination-btn"
+                                                 onClick={goToNextPage}
+                                                 disabled={currentPage === totalPages || totalPages === 0}
+                                                 title="Következő oldal"
+                                          >
+                                                 Következő →
+                                          </button>
+                                   </div>
                             </Col>
 
                             <Col md={3} className="users-sidebar">

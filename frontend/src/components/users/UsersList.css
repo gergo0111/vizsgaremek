@@ -175,15 +175,48 @@
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 450px;
 }
 
 .users-table {
   margin-bottom: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  table-layout: fixed;
+  box-sizing: border-box;
 }
 
 .users-table thead {
-  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-  color: white;
+  background: white;
+  color: #001f4d;
+  flex-shrink: 0;
+  display: flex;
+  width: 100%;
+  border-spacing: 0;
+  box-sizing: border-box;
+  padding-right: 17px;
+  position: relative;
+  border-bottom: 2px solid #0066cc;
+}
+
+.users-table thead::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 17px;
+  height: 100%;
+  background-color: white;
+}
+
+.users-table thead tr {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .users-table thead th {
@@ -192,11 +225,39 @@
   border: none;
   font-size: 0.95rem;
   text-align: left;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.users-table thead th:nth-child(1) {
+  width: 35%;
+}
+
+.users-table thead th:nth-child(2) {
+  width: 35%;
+}
+
+.users-table thead th:nth-child(3),
+.users-table thead th:nth-child(4) {
+  width: 15%;
+  text-align: center;
+}
+
+.users-table tbody {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-spacing: 0;
+  box-sizing: border-box;
+  background-color: white;
 }
 
 .users-table tbody tr {
-  border-bottom: 1px solid #e0e0e0;
-  transition: all 0.2s ease;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .users-table tbody tr:hover {
@@ -206,6 +267,23 @@
 .user-row td {
   padding: 1rem 1.25rem;
   vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.user-row td:nth-child(1) {
+  width: 35%;
+}
+
+.user-row td:nth-child(2) {
+  width: 35%;
+}
+
+.user-row td:nth-child(3),
+.user-row td:nth-child(4) {
+  width: 15%;
+  text-align: center;
 }
 
 .user-name {
@@ -301,3 +379,50 @@
   color: #999 !important;
   font-style: italic;
 }
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn {
+  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 102, 204, 0.3);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0052a3 0%, #003d7a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 102, 204, 0.4);
+}
+
+.pagination-btn:disabled {
+  background: #cccccc;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-info {
+  font-weight: 600;
+  color: #001f4d;
+  font-size: 0.95rem;
+  min-width: 150px;
+  text-align: center;
+}
+
