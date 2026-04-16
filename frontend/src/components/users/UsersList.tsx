@@ -220,13 +220,13 @@ export function UsersList() {
                                                                       className={`sort-order-btn ${sortOrder === 'asc' ? 'active' : ''}`}
                                                                       onClick={() => setSortOrder('asc')}
                                                                >
-                                                                      ⬆️ Növekvő
+                                                                      ▲ Növekvő
                                                                </button>
                                                                <button
                                                                       className={`sort-order-btn ${sortOrder === 'desc' ? 'active' : ''}`}
                                                                       onClick={() => setSortOrder('desc')}
                                                                >
-                                                                      ⬇️ Csökkenő
+                                                                      ▼ Csökkenő
                                                                </button>
                                                         </div>
                                                  </div>
