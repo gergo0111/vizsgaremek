@@ -236,17 +236,6 @@ export function GanntChart() {
 		setFilters((prev) => ({ ...prev, [key]: value }));
 	}
 
-	function toggleSort(next: SortKey) {
-		setSortKey((prev) => {
-			if (prev !== next) {
-				setSortDir("asc");
-				return next;
-			}
-			setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-			return prev;
-		});
-	}
-
 	function closeModal() {
 		setSelectedWork(null);
 	}
@@ -276,26 +265,102 @@ export function GanntChart() {
 					</div>
 
 					<div className="pt-sortBar">
-						<button className="pt-sortBtn" type="button" onClick={() => toggleSort("name")}>
-							Név
-							{sortKey === "name" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
-						</button>
-						<button className="pt-sortBtn" type="button" onClick={() => toggleSort("start")}>
-							Kezdet
-							{sortKey === "start" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
-						</button>
-						<button className="pt-sortBtn" type="button" onClick={() => toggleSort("end")}>
-							Határidő
-							{sortKey === "end" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
-						</button>
-						<button
-							className="pt-sortBtn"
-							type="button"
-							onClick={() => toggleSort("progress")}
-						>
-							%
-							{sortKey === "progress" ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
-						</button>
+						<div className="pt-sortGroup">
+							<button 
+								className={`pt-sortBtn ${sortKey === "name" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("name");
+									setSortDir("asc");
+								}}
+								title="Név - Növekvő"
+							>
+								Név ▲
+							</button>
+							<button 
+								className={`pt-sortBtn ${sortKey === "name" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("name");
+									setSortDir("desc");
+								}}
+								title="Név - Csökkenő"
+							>
+								Név ▼
+							</button>
+						</div>
+						<div className="pt-sortGroup">
+							<button 
+								className={`pt-sortBtn ${sortKey === "start" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("start");
+									setSortDir("asc");
+								}}
+								title="Kezdet - Növekvő"
+							>
+								Kezdet ▲
+							</button>
+							<button 
+								className={`pt-sortBtn ${sortKey === "start" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("start");
+									setSortDir("desc");
+								}}
+								title="Kezdet - Csökkenő"
+							>
+								Kezdet ▼
+							</button>
+						</div>
+						<div className="pt-sortGroup">
+							<button 
+								className={`pt-sortBtn ${sortKey === "end" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("end");
+									setSortDir("asc");
+								}}
+								title="Határidő - Növekvő"
+							>
+								Határidő ▲
+							</button>
+							<button 
+								className={`pt-sortBtn ${sortKey === "end" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+								type="button" 
+								onClick={() => {
+									setSortKey("end");
+									setSortDir("desc");
+								}}
+								title="Határidő - Csökkenő"
+							>
+								Határidő ▼
+							</button>
+						</div>
+						<div className="pt-sortGroup">
+							<button
+								className={`pt-sortBtn ${sortKey === "progress" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+								type="button"
+								onClick={() => {
+									setSortKey("progress");
+									setSortDir("asc");
+								}}
+								title="Százalék - Növekvő"
+							>
+								% ▲
+							</button>
+							<button
+								className={`pt-sortBtn ${sortKey === "progress" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+								type="button"
+								onClick={() => {
+									setSortKey("progress");
+									setSortDir("desc");
+								}}
+								title="Százalék - Csökkenő"
+							>
+								% ▼
+							</button>
+						</div>
 					</div>
 
 					<div className="pt-leftList">

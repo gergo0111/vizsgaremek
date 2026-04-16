@@ -1,7 +1,10 @@
 .pt-page {
-	min-height: calc(100vh - 56px);
+	height: calc(100vh - 56px);
 	background: #061a46;
 	padding: 18px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }
 
 .pt-main {
@@ -9,6 +12,9 @@
 	grid-template-columns: 320px 1fr;
 	gap: 22px;
 	align-items: start;
+	flex: 1;
+	overflow: hidden;
+	min-height: 0;
 }
 
 .pt-panel {
@@ -17,6 +23,9 @@
 	border-radius: 26px;
 	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
 	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 }
 
 .pt-panelHeader {
@@ -36,6 +45,8 @@
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
+	flex: 1;
+	overflow-y: auto;
 }
 
 .pt-error {
@@ -117,6 +128,10 @@
 
 .pt-right {
 	padding-bottom: 12px;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
 }
 
 .pt-ganttHeader {
@@ -125,24 +140,55 @@
 	justify-content: space-between;
 	align-items: center;
 	gap: 16px;
+	flex-shrink: 0;
 }
 
 .pt-sortBar {
-	padding: 10px 14px;
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 8px;
+	padding: 16px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 	border-bottom: 3px solid #cfcfcf;
+	flex-shrink: 0;
+}
+
+.pt-sortGroup {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
 }
 
 .pt-sortBtn {
 	border: 2px solid #cfcfcf;
 	background: #f6f6f6;
 	border-radius: 12px;
-	padding: 8px 10px;
-	font-weight: 800;
+	padding: 12px 10px;
+	font-weight: 700;
 	color: #084885;
 	cursor: pointer;
+	font-size: 13px;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.pt-sortBtn:hover {
+	background: #e8e8e8;
+	border-color: #084885;
+}
+
+.pt-sortBtn:active,
+.pt-sortBtn:focus {
+	outline: none;
+	background: #d4d4d4;
+}
+
+.pt-sortBtn--active {
+	background: #0066cc;
+	color: #ffffff;
+	border-color: #0052a3;
+	font-weight: 900;
 }
 
 .pt-viewSelect {
@@ -203,13 +249,17 @@
 	grid-template-columns: 220px repeat(var(--pt-days, 14), minmax(28px, 1fr));
 	grid-auto-rows: 58px;
 	position: relative;
-	overflow-x: auto;
+	overflow: auto;
+	flex: 1;
+	min-height: 0;
 }
 
 .pt-col {
 	border-right: 2px solid #e3e3e3;
 	background: #e6f3b9;
-	position: relative;
+	position: sticky;
+	top: 0;
+	z-index: 1;
 }
 
 .pt-col--label {
@@ -217,6 +267,9 @@
 	font-weight: 800;
 	padding: 18px 12px;
 	border-right: 3px solid #cfcfcf;
+	position: sticky;
+	top: 0;
+	z-index: 2;
 }
 
 .pt-col--weekend {
@@ -316,6 +369,7 @@
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 10px 16px;
 	background: #061a46;
+	flex-shrink: 0;
 }
 
 .pt-legendItem {
