@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export function Menusor() {
   const user = getUser();
   const navigate = useNavigate();
-  const isAdmin = user?.jogosultsag === 'Admin';
+  const isAdmin = user?.isAdmin === true;
 
   const handleLogout = () => {
     logout();
