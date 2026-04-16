@@ -393,7 +393,7 @@ export function NewWorkAdd() {
                                                                       <Button 
                                                                              type="button" 
                                                                              variant="outline-primary"
-                                                                             onClick={() => navigate("/fooldal")}
+                                                                             onClick={() => navigate("/munka-lista")}
                                                                              className="flex-grow-1"
                                                                       >
                                                                              ← Vissza

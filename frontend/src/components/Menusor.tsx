@@ -39,6 +39,11 @@ export function Menusor() {
 
         <div className="collapse navbar-collapse" id="navbarText">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/fooldal")}>
+                Főoldal
+              </button>
+            </li>
             {isAdmin && (
               <>
                 <li className="nav-item">
@@ -54,11 +59,6 @@ export function Menusor() {
                 <li className="nav-item">
                   <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/munka-lista")}>
                     Munkák módosítása
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/uj-munka")}>
-                    ⊕ Új munka
                   </button>
                 </li>
               </>
