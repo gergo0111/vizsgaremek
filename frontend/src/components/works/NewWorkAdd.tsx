@@ -233,14 +233,18 @@ export function NewWorkAdd() {
                                                                              <div className="error-message">{errors.selectedUsers}</div>
                                                                       )}
                                                                       <div>
-                                                                             {selectedUsers.map((userId, idx) => (
+                                                                             {selectedUsers.map((userId, idx) => {
+                                                                                    const availableUsers = users.filter(user => 
+                                                                                           !selectedUsers.includes(user.user_id) || selectedUsers[idx] === user.user_id
+                                                                                    );
+                                                                                    return (
                                                                                     <div key={idx} className="dynamic-row">
                                                                                            <Form.Select
                                                                                                   value={userId}
                                                                                                   onChange={(e) => handleUserChange(idx, parseInt(e.target.value || '0', 10) || 0)}
                                                                                            >
                                                                                                   <option value={0}>-- válassz --</option>
-                                                                                                  {users.map((user) => (
+                                                                                                  {availableUsers.map((user) => (
                                                                                                          <option key={user.user_id} value={user.user_id}>
                                                                                                                 {user.nev}
                                                                                                          </option>
@@ -254,7 +258,8 @@ export function NewWorkAdd() {
                                                                                                   Törlés
                                                                                            </Button>
                                                                                     </div>
-                                                                             ))}
+                                                                                    );
+                                                                             })}
                                                                              <Button 
                                                                                     variant="primary" 
                                                                                     size="sm"
@@ -288,14 +293,18 @@ export function NewWorkAdd() {
                                                                                            </Button>
                                                                                     </div>
                                                                              )}
-                                                                             {selectedTools.map((toolId, idx) => (
+                                                                             {selectedTools.map((toolId, idx) => {
+                                                                                    const availableTools = tools.filter(tool => 
+                                                                                           !selectedTools.includes(tool.eszkoz_id) || selectedTools[idx] === tool.eszkoz_id
+                                                                                    );
+                                                                                    return (
                                                                                     <div key={idx} className="dynamic-row">
                                                                                            <Form.Select
                                                                                                   value={toolId}
                                                                                                   onChange={(e) => handleToolChange(idx, parseInt(e.target.value || '0', 10) || 0)}
                                                                                            >
                                                                                                   <option value={0}>-- válassz --</option>
-                                                                                                  {tools.map((tool) => (
+                                                                                                  {availableTools.map((tool) => (
                                                                                                          <option key={tool.eszkoz_id} value={tool.eszkoz_id}>
                                                                                                                 {tool.nev}
                                                                                                          </option>
@@ -309,7 +318,8 @@ export function NewWorkAdd() {
                                                                                                   Törlés
                                                                                            </Button>
                                                                                     </div>
-                                                                             ))}
+                                                                                    );
+                                                                             })}
                                                                              <Button 
                                                                                     variant="primary" 
                                                                                     size="sm"
