@@ -149,7 +149,7 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant="secondary" onClick={handleClose}>Bezárás</Button>
+				<Button variant="secondary" onClick={handleClose}>Mégsem</Button>
 				<Button variant="primary" onClick={handleSave} disabled={isSaving}>
 					{isSaving ? "Mentés..." : "Mentés"}
 				</Button>
