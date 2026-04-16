@@ -65,6 +65,11 @@ export function Menusor() {
             )}
           </ul>
       
+            <div className="navbar-nav">
+              <button className="nav-link text-white border-0 bg-transparent">
+                {user?.nev || 'Kérlek jelentkezz be❗️'}
+              </button>
+            </div>
           <div className="navbar-nav">
             <button
               className="nav-link text-white border-0 bg-transparent"
