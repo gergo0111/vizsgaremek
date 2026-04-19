@@ -16,14 +16,26 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../users/UsersList.css";
 
+interface MunkaUser {
+  munka_id: number;
+  user_id: number;
+  user?: UserData;
+}
+
+interface MunkaEszkoz {
+  munka_id: number;
+  eszkoz_id: number;
+  eszkoz?: EszkozData;
+}
+
 interface WorkData {
   munka_id: number;
   munka_neve: string;
   leiras?: string;
   kezdeti_datum?: string;
   varhato_befejezes_datuma?: string;
-  user_id?: number;
-  eszkoz_id?: number;
+  munkaUsers?: MunkaUser[];
+  munkaEszkozok?: MunkaEszkoz[];
   feladat?: Array<{ feladat_id: number; leiras: string }>;
 }
 
@@ -92,14 +104,14 @@ export function WorkList() {
       }
     } else if (sortBy === "user") {
       filtered.sort((a, b) =>
-        getUserName(a.user_id).localeCompare(getUserName(b.user_id), "hu"),
+        getUsersNames(a).localeCompare(getUsersNames(b), "hu"),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "tool") {
       filtered.sort((a, b) =>
-        getToolName(a.eszkoz_id).localeCompare(getToolName(b.eszkoz_id), "hu"),
+        getToolsNames(a).localeCompare(getToolsNames(b), "hu"),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
@@ -156,8 +168,24 @@ export function WorkList() {
   const getUserName = (userId?: number) =>
     users.find((user) => user.user_id === userId)?.nev ?? "";
 
+  const getUsersNames = (work: WorkData) => {
+    if (!work.munkaUsers || work.munkaUsers.length === 0) return "";
+    return work.munkaUsers
+      .map((mu) => mu.user?.nev || "")
+      .filter((name) => name)
+      .join(", ");
+  };
+
   const getToolName = (eszkozId?: number) =>
     tools.find((tool) => tool.eszkoz_id === eszkozId)?.nev ?? "";
+
+  const getToolsNames = (work: WorkData) => {
+    if (!work.munkaEszkozok || work.munkaEszkozok.length === 0) return "";
+    return work.munkaEszkozok
+      .map((me) => me.eszkoz?.nev || "")
+      .filter((name) => name)
+      .join(", ");
+  };
 
   const getDateValue = (dateString?: string) =>
     dateString ? new Date(dateString).getTime() : 0;
@@ -232,8 +260,8 @@ export function WorkList() {
                         <td className="user-department">
                           {work.leiras || "-"}
                         </td>
-                        <td>{getUserName(work.user_id) || "-"}</td>
-                        <td>{getToolName(work.eszkoz_id) || "-"}</td>
+                        <td>{getUsersNames(work) || "-"}</td>
+                        <td>{getToolsNames(work) || "-"}</td>
                         <td>{work.kezdeti_datum || "-"}</td>
                         <td>{work.varhato_befejezes_datuma || "-"}</td>
                         <td className="action-cell">

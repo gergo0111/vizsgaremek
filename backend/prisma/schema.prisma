@@ -18,19 +18,19 @@ model User {
   isActive       Boolean   @default(false)
   isAdmin        Boolean   @default(false)
   comment        Comment[]
-  munka          Munka[]
-  token           Token[]
+  munkaUsers     MunkaUser[]
+  token          Token[]
 
   @@map("user")
 }
 
 model Eszkoz {
-  eszkoz_id    Int     @id @default(autoincrement())
-  nev          String  @unique
-  tipus        String
-  darabszam    Int
-  hasznalatban Boolean @default(false)
-  munka        Munka[]
+  eszkoz_id      Int     @id @default(autoincrement())
+  nev            String  @unique
+  tipus          String
+  darabszam      Int
+  hasznalatban   Boolean @default(false)
+  munkaEszkozok  MunkaEszkoz[]
 
   @@map("eszkoz")
 }
@@ -51,20 +51,38 @@ model Munka {
   munka_id                 Int       @id @default(autoincrement())
   munka_neve               String    @unique
   leiras                   String    @db.Text
-  eszkoz_id                Int
-  user_id                  Int
   ertesitesIsActive        Boolean   @default(false)
   isActive                 Boolean   @default(true)
   kezdeti_datum            DateTime  @default(now())
   varhato_befejezes_datuma DateTime
   comment                  Comment[]
   feladat                  Feladat[]
-  eszkoz                   Eszkoz    @relation(fields: [eszkoz_id], references: [eszkoz_id])
-  user                     User      @relation(fields: [user_id], references: [user_id])
+  munkaUsers               MunkaUser[]
+  munkaEszkozok            MunkaEszkoz[]
 
-  @@index([eszkoz_id], map: "munka_eszkoz_id_fkey")
-  @@index([user_id], map: "munka_user_id_fkey")
   @@map("munka")
+}
+
+model MunkaUser {
+  munka_id Int
+  user_id  Int
+  munka    Munka @relation(fields: [munka_id], references: [munka_id], onDelete: Cascade)
+  user     User  @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@id([munka_id, user_id])
+  @@index([user_id])
+  @@map("munka_user")
+}
+
+model MunkaEszkoz {
+  munka_id  Int
+  eszkoz_id Int
+  munka     Munka   @relation(fields: [munka_id], references: [munka_id], onDelete: Cascade)
+  eszkoz    Eszkoz  @relation(fields: [eszkoz_id], references: [eszkoz_id], onDelete: Cascade)
+
+  @@id([munka_id, eszkoz_id])
+  @@index([eszkoz_id])
+  @@map("munka_eszkoz")
 }
 
 model Comment {

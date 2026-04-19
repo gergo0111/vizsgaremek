@@ -13,14 +13,26 @@ interface Tool {
   nev: string;
 }
 
+interface MunkaUser {
+  munka_id: number;
+  user_id: number;
+  user?: User;
+}
+
+interface MunkaEszkoz {
+  munka_id: number;
+  eszkoz_id: number;
+  eszkoz?: Tool;
+}
+
 interface WorkData {
   munka_id: number;
   munka_neve: string;
   leiras?: string;
   kezdeti_datum?: string;
   varhato_befejezes_datuma?: string;
-  user_id?: number;
-  eszkoz_id?: number;
+  munkaUsers?: MunkaUser[];
+  munkaEszkozok?: MunkaEszkoz[];
   feladat?: Array<{ feladat_id: number; leiras: string }>;
 }
 
@@ -36,8 +48,8 @@ export function ModifyWork() {
     leiras: "",
     kezdeti_datum: "",
     varhato_befejezes_datuma: "",
-    user_id: undefined,
-    eszkoz_id: undefined,
+    munkaUsers: [],
+    munkaEszkozok: [],
     feladat: [],
   });
   const [loading, setLoading] = useState(true);
@@ -81,8 +93,12 @@ export function ModifyWork() {
           varhato_befejezes_datuma: varhato,
         });
         
-        setSelectedUsers(data.user_id ? [data.user_id] : []);
-        setSelectedTools(data.eszkoz_id ? [data.eszkoz_id] : []);
+        const userIds = data.munkaUsers?.map((mu) => mu.user_id) || [];
+        setSelectedUsers(userIds.length > 0 ? userIds : [0]);
+        
+        const toolIds = data.munkaEszkozok?.map((me) => me.eszkoz_id) || [];
+        setSelectedTools(toolIds.length > 0 ? toolIds : [0]);
+        
         setSelectedTasks(data.feladat ? data.feladat.map((f: any) => f.leiras) : [""]);
         setLoading(false);
       } catch (error) {
@@ -159,8 +175,8 @@ export function ModifyWork() {
       leiras: workData.leiras,
       kezdeti_datum: workData.kezdeti_datum || undefined,
       varhato_befejezes_datuma: workData.varhato_befejezes_datuma || undefined,
-      user_id: selectedUsers[0] || undefined,
-      eszkoz_id: selectedTools[0] || undefined,
+      dolgozok: selectedUsers.filter((u) => u > 0),
+      eszkozok: selectedTools.filter((t) => t > 0),
       feladatok: selectedTasks.filter((t) => t && t.trim() !== ""),
     };
 

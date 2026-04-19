@@ -142,7 +142,9 @@ export function GanntChart() {
         const data = await apiGet<Munka[]>("/munka");
         let filtered = Array.isArray(data) ? data : [];
         if (!isAdminUser && currentUserId) {
-          filtered = filtered.filter((w) => w.user_id === currentUserId);
+          filtered = filtered.filter((w) => 
+            w.munkaUsers?.some((mu) => mu.user_id === currentUserId)
+          );
         }
         if (!cancelled) setWorks(filtered);
       } catch (e) {

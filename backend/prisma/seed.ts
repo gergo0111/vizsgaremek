@@ -85,22 +85,56 @@ async function main() {
     console.log('10 munka létrehozása...');
 
     for (let i = 1; i <= 10; i++) {
-      const kezdeti_datum = new Date(2026, 0, i % 28 + 1);
-      const varhato_befejezes_datuma = new Date(kezdeti_datum);
-      varhato_befejezes_datuma.setDate(varhato_befejezes_datuma.getDate() + Math.floor(i / 2) + 1);
+      const kezdeti_datum = new Date();
+      kezdeti_datum.setDate(kezdeti_datum.getDate() - (10 - i));
+      kezdeti_datum.setHours(9, 0, 0, 0);
       
-      await prisma.munka.create({
+      const varhato_befejezes_datuma = new Date(kezdeti_datum);
+      varhato_befejezes_datuma.setDate(varhato_befejezes_datuma.getDate() + i + 2);
+      varhato_befejezes_datuma.setHours(17, 0, 0, 0);
+      
+      const munka = await prisma.munka.create({
         data: {
           munka_neve: `Munka ${i}`,
           leiras: `Ez a munka ${i} leírása`,
-          eszkoz_id: eszkozok[(i - 1) % 10].eszkoz_id,
-          user_id: users[(i - 1) % 10].user_id,
           ertesitesIsActive: i % 2 === 0,
           isActive: true,
           kezdeti_datum: kezdeti_datum,
           varhato_befejezes_datuma: varhato_befejezes_datuma,
         },
       });
+
+      const felhasznalok_szama = (i % 3) + 1;
+      for (let u = 0; u < felhasznalok_szama; u++) {
+        const user_id = users[(i - 1 + u) % 10].user_id;
+        await (prisma as any).munkaUser.create({
+          data: {
+            munka_id: munka.munka_id,
+            user_id: user_id
+          }
+        });
+      }
+
+      const eszkozok_szama = (i % 2) + 1;
+      for (let e = 0; e < eszkozok_szama; e++) {
+        const eszkoz_id = eszkozok[(i - 1 + e) % 10].eszkoz_id;
+        
+        try {
+          await prisma.eszkoz.update({
+            where: { eszkoz_id },
+            data: { hasznalatban: true }
+          });
+        } catch (e) {
+          console.warn(`Eszkoz with id ${eszkoz_id} not found, skipping hasznalatban update.`);
+        }
+
+        await (prisma as any).munkaEszkoz.create({
+          data: {
+            munka_id: munka.munka_id,
+            eszkoz_id: eszkoz_id
+          }
+        });
+      }
     }
     console.log(`✅ 10 munka sikeresen létrehozva\n`);
 

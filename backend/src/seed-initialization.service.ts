@@ -100,8 +100,6 @@ export class SeedInitializationService implements OnModuleInit {
           data: {
             munka_neve: `Munka ${i}`,
             leiras: `Ez a munka ${i} leírása`,
-            eszkoz_id: eszkozok[(i - 1) % 10].eszkoz_id,
-            user_id: users[(i - 1) % 10].user_id,
             ertesitesIsActive: i % 2 === 0,
             isActive: true,
             kezdeti_datum: kezdeti_datum,
@@ -109,6 +107,37 @@ export class SeedInitializationService implements OnModuleInit {
           },
         });
         munkak.push(munka);
+
+        const felhasznalok_szama = (i % 3) + 1;
+        for (let u = 0; u < felhasznalok_szama; u++) {
+          const user_id = users[(i - 1 + u) % 10].user_id;
+          await (this.prisma as any).munkaUser.create({
+            data: {
+              munka_id: munka.munka_id,
+              user_id: user_id
+            }
+          });
+        }
+
+        const eszkozok_szama = (i % 2) + 1;
+        for (let e = 0; e < eszkozok_szama; e++) {
+          const eszkoz_id = eszkozok[(i - 1 + e) % 10].eszkoz_id;
+          try {
+            await (this.prisma as any).eszkoz.update({
+              where: { eszkoz_id },
+              data: { hasznalatban: true }
+            });
+          } catch (e) {
+            console.warn(`Eszkoz with id ${eszkoz_id} not found, skipping hasznalatban update.`);
+          }
+
+          await (this.prisma as any).munkaEszkoz.create({
+            data: {
+              munka_id: munka.munka_id,
+              eszkoz_id: eszkoz_id
+            }
+          });
+        }
 
         const feladatSzam = Math.floor(Math.random() * 4) + 2;
         for (let j = 1; j <= feladatSzam; j++) {

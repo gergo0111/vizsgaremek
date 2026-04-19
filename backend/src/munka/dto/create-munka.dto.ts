@@ -1,34 +1,54 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, IsArray } from "class-validator";
  
 export class CreateMunkaDto {
  
   @IsString()
   @IsNotEmpty()
   munka_neve: string;
+
+  @IsString()
+  @IsOptional()
+  leiras?: string;
+ 
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  eszkozok?: number[];
+ 
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  dolgozok?: number[];
+
+  @IsNumber()
+  @IsOptional()
+  eszkoz_id?: number;
  
   @IsNumber()
-  @IsNotEmpty()
-  eszkoz_id: number;
- 
-  @IsNumber()
-  @IsNotEmpty()
-  user_id: number;
+  @IsOptional()
+  user_id?: number;
  
   @IsOptional()
   @IsBoolean()
-  ertesitesIsActive: boolean;
+  ertesitesIsActive?: boolean;
  
   @IsOptional()
   @IsBoolean()
-  isActive: boolean;
+  isActive?: boolean;
  
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
-  kezdeti_datum: Date;
+  kezdeti_datum?: Date;
  
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
-  varhato_befejezes_datuma: Date;
+  varhato_befejezes_datuma?: Date;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  feladatok?: string[];
  
 }
+ 
  
