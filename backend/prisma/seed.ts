@@ -9,7 +9,7 @@ async function main() {
   const adminEmail = 'admin@example.com';
   const adminPassword = 'Admin123';
   const adminName = 'Administrator';
-  const userPassword = 'felhasznalo123';
+  const userPassword = 'Felhasznalo123';
   const saltRounds = 10;
 
   try {
@@ -74,7 +74,7 @@ async function main() {
         data: {
           nev: `Eszköz ${i}`,
           tipus: `Típus ${i}`,
-          darabszam: i,
+          darabszam: Math.max(1, i),
           hasznalatban: i % 2 === 0,
         },
       });
@@ -85,7 +85,10 @@ async function main() {
     console.log('10 munka létrehozása...');
 
     for (let i = 1; i <= 10; i++) {
-      const varhato_datum = new Date(2026, Math.floor((i - 1) / 2), (i % 28) + 1);
+      const kezdeti_datum = new Date(2026, 0, i % 28 + 1);
+      const varhato_befejezes_datuma = new Date(kezdeti_datum);
+      varhato_befejezes_datuma.setDate(varhato_befejezes_datuma.getDate() + Math.floor(i / 2) + 1);
+      
       await prisma.munka.create({
         data: {
           munka_neve: `Munka ${i}`,
@@ -94,7 +97,8 @@ async function main() {
           user_id: users[(i - 1) % 10].user_id,
           ertesitesIsActive: i % 2 === 0,
           isActive: true,
-          varhato_befejezes_datuma: varhato_datum,
+          kezdeti_datum: kezdeti_datum,
+          varhato_befejezes_datuma: varhato_befejezes_datuma,
         },
       });
     }

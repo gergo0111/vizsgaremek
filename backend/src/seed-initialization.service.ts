@@ -13,7 +13,7 @@ export class SeedInitializationService implements OnModuleInit {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
     const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123';
     const adminName = 'Administrator';
-    const userPassword = 'felhasznalo123';
+    const userPassword = 'Felhasznalo123';
     const saltRounds = 10;
 
     try {
@@ -76,7 +76,7 @@ export class SeedInitializationService implements OnModuleInit {
           data: {
             nev: `Eszköz ${i}`,
             tipus: `Típus ${i}`,
-            darabszam: i,
+            darabszam: Math.max(1, i),
             hasznalatban: i % 2 === 0,
           },
         });
@@ -88,7 +88,14 @@ export class SeedInitializationService implements OnModuleInit {
       const munkak: any[] = [];
 
       for (let i = 1; i <= 10; i++) {
-        const varhato_datum = new Date(2026, Math.floor((i - 1) / 2), (i % 28) + 1);
+        const kezdeti_datum = new Date();
+        kezdeti_datum.setDate(kezdeti_datum.getDate() - (10 - i));
+        kezdeti_datum.setHours(9, 0, 0, 0);
+        
+        const varhato_befejezes_datuma = new Date(kezdeti_datum);
+        varhato_befejezes_datuma.setDate(varhato_befejezes_datuma.getDate() + i + 2);
+        varhato_befejezes_datuma.setHours(17, 0, 0, 0);
+        
         const munka = await (this.prisma as any).munka.create({
           data: {
             munka_neve: `Munka ${i}`,
@@ -97,7 +104,8 @@ export class SeedInitializationService implements OnModuleInit {
             user_id: users[(i - 1) % 10].user_id,
             ertesitesIsActive: i % 2 === 0,
             isActive: true,
-            varhato_befejezes_datuma: varhato_datum,
+            kezdeti_datum: kezdeti_datum,
+            varhato_befejezes_datuma: varhato_befejezes_datuma,
           },
         });
         munkak.push(munka);
