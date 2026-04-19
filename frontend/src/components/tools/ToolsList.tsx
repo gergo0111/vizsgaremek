@@ -43,12 +43,12 @@ export function ToolsList() {
               );
 
               if (sortBy === 'name') {
-                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu', { numeric: true, sensitivity: 'base' }));
                      if (sortOrder === 'desc') {
                             filtered.reverse();
                      }
               } else if (sortBy === 'type') {
-                     filtered.sort((a, b) => a.tipus.localeCompare(b.tipus, 'hu'));
+                     filtered.sort((a, b) => a.tipus.localeCompare(b.tipus, 'hu', { numeric: true, sensitivity: 'base' }));
                      if (sortOrder === 'desc') {
                             filtered.reverse();
                      }

@@ -98,20 +98,20 @@ export function WorkList() {
     );
 
     if (sortBy === "name") {
-      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu"));
+      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu", { numeric: true, sensitivity: 'base' }));
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "user") {
       filtered.sort((a, b) =>
-        getUsersNames(a).localeCompare(getUsersNames(b), "hu"),
+        getUsersNames(a).localeCompare(getUsersNames(b), "hu", { numeric: true, sensitivity: 'base' }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "tool") {
       filtered.sort((a, b) =>
-        getToolsNames(a).localeCompare(getToolsNames(b), "hu"),
+        getToolsNames(a).localeCompare(getToolsNames(b), "hu", { numeric: true, sensitivity: 'base' }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();

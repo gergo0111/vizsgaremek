@@ -65,7 +65,17 @@
 }
 
 .pt-workCard {
-	padding: 0;
+		padding: 0;
+		cursor: pointer;
+}
+
+.pt-workCard:focus {
+	outline: none;
+}
+
+.pt-workCard:focus-visible {
+	box-shadow: 0 0 0 3px rgba(127,177,14,0.35);
+	border-radius: 12px;
 }
 
 .pt-bar {
@@ -346,9 +356,21 @@
 	font-size: 12px;
 	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
 	white-space: nowrap;
-	max-width: calc(100% - 34px);
+	max-width: calc(100% - 64px);
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.pt-ganttBarPercent {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-weight: 900;
+  font-size: 12px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
 }
 
 .pt-ganttKnob {

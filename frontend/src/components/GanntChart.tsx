@@ -214,7 +214,7 @@ export function GanntChart() {
     return [...visible].sort((a, b) => {
       switch (sortKey) {
         case "name":
-          return a.munka_neve.localeCompare(b.munka_neve) * dir;
+          return a.munka_neve.localeCompare(b.munka_neve, 'hu', { numeric: true, sensitivity: 'base' }) * dir;
         case "start":
           return (a.start.getTime() - b.start.getTime()) * dir;
         case "end":
@@ -324,7 +324,20 @@ export function GanntChart() {
           <div className="pt-leftList">
             {error && <div className="pt-error">{error}</div>}
             {filteredSorted.map((w) => (
-              <div key={w.munka_id} className="pt-workCard">
+              <div
+                key={w.munka_id}
+                className="pt-workCard"
+                onClick={() => setSelectedWork(w)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedWork(w);
+                  }
+                }}
+                role="button"
+                aria-label={`Megnyitás: ${w.munka_neve}`}
+              >
                 <div
                   className={`pt-bar ${progressColorClass(w.progress)} ${w.status === "late" ? "pt-bar--late" : ""}`}
                 >
@@ -422,6 +435,7 @@ export function GanntChart() {
                         style={{ width: `${w.progress}%` }}
                       />
                       <div className="pt-ganttBarLabel">{w.munka_neve}</div>
+                      <div className="pt-ganttBarPercent">{w.progress}%</div>
                     </div>
                   </div>
                 </div>

@@ -37,12 +37,12 @@ export function UsersList() {
               );
 
               if (sortBy === 'name') {
-                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu', { numeric: true, sensitivity: 'base' }));
                      if (sortOrder === 'desc') {
                             filtered.reverse();
                      }
               } else if (sortBy === 'department') {
-                     filtered.sort((a, b) => a.munkakor.localeCompare(b.munkakor, 'hu'));
+                     filtered.sort((a, b) => a.munkakor.localeCompare(b.munkakor, 'hu', { numeric: true, sensitivity: 'base' }));
                      if (sortOrder === 'desc') {
                             filtered.reverse();
                      }

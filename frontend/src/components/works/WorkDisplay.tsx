@@ -85,7 +85,7 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 	function prevPage() {
 		setCurrentPage((p) => Math.max(0, p - 1));
 	}
-
+	
 	function nextPage() {
 		setCurrentPage((p) => Math.min(totalPages - 1, p + 1));
 	}
