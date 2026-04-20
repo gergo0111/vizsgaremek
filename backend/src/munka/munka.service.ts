@@ -58,19 +58,24 @@ export class MunkaService {
        }
 
        async create(data: any) {
-              const dolgozok: number[] = Array.isArray(data.dolgozok) ? data.dolgozok : [data.user_id].filter(Boolean);
-              const eszkozok: number[] = Array.isArray(data.eszkozok) ? data.eszkozok : [data.eszkoz_id].filter(Boolean);
+              const rawDolgozok: number[] = Array.isArray(data.dolgozok) ? data.dolgozok : [data.user_id].filter(Boolean);
+              const rawEszkozok: number[] = Array.isArray(data.eszkozok) ? data.eszkozok : [data.eszkoz_id].filter(Boolean);
               const feladatok: string[] = Array.isArray(data.feladatok) ? data.feladatok : [];
 
+              // Deduplicate and normalize IDs to avoid creating duplicate relations
+              const dolgozok = Array.from(new Set(rawDolgozok.filter(Boolean)));
+              const eszkozok = Array.from(new Set(rawEszkozok.filter(Boolean)));
               if (dolgozok.length === 0 && data.user_id) dolgozok.push(data.user_id);
               if (eszkozok.length === 0 && data.eszkoz_id) eszkozok.push(data.eszkoz_id);
 
               const baseName = data.nev || `Munka ${new Date().toISOString()}`;
-              const uniqueName = `${baseName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              // If client provided a name, use it as-is. Only generate a unique
+              // name when no name is provided to avoid accidental renaming.
+              const munkaName = data.nev ? data.nev : `${baseName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
               const munka = await (this.prisma as any).munka.create({
                      data: {
-                            munka_neve: uniqueName,
+                            munka_neve: munkaName,
                             leiras: data.leiras || '',
                             kezdeti_datum: data.kezdetiDatum ? new Date(data.kezdetiDatum) : undefined,
                             varhato_befejezes_datuma: data.velemenyDatum ? new Date(data.velemenyDatum) : undefined,
@@ -162,7 +167,8 @@ export class MunkaService {
                             where: { munka_id: id }
                      });
 
-                     for (const user_id of data.dolgozok) {
+                     const inUsers = Array.from(new Set(data.dolgozok.filter(Boolean)));
+                     for (const user_id of inUsers) {
                             await (this.prisma as any).munkaUser.create({
                                    data: {
                                           munka_id: id,
@@ -177,7 +183,8 @@ export class MunkaService {
                             where: { munka_id: id }
                      });
 
-                     for (const eszkoz_id of data.eszkozok) {
+                     const inTools = Array.from(new Set(data.eszkozok.filter(Boolean)));
+                     for (const eszkoz_id of inTools) {
                             try {
                                    await (this.prisma as any).eszkoz.update({
                                           where: { eszkoz_id },

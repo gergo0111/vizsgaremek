@@ -4,10 +4,9 @@ import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
 import { isAdmin, getUser } from "../lib/auth";
 import { WorkDisplay } from "./works/WorkDisplay";
-
-
+ 
 type ViewMode = "week" | "month" | "year";
-
+ 
 type StatusKey =
   | "p0_25"
   | "p25_50"
@@ -16,25 +15,37 @@ type StatusKey =
   | "late"
   | "done"
   | "planned";
-
+ 
 type SortKey = "name" | "start" | "end" | "progress";
-
+ 
 type DecoratedWork = Munka & {
   progress: number;
   status: StatusKey;
   start: Date;
   end: Date;
 };
-
-function progressColorClass(progress: number) {
-  if (progress === 0) return "pt-bar--planned";
-  if (progress >= 100) return "pt-bar--done";
-  if (progress < 25) return "pt-bar--p0_25";
-  if (progress < 50) return "pt-bar--p25_50";
-  if (progress < 75) return "pt-bar--p50_75";
-  return "pt-bar--p75_100";
+ 
+function progressColorClass(status: StatusKey) {
+  switch (status) {
+    case "done":
+      return "pt-bar--done";
+    case "late":
+      return "pt-bar--late";
+    case "planned":
+      return "pt-bar--planned";
+    case "p0_25":
+      return "pt-bar--p0_25";
+    case "p25_50":
+      return "pt-bar--p25_50";
+    case "p50_75":
+      return "pt-bar--p50_75";
+    case "p75_100":
+      return "pt-bar--p75_100";
+    default:
+      return "pt-bar--p0_25";
+  }
 }
-
+ 
 function startOfWeek(d: Date) {
   const x = new Date(d);
   const day = (x.getDay() + 6) % 7;
@@ -42,25 +53,25 @@ function startOfWeek(d: Date) {
   x.setHours(0, 0, 0, 0);
   return x;
 }
-
+ 
 function startOfMonth(d: Date) {
   const x = new Date(d.getFullYear(), d.getMonth(), 1);
   x.setHours(0, 0, 0, 0);
   return x;
 }
-
+ 
 function startOfYear(d: Date) {
   const x = new Date(d.getFullYear(), 0, 1);
   x.setHours(0, 0, 0, 0);
   return x;
 }
-
+ 
 function addDays(d: Date, days: number) {
   const x = new Date(d);
   x.setDate(x.getDate() + days);
   return x;
 }
-
+ 
 function daysBetweenInclusive(a: Date, b: Date) {
   const start = new Date(a);
   start.setHours(0, 0, 0, 0);
@@ -69,24 +80,21 @@ function daysBetweenInclusive(a: Date, b: Date) {
   const ms = 24 * 60 * 60 * 1000;
   return Math.floor((end.getTime() - start.getTime()) / ms) + 1;
 }
-
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
-
+ 
+ 
 function isWeekend(d: Date) {
   const day = d.getDay();
   return day === 0 || day === 6;
 }
-
+ 
 function formatMonthDay(d: Date) {
   return d.toLocaleDateString("hu-HU", { month: "short", day: "numeric" });
 }
-
+ 
 function formatDowHu(d: Date) {
   return d.toLocaleDateString("hu-HU", { weekday: "short" });
 }
-
+ 
 function sameDay(a: Date, b: Date) {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -94,29 +102,32 @@ function sameDay(a: Date, b: Date) {
     a.getDate() === b.getDate()
   );
 }
-
+ 
 function computeProgressPercent(w: Munka) {
   const total = w.feladat?.length ?? 0;
   const done = w.feladat?.filter((f) => f.isCompleted).length ?? 0;
   return total === 0 ? 0 : Math.round((done / total) * 100);
 }
-
-function computeStatus(progress: number, start: Date, end: Date): StatusKey {
+ 
+function computeStatus(progress: number, _start: Date, end: Date): StatusKey {
   const now = new Date();
   if (progress >= 100) return "done";
-  if (progress === 0 && start.getTime() > now.getTime()) return "planned";
-  if (progress < 100 && end.getTime() < now.getTime()) return "late";
-  if (progress < 25) return "p0_25";
-  if (progress < 50) return "p25_50";
-  if (progress < 75) return "p50_75";
+
+  if (end.getTime() < now.getTime() && progress < 100) return "late";
+
+  if (progress === 0 && end.getTime() > now.getTime()) return "planned";
+
+  if (progress <= 24) return "p0_25";
+  if (progress <= 49) return "p25_50";
+  if (progress <= 74) return "p50_75";
   return "p75_100";
 }
-
+ 
 export function GanntChart() {
   const user = getUser();
   const isAdminUser = isAdmin();
   const currentUserId = user?.user_id ?? user?.id;
-
+ 
   const [works, setWorks] = useState<Munka[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("week");
@@ -133,7 +144,7 @@ export function GanntChart() {
     done: true,
     planned: true,
   });
-
+ 
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -142,8 +153,8 @@ export function GanntChart() {
         const data = await apiGet<Munka[]>("/munka");
         let filtered = Array.isArray(data) ? data : [];
         if (!isAdminUser && currentUserId) {
-          filtered = filtered.filter((w) => 
-            w.munkaUsers?.some((mu) => mu.user_id === currentUserId)
+          filtered = filtered.filter((w) =>
+            w.munkaUsers?.some((mu) => mu.user_id === currentUserId),
           );
         }
         if (!cancelled) setWorks(filtered);
@@ -155,7 +166,7 @@ export function GanntChart() {
       cancelled = true;
     };
   }, [isAdminUser, currentUserId]);
-
+ 
   const decoratedAll = useMemo<DecoratedWork[]>(() => {
     return works
       .map((w) => {
@@ -170,7 +181,7 @@ export function GanntChart() {
           !Number.isNaN(w.start.getTime()) && !Number.isNaN(w.end.getTime()),
       );
   }, [works]);
-
+ 
   const { rangeStart, rangeEnd, days } = useMemo(() => {
     const a = new Date(anchorDate);
     a.setHours(0, 0, 0, 0);
@@ -202,19 +213,24 @@ export function GanntChart() {
       days: Array.from({ length: len }, (_, i) => addDays(start, i)),
     };
   }, [anchorDate, viewMode]);
-
+ 
   const filteredSorted = useMemo<DecoratedWork[]>(() => {
     const visible = decoratedAll.filter((w) => {
       const isStatusMatch = filters[w.status];
       const isInView = w.start <= rangeEnd && w.end >= rangeStart;
       return isStatusMatch && isInView;
     });
-
+ 
     const dir = sortDir === "asc" ? 1 : -1;
     return [...visible].sort((a, b) => {
       switch (sortKey) {
         case "name":
-          return a.munka_neve.localeCompare(b.munka_neve, 'hu', { numeric: true, sensitivity: 'base' }) * dir;
+          return (
+            a.munka_neve.localeCompare(b.munka_neve, "hu", {
+              numeric: true,
+              sensitivity: "base",
+            }) * dir
+          );
         case "start":
           return (a.start.getTime() - b.start.getTime()) * dir;
         case "end":
@@ -226,13 +242,13 @@ export function GanntChart() {
       }
     });
   }, [decoratedAll, filters, sortKey, sortDir, rangeStart, rangeEnd]);
-
+ 
   const today = useMemo(() => {
     const t = new Date();
     t.setHours(0, 0, 0, 0);
     return t;
   }, []);
-
+ 
   function step(delta: number) {
     setAnchorDate((prev) => {
       const x = new Date(prev);
@@ -242,13 +258,13 @@ export function GanntChart() {
       return x;
     });
   }
-
+ 
   function handleWorkSave(updatedWork: Munka) {
     setWorks((prev) =>
       prev.map((w) => (w.munka_id === updatedWork.munka_id ? updatedWork : w)),
     );
   }
-
+ 
   return (
     <div className="pt-page">
       <div className="pt-main">
@@ -257,7 +273,7 @@ export function GanntChart() {
             <span>Rendezés</span>
             <span className="pt-dropdown">▼</span>
           </div>
-
+ 
           <div className="pt-sortBar">
             <div className="pt-sortGroup">
               <button
@@ -320,7 +336,7 @@ export function GanntChart() {
               </button>
             </div>
           </div>
-
+ 
           <div className="pt-leftList">
             {error && <div className="pt-error">{error}</div>}
             {filteredSorted.map((w) => (
@@ -339,7 +355,7 @@ export function GanntChart() {
                 aria-label={`Megnyitás: ${w.munka_neve}`}
               >
                 <div
-                  className={`pt-bar ${progressColorClass(w.progress)} ${w.status === "late" ? "pt-bar--late" : ""}`}
+                  className={`pt-bar ${progressColorClass(w.status)}`}
                 >
                   <div
                     className="pt-barFill"
@@ -353,7 +369,7 @@ export function GanntChart() {
             ))}
           </div>
         </div>
-
+ 
         <div
           className="pt-panel pt-right"
           style={{ ["--pt-days" as any]: days.length }}
@@ -386,7 +402,7 @@ export function GanntChart() {
               </button>
             </div>
           </div>
-
+ 
           <div className="pt-ganttGrid">
             <div className="pt-col pt-col--label">Dátum:</div>
             {days.map((d) => (
@@ -400,24 +416,24 @@ export function GanntChart() {
                 </div>
               </div>
             ))}
-
+ 
             {filteredSorted.map((w) => {
               const totalDays = days.length;
-
+ 
               const visibleStart = new Date(
                 Math.max(w.start.getTime(), rangeStart.getTime()),
               );
               const visibleEnd = new Date(
                 Math.min(w.end.getTime(), rangeEnd.getTime()),
               );
-
+ 
               const startOffset =
                 daysBetweenInclusive(rangeStart, visibleStart) - 1;
               const span = daysBetweenInclusive(visibleStart, visibleEnd);
-
+ 
               const leftPct = (startOffset / totalDays) * 100;
               const widthPct = (span / totalDays) * 100;
-
+ 
               return (
                 <div
                   key={w.munka_id}
@@ -427,7 +443,7 @@ export function GanntChart() {
                   <div />
                   <div className="pt-rowTrack">
                     <div
-                      className={`pt-ganttBar ${progressColorClass(w.progress)} ${w.status === "late" ? "pt-bar--late" : ""}`}
+                      className={`pt-ganttBar ${progressColorClass(w.status)}`}
                       style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
                     >
                       <div
@@ -442,7 +458,7 @@ export function GanntChart() {
               );
             })}
           </div>
-
+ 
           <div className="pt-legend">
             {(Object.keys(filters) as StatusKey[]).map((key) => (
               <label key={key} className="pt-legendItem">
@@ -454,19 +470,19 @@ export function GanntChart() {
                   }
                 />
                 <span className={`pt-dot pt-dot--${key}`} />
-                {key === "p0_25" && "0% - 25%"}
-                {key === "p25_50" && "25% - 50%"}
-                {key === "p50_75" && "50% - 75%"}
-                {key === "p75_100" && "75% - 100%"}
+                {key === "p0_25" && "0% - 24%"}
+                {key === "p25_50" && "25% - 49%"}
+                {key === "p50_75" && "50% - 74%"}
+                {key === "p75_100" && "75% - 99%"}
                 {key === "late" && "Késésben"}
-                {key === "done" && "Kész"}
+                {key === "done" && "Kész (100%)"}
                 {key === "planned" && "Tervezett"}
               </label>
             ))}
           </div>
         </div>
       </div>
-
+ 
       {selectedWork && (
         <WorkDisplay
           work={selectedWork}
@@ -477,5 +493,5 @@ export function GanntChart() {
     </div>
   );
 }
-
+ 
 export default GanntChart;

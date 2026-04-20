@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
 import { apiGet } from "../../lib/api";
 import { apiDelete } from "../../lib/api";
+import { apiPatch } from "../../lib/api";
+import { isAdmin } from "../../lib/auth";
 import {
   Container,
   Col,
@@ -34,6 +36,7 @@ interface WorkData {
   leiras?: string;
   kezdeti_datum?: string;
   varhato_befejezes_datuma?: string;
+  isActive?: boolean;
   munkaUsers?: MunkaUser[];
   munkaEszkozok?: MunkaEszkoz[];
   feladat?: Array<{ feladat_id: number; leiras: string }>;
@@ -165,24 +168,17 @@ export function WorkList() {
     }
   };
 
-  const getUserName = (userId?: number) =>
-    users.find((user) => user.user_id === userId)?.nev ?? "";
-
   const getUsersNames = (work: WorkData) => {
     if (!work.munkaUsers || work.munkaUsers.length === 0) return "";
     return work.munkaUsers
-      .map((mu) => mu.user?.nev || "")
+      .map((mu) => mu.user?.nev || users.find((u) => u.user_id === mu.user_id)?.nev || "")
       .filter((name) => name)
       .join(", ");
   };
-
-  const getToolName = (eszkozId?: number) =>
-    tools.find((tool) => tool.eszkoz_id === eszkozId)?.nev ?? "";
-
   const getToolsNames = (work: WorkData) => {
     if (!work.munkaEszkozok || work.munkaEszkozok.length === 0) return "";
     return work.munkaEszkozok
-      .map((me) => me.eszkoz?.nev || "")
+      .map((me) => me.eszkoz?.nev || tools.find((t) => t.eszkoz_id === me.eszkoz_id)?.nev || "")
       .filter((name) => name)
       .join(", ");
   };
@@ -243,7 +239,7 @@ export function WorkList() {
                     <th>Eszköz</th>
                     <th>Kezdete</th>
                     <th>Befejezés</th>
-                    <th colSpan={2} className="text-center">Műveletek</th>
+                    <th colSpan={3} className="text-center">Műveletek</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -293,6 +289,27 @@ export function WorkList() {
                           >
                             ❌
                           </button>
+                        </td>
+                        <td className="action-cell">
+                          {isAdmin() ? (
+                            <button
+                              className={`action-btn ${work.isActive ? 'close-btn' : 'open-btn'}`}
+                              aria-label={`${work.isActive ? 'Lezárás' : 'Megnyitás'} ${work.munka_neve}`}
+                              onClick={async () => {
+                                const newActive = !work.isActive;
+                                try {
+                                  await apiPatch(`/munka/${work.munka_id}`, { isActive: newActive });
+                                  setWorks((prev) => prev.map((w) => w.munka_id === work.munka_id ? { ...w, isActive: newActive } : w));
+                                } catch (err) {
+                                  console.error('Hiba a munka lezárásakor:', err);
+                                  alert('Hiba történt a művelet végrehajtásakor');
+                                }
+                              }}
+                              title={work.isActive ? 'Munka lezárása' : 'Munka megnyitása'}
+                            >
+                              {work.isActive ? '🔒' : '🔓'}
+                            </button>
+                          ) : null}
                         </td>
                       </tr>
                     ))

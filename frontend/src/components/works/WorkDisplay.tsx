@@ -114,8 +114,9 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 											type="checkbox"
 											id={`task-${task.feladat_id}`}
 											label={task.leiras}
-											checked={task.isCompleted}
-											onChange={() => toggleTask(task.feladat_id)}
+														checked={task.isCompleted}
+														onChange={() => toggleTask(task.feladat_id)}
+														disabled={work.isActive === false}
 										/>
 										{task.isCompleted && <span className="wd-done">✓</span>}
 									</ListGroup.Item>
@@ -150,7 +151,7 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="secondary" onClick={handleClose}>Mégsem</Button>
-				<Button variant="primary" onClick={handleSave} disabled={isSaving}>
+				<Button variant="primary" onClick={handleSave} disabled={isSaving || work.isActive === false}>
 					{isSaving ? "Mentés..." : "Mentés"}
 				</Button>
 			</Modal.Footer>
