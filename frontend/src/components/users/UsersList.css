@@ -181,6 +181,10 @@
   max-height: 700px;
 }
 
+.work-list-card {
+  padding: 0.5rem;
+}
+
 .users-table {
   margin-bottom: 0;
   flex: 1;
@@ -192,8 +196,8 @@
 }
 
 .users-table thead {
-  background: white;
-  color: #001f4d;
+  background: #03264d;
+  color: #ffffff;
   flex-shrink: 0;
   display: flex;
   width: 100%;
@@ -221,7 +225,7 @@
 }
 
 .users-table thead th {
-  padding: 1.25rem;
+  padding: 0.9rem 1rem;
   font-weight: 700;
   border: none;
   font-size: 0.95rem;
@@ -266,9 +270,9 @@
 }
 
 .user-row td {
-  padding: 1rem 1.25rem;
+  padding: 0.85rem 1rem;
   vertical-align: middle;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e9eef6;
   word-break: break-word;
   box-sizing: border-box;
 }
@@ -316,6 +320,66 @@
   justify-content: center;
   min-width: 40px;
   min-height: 40px;
+}
+
+.actions-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.chip-list {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.chip {
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  border: 1px solid #e6eefb;
+  background: #f6fbff;
+  color: #022b52;
+  display: inline-flex;
+  align-items: center;
+}
+
+.more-chip {
+  background: #eef3fa;
+  color: #03264d;
+  border: 1px solid #d7e6fb;
+}
+
+.description-truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description-expanded {
+  white-space: normal;
+}
+
+.toggle-desc-btn {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.empty-row td {
+  background: transparent;
+  border: none;
+  height: 56px;
 }
 
 .edit-btn {
