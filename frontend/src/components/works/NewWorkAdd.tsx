@@ -33,7 +33,9 @@ export function NewWorkAdd() {
        const [kezdetiDatum, SetKezdetiDatum] = useState('');
        const [velemenyDatum, SetVelemenyDatum] = useState('');
        const [selectedUsers, setSelectedUsers] = useState<number[]>([0]);
-       const [selectedTools, setSelectedTools] = useState<number[]>([]);
+       // Start with one empty select so the UI is controlled and adding another
+       // tool won't cause the initial selection to disappear.
+       const [selectedTools, setSelectedTools] = useState<number[]>([0]);
        const [selectedTasks, setSelectedTasks] = useState<string[]>([""]);
        const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -274,25 +276,6 @@ export function NewWorkAdd() {
                                                                <Form.Group className="mb-3">
                                                                       <Form.Label>Eszközök kiválasztása</Form.Label>
                                                                       <div>
-                                                                             {selectedTools.length === 0 && (
-                                                                                    <div className="dynamic-row">
-                                                                                           <Form.Select defaultValue={0}>
-                                                                                                  <option value={0}>-- válassz --</option>
-                                                                                                  {tools.map((tool) => (
-                                                                                                         <option key={tool.eszkoz_id} value={tool.eszkoz_id}>
-                                                                                                                {tool.nev}
-                                                                                                         </option>
-                                                                                                  ))}
-                                                                                           </Form.Select>
-                                                                                           <Button 
-                                                                                                  variant="danger" 
-                                                                                                  size="sm"
-                                                                                                  onClick={() => PlusEszkoz()}
-                                                                                           >
-                                                                                                  Törlés
-                                                                                           </Button>
-                                                                                    </div>
-                                                                             )}
                                                                              {selectedTools.map((toolId, idx) => {
                                                                                     const availableTools = tools.filter(tool => 
                                                                                            !selectedTools.includes(tool.eszkoz_id) || selectedTools[idx] === tool.eszkoz_id
