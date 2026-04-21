@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
@@ -59,13 +58,15 @@ export function WorkList() {
   const [works, setWorks] = useState<WorkData[]>([]);
   const [deletedWorks, setDeletedWorks] = useState<WorkData[]>([]);
   const [filteredWorks, setFilteredWorks] = useState<WorkData[]>([]);
-  const [filteredDeletedWorks, setFilteredDeletedWorks] = useState<WorkData[]>([]);
+  const [filteredDeletedWorks, setFilteredDeletedWorks] = useState<WorkData[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, SetUsers] = useState<UserData[]>([]);
   const [tools, SetTools] = useState<EszkozData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
+  const [activeTab, setActiveTab] = useState<"active" | "deleted">("active");
   const itemsPerPage = 5;
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<
@@ -128,20 +129,35 @@ export function WorkList() {
     );
 
     if (sortBy === "name") {
-      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu", { numeric: true, sensitivity: 'base' }));
+      filtered.sort((a, b) =>
+        a.munka_neve.localeCompare(b.munka_neve, "hu", {
+          numeric: true,
+          sensitivity: "base",
+        }),
+      );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "user") {
       filtered.sort((a, b) =>
-        getUsersNames(a).join(', ').localeCompare(getUsersNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+        getUsersNames(a)
+          .join(", ")
+          .localeCompare(getUsersNames(b).join(", "), "hu", {
+            numeric: true,
+            sensitivity: "base",
+          }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "tool") {
       filtered.sort((a, b) =>
-        getToolsNames(a).join(', ').localeCompare(getToolsNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+        getToolsNames(a)
+          .join(", ")
+          .localeCompare(getToolsNames(b).join(", "), "hu", {
+            numeric: true,
+            sensitivity: "base",
+          }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
@@ -167,20 +183,35 @@ export function WorkList() {
     );
 
     if (sortBy === "name") {
-      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu", { numeric: true, sensitivity: 'base' }));
+      filtered.sort((a, b) =>
+        a.munka_neve.localeCompare(b.munka_neve, "hu", {
+          numeric: true,
+          sensitivity: "base",
+        }),
+      );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "user") {
       filtered.sort((a, b) =>
-        getUsersNames(a).join(', ').localeCompare(getUsersNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+        getUsersNames(a)
+          .join(", ")
+          .localeCompare(getUsersNames(b).join(", "), "hu", {
+            numeric: true,
+            sensitivity: "base",
+          }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
       }
     } else if (sortBy === "tool") {
       filtered.sort((a, b) =>
-        getToolsNames(a).join(', ').localeCompare(getToolsNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+        getToolsNames(a)
+          .join(", ")
+          .localeCompare(getToolsNames(b).join(", "), "hu", {
+            numeric: true,
+            sensitivity: "base",
+          }),
       );
       if (sortOrder === "desc") {
         filtered.reverse();
@@ -238,9 +269,7 @@ export function WorkList() {
           ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
           : "",
         varhato_befejezes_datuma: work.varhato_befejezes_datuma
-          ? new Date(work.varhato_befejezes_datuma)
-              .toISOString()
-              .split("T")[0]
+          ? new Date(work.varhato_befejezes_datuma).toISOString().split("T")[0]
           : "",
       }));
       setWorks(normalized);
@@ -251,15 +280,13 @@ export function WorkList() {
           ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
           : "",
         varhato_befejezes_datuma: work.varhato_befejezes_datuma
-          ? new Date(work.varhato_befejezes_datuma)
-              .toISOString()
-              .split("T")[0]
+          ? new Date(work.varhato_befejezes_datuma).toISOString().split("T")[0]
           : "",
       }));
       setDeletedWorks(normalizedDeleted);
     } catch (error) {
       console.error("Hiba:", error);
-      alert('Hiba a munka törlésénél');
+      alert("Hiba a munka törlésénél");
     }
   };
 
@@ -277,9 +304,7 @@ export function WorkList() {
           ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
           : "",
         varhato_befejezes_datuma: work.varhato_befejezes_datuma
-          ? new Date(work.varhato_befejezes_datuma)
-              .toISOString()
-              .split("T")[0]
+          ? new Date(work.varhato_befejezes_datuma).toISOString().split("T")[0]
           : "",
       }));
       setWorks(normalized);
@@ -290,28 +315,36 @@ export function WorkList() {
           ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
           : "",
         varhato_befejezes_datuma: work.varhato_befejezes_datuma
-          ? new Date(work.varhato_befejezes_datuma)
-              .toISOString()
-              .split("T")[0]
+          ? new Date(work.varhato_befejezes_datuma).toISOString().split("T")[0]
           : "",
       }));
       setDeletedWorks(normalizedDeleted);
     } catch (error) {
       console.error("Hiba a visszaállításnál:", error);
-      alert('Hiba a munka visszaállításánál');
+      alert("Hiba a munka visszaállításánál");
     }
   };
 
   const getUsersNames = (work: WorkData) => {
     if (!work.munkaUsers || work.munkaUsers.length === 0) return [];
     return work.munkaUsers
-      .map((mu) => mu.user?.nev || users.find((u) => u.user_id === mu.user_id)?.nev || "")
+      .map(
+        (mu) =>
+          mu.user?.nev ||
+          users.find((u) => u.user_id === mu.user_id)?.nev ||
+          "",
+      )
       .filter((name) => name);
   };
   const getToolsNames = (work: WorkData) => {
     if (!work.munkaEszkozok || work.munkaEszkozok.length === 0) return [];
     return work.munkaEszkozok
-      .map((me) => me.eszkoz?.nev || tools.find((t) => t.eszkoz_id === me.eszkoz_id)?.nev || "")
+      .map(
+        (me) =>
+          me.eszkoz?.nev ||
+          tools.find((t) => t.eszkoz_id === me.eszkoz_id)?.nev ||
+          "",
+      )
       .filter((name) => name);
   };
 
@@ -323,10 +356,15 @@ export function WorkList() {
   const endIndex = startIndex + itemsPerPage;
   const currentWorks = filteredWorks.slice(startIndex, endIndex);
 
-  const totalDeletedPages = Math.ceil(filteredDeletedWorks.length / itemsPerPage);
+  const totalDeletedPages = Math.ceil(
+    filteredDeletedWorks.length / itemsPerPage,
+  );
   const deletedStartIndex = (currentPage - 1) * itemsPerPage;
   const deletedEndIndex = deletedStartIndex + itemsPerPage;
-  const currentDeletedWorks = filteredDeletedWorks.slice(deletedStartIndex, deletedEndIndex);
+  const currentDeletedWorks = filteredDeletedWorks.slice(
+    deletedStartIndex,
+    deletedEndIndex,
+  );
 
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
@@ -335,9 +373,8 @@ export function WorkList() {
   };
 
   const goToNextPage = () => {
-    const currentTabTotal = activeTab === 'active' 
-      ? totalPages
-      : totalDeletedPages;
+    const currentTabTotal =
+      activeTab === "active" ? totalPages : totalDeletedPages;
     if (currentPage < currentTabTotal) {
       setCurrentPage(currentPage + 1);
     }
@@ -349,9 +386,8 @@ export function WorkList() {
     }
   };
 
-  const currentTabTotal = activeTab === 'active' 
-    ? totalPages
-    : totalDeletedPages;
+  const currentTabTotal =
+    activeTab === "active" ? totalPages : totalDeletedPages;
 
   return (
     <>
@@ -362,16 +398,13 @@ export function WorkList() {
             <h2>Munkák kezelése</h2>
           </Col>
           <Col md={6} className="text-end">
-            <Button 
+            <Button
               className="btn-new-user"
-              onClick={() => navigate('/uj-munka')}
+              onClick={() => navigate("/uj-munka")}
             >
               + Új munka
             </Button>
-            <Button 
-              className="btn-back"
-              onClick={() => navigate('/fooldal')}
-            >
+            <Button className="btn-back" onClick={() => navigate("/fooldal")}>
               ← Vissza
             </Button>
           </Col>
@@ -381,33 +414,32 @@ export function WorkList() {
           <Col md={9} className="users-table-column">
             <Nav fill variant="tabs" className="mb-3">
               <Nav.Item>
-                <Nav.Link 
+                <Nav.Link
                   eventKey="active"
-                  active={activeTab === 'active'}
+                  active={activeTab === "active"}
                   onClick={() => {
-                    setActiveTab('active');
+                    setActiveTab("active");
                     setCurrentPage(1);
-                  }}
-                >
-                  Aktív munkák
-                </Nav.Link>
+                  }}>Aktív munkák</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link 
+                <Nav.Link
                   eventKey="deleted"
-                  active={activeTab === 'deleted'}
+                  active={activeTab === "deleted"}
                   onClick={() => {
-                    setActiveTab('deleted');
+                    setActiveTab("deleted");
                     setCurrentPage(1);
-                  }}
-                >
-                  Törölt munkák
-                </Nav.Link>
+                  }}>Törölt munkák</Nav.Link>
               </Nav.Item>
             </Nav>
 
             <Card className="users-table-card work-list-card">
-              <Table responsive hover className="users-table work-table" style={{ tableLayout: 'auto' }}>
+              <Table
+                responsive
+                hover
+                className="users-table work-table"
+                style={{ tableLayout: "auto" }}
+              >
                 <thead>
                   <tr>
                     <th>Munka neve</th>
@@ -426,21 +458,33 @@ export function WorkList() {
                         Betöltés...
                       </td>
                     </tr>
-                  ) : activeTab === 'active' && currentWorks.length > 0 ? (
+                  ) : activeTab === "active" && currentWorks.length > 0 ? (
                     currentWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
                         <td className="user-name">{work.munka_neve}</td>
                         <td className="user-department">
-                          <div className={expandedRows[work.munka_id] ? 'description-expanded' : 'description-truncated'}>
+                          <div
+                            className={
+                              expandedRows[work.munka_id]
+                                ? "description-expanded"
+                                : "description-truncated"
+                            }
+                          >
                             {work.leiras || "-"}
                           </div>
                           {work.leiras && work.leiras.length > 120 && (
                             <button
                               className="toggle-desc-btn"
                               onClick={() => toggleExpand(work.munka_id)}
-                              aria-label={expandedRows[work.munka_id] ? 'Rejtés' : 'Teljes leírás megtekintése'}
+                              aria-label={
+                                expandedRows[work.munka_id]
+                                  ? "Rejtés"
+                                  : "Teljes leírás megtekintése"
+                              }
                             >
-                              {expandedRows[work.munka_id] ? 'Kevesebb' : 'Tovább...'}
+                              {expandedRows[work.munka_id]
+                                ? "Kevesebb"
+                                : "Tovább..."}
                             </button>
                           )}
                         </td>
@@ -450,7 +494,12 @@ export function WorkList() {
                               <span className="text-muted">-</span>
                             ) : (
                               getUsersNames(work).map((n, i) => (
-                                <Badge key={i} bg="light" text="dark" className="chip">
+                                <Badge
+                                  key={i}
+                                  bg="light"
+                                  text="dark"
+                                  className="chip"
+                                >
                                   {n}
                                 </Badge>
                               ))
@@ -463,7 +512,12 @@ export function WorkList() {
                               <span className="text-muted">-</span>
                             ) : (
                               getToolsNames(work).map((t, i) => (
-                                <Badge key={i} bg="light" text="dark" className="chip">
+                                <Badge
+                                  key={i}
+                                  bg="light"
+                                  text="dark"
+                                  className="chip"
+                                >
                                   {t}
                                 </Badge>
                               ))
@@ -474,32 +528,87 @@ export function WorkList() {
                         <td>{work.varhato_befejezes_datuma || "-"}</td>
                         <td className="action-cell">
                           <div className="actions-row">
-                            <Button variant="outline-primary" size="sm" onClick={() => navigate(`/munka-modositas/${work.munka_id}`)}>✏️</Button>
-                            <Button variant="outline-danger" size="sm" onClick={() => deleteWork(work.munka_id, work.munka_neve)}>❌</Button>
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() =>
+                                navigate(`/munka-modositas/${work.munka_id}`)
+                              }
+                            >
+                              ✏️
+                            </Button>
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              onClick={() =>
+                                deleteWork(work.munka_id, work.munka_neve)
+                              }
+                            >
+                              ❌
+                            </Button>
                             {isAdmin() ? (
-                              <Button variant={work.isActive ? 'outline-secondary' : 'outline-success'} size="sm" onClick={() => { const newActive = !work.isActive; apiPatch(`/munka/${work.munka_id}`, { isActive: newActive }).then(() => setWorks((prev) => prev.map((w) => w.munka_id === work.munka_id ? { ...w, isActive: newActive } : w))).catch((err) => { console.error(err); alert('Hiba történt'); }); }}>
-                                {work.isActive ? '🔓' : '🔒'}
+                              <Button
+                                variant={
+                                  work.isActive
+                                    ? "outline-secondary"
+                                    : "outline-success"
+                                }
+                                size="sm"
+                                onClick={() => {
+                                  const newActive = !work.isActive;
+                                  apiPatch(`/munka/${work.munka_id}`, {
+                                    isActive: newActive,
+                                  })
+                                    .then(() =>
+                                      setWorks((prev) =>
+                                        prev.map((w) =>
+                                          w.munka_id === work.munka_id
+                                            ? { ...w, isActive: newActive }
+                                            : w,
+                                        ),
+                                      ),
+                                    )
+                                    .catch((err) => {
+                                      console.error(err);
+                                      alert("Hiba történt");
+                                    });
+                                }}
+                              >
+                                {work.isActive ? "🔓" : "🔒"}
                               </Button>
                             ) : null}
                           </div>
                         </td>
                       </tr>
                     ))
-                  ) : activeTab === 'deleted' && currentDeletedWorks.length > 0 ? (
+                  ) : activeTab === "deleted" &&
+                    currentDeletedWorks.length > 0 ? (
                     currentDeletedWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
                         <td className="user-name">{work.munka_neve}</td>
                         <td className="user-department">
-                          <div className={expandedRows[work.munka_id] ? 'description-expanded' : 'description-truncated'}>
+                          <div
+                            className={
+                              expandedRows[work.munka_id]
+                                ? "description-expanded"
+                                : "description-truncated"
+                            }
+                          >
                             {work.leiras || "-"}
                           </div>
                           {work.leiras && work.leiras.length > 120 && (
                             <button
                               className="toggle-desc-btn"
                               onClick={() => toggleExpand(work.munka_id)}
-                              aria-label={expandedRows[work.munka_id] ? 'Rejtés' : 'Teljes leírás megtekintése'}
+                              aria-label={
+                                expandedRows[work.munka_id]
+                                  ? "Rejtés"
+                                  : "Teljes leírás megtekintése"
+                              }
                             >
-                              {expandedRows[work.munka_id] ? 'Kevesebb' : 'Tovább...'}
+                              {expandedRows[work.munka_id]
+                                ? "Kevesebb"
+                                : "Tovább..."}
                             </button>
                           )}
                         </td>
@@ -509,7 +618,12 @@ export function WorkList() {
                               <span className="text-muted">-</span>
                             ) : (
                               getUsersNames(work).map((n, i) => (
-                                <Badge key={i} bg="light" text="dark" className="chip">
+                                <Badge
+                                  key={i}
+                                  bg="light"
+                                  text="dark"
+                                  className="chip"
+                                >
                                   {n}
                                 </Badge>
                               ))
@@ -522,7 +636,12 @@ export function WorkList() {
                               <span className="text-muted">-</span>
                             ) : (
                               getToolsNames(work).map((t, i) => (
-                                <Badge key={i} bg="light" text="dark" className="chip">
+                                <Badge
+                                  key={i}
+                                  bg="light"
+                                  text="dark"
+                                  className="chip"
+                                >
                                   {t}
                                 </Badge>
                               ))
@@ -532,11 +651,21 @@ export function WorkList() {
                         <td>{work.kezdeti_datum || "-"}</td>
                         <td>{work.varhato_befejezes_datuma || "-"}</td>
                         <td className="action-cell text-center">
-                          <Button variant="outline-success" size="sm" onClick={() => {
-                            if (window.confirm(`Biztosan visszaállítod ${work.munka_neve} munkát?`)) {
-                              restoreWork(work.munka_id);
-                            }
-                          }}>↻ Visszaállítás</Button>
+                          <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  `Biztosan visszaállítod ${work.munka_neve} munkát?`,
+                                )
+                              ) {
+                                restoreWork(work.munka_id);
+                              }
+                            }}
+                          >
+                            ↻ Visszaállítás
+                          </Button>
                         </td>
                       </tr>
                     ))
@@ -547,16 +676,21 @@ export function WorkList() {
                       </td>
                     </tr>
                   )}
-                  {activeTab === 'active' && currentWorks.length < itemsPerPage && !loading && Array.from({ length: itemsPerPage - currentWorks.length }).map((_, i) => (
-                    <tr key={`empty-${i}`} className="user-row empty-row">
-                      <td colSpan={7}>&nbsp;</td>
-                    </tr>
-                  ))}
+                  {activeTab === "active" &&
+                    currentWorks.length < itemsPerPage &&
+                    !loading &&
+                    Array.from({
+                      length: itemsPerPage - currentWorks.length,
+                    }).map((_, i) => (
+                      <tr key={`empty-${i}`} className="user-row empty-row">
+                        <td colSpan={7}>&nbsp;</td>
+                      </tr>
+                    ))}
                 </tbody>
               </Table>
             </Card>
             <div className="pagination-controls">
-              <Button 
+              <Button
                 variant="primary"
                 onClick={goToPrevPage}
                 disabled={currentPage === 1}
@@ -567,10 +701,12 @@ export function WorkList() {
               <span className="pagination-info">
                 Oldal {currentPage} / {currentTabTotal || 1}
               </span>
-              <Button 
+              <Button
                 variant="primary"
                 onClick={goToNextPage}
-                disabled={currentPage === currentTabTotal || currentTabTotal === 0}
+                disabled={
+                  currentPage === currentTabTotal || currentTabTotal === 0
+                }
                 title="Következő oldal"
               >
                 Következő →
@@ -604,9 +740,9 @@ export function WorkList() {
                           | "user"
                           | "tool"
                           | "date"
-                          | "none"
+                          | "none",
                       );
-                      setSortOrder('asc');
+                      setSortOrder("asc");
                     }}
                     className="sort-select"
                   >

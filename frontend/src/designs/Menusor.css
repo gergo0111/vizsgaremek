@@ -1,0 +1,14 @@
+.nav-button {
+  color: white;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+  text-decoration: underline;
+}

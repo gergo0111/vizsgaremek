@@ -27,37 +27,28 @@ export function Menusor() {
           style={{ cursor: 'pointer' }}
           onClick={() => navigate('/fooldal')} 
         />
-        
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarText"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
 
         <div className="collapse navbar-collapse" id="navbarText">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/fooldal")}>
+              <button className="nav-link nav-button" onClick={() => navigate("/fooldal")}>
                 Főoldal
               </button>
             </li>
             {isAdmin && (
               <>
                 <li className="nav-item">
-                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/felhasznalok-kezelese")}>
+                  <button className="nav-link nav-button" onClick={() => navigate("/felhasznalok-kezelese")}>
                     Felhasználók kezelése
                   </button>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/eszkozok")}>
+                  <button className="nav-link nav-button" onClick={() => navigate("/eszkozok")}>
                     Gépek kezelése
                   </button>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link text-white border-0 bg-transparent" onClick={() => navigate("/munka-lista")}>
+                  <button className="nav-link nav-button" onClick={() => navigate("/munka-lista")}>
                     Munkák módosítása
                   </button>
                 </li>
@@ -72,9 +63,8 @@ export function Menusor() {
             </div>
           <div className="navbar-nav">
             <button
-              className="nav-link text-white border-0 bg-transparent"
+              className="nav-link nav-button"
               onClick={handleLogout}
-              style={{ textDecoration: 'none' }}
             >
               Kijelentkezés
             </button>
