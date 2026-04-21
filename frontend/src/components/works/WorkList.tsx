@@ -416,7 +416,7 @@ export function WorkList() {
                     <th>Eszköz</th>
                     <th>Kezdete</th>
                     <th>Befejezés</th>
-                    <th className="text-center">Műveletek</th>
+                    <th>Műveletek</th>
                   </tr>
                 </thead>
                 <tbody>
