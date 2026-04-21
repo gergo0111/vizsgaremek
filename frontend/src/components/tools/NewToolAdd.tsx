@@ -76,7 +76,7 @@ export function NewToolAdd() {
        };
 
        return (
-              <div className="tool-form-page">
+              <div className="user-form-page">
                      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
                      <Container className="tool-form-container-wide">
                             <Row className="justify-content-center">
