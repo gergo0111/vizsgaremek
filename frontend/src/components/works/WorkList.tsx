@@ -461,7 +461,16 @@ export function WorkList() {
                   ) : activeTab === "active" && currentWorks.length > 0 ? (
                     currentWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
-                        <td className="user-name">{work.munka_neve}</td>
+                        <td className="user-name">
+                          {work.munka_neve}
+                          <Badge 
+                            bg={work.isActive ? "success" : "danger"} 
+                            className="ms-2"
+                            style={{ fontSize: '0.75rem' }}
+                          >
+                            {work.isActive ? "Folyamatban" : "Lezárva"}
+                          </Badge>
+                        </td>
                         <td className="user-department">
                           <div
                             className={
@@ -585,7 +594,16 @@ export function WorkList() {
                     currentDeletedWorks.length > 0 ? (
                     currentDeletedWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
-                        <td className="user-name">{work.munka_neve}</td>
+                        <td className="user-name">
+                          {work.munka_neve}
+                          <Badge 
+                            bg={work.isActive ? "success" : "danger"} 
+                            className="ms-2"
+                            style={{ fontSize: '0.75rem' }}
+                          >
+                            {work.isActive ? "Nyitott" : "Lezárva"}
+                          </Badge>
+                        </td>
                         <td className="user-department">
                           <div
                             className={
