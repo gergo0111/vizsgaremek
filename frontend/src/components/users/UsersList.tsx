@@ -95,11 +95,9 @@ export function UsersList() {
               }
               try {
                      await apiDelete(`/users/${userId}`);
-                     // Újra betöltjük az aktív felhasználókat
                      const data = await apiGet<User[]>('/users');
                      setUsers(data);
                      setFilteredUsers(data);
-                     // Újra betöltjük a törölt felhasználókat
                      const deletedData = await apiGet<User[]>('/users/deleted');
                      setDeletedUsers(deletedData);
                      setFilteredDeletedUsers(deletedData);
@@ -115,11 +113,9 @@ export function UsersList() {
               }
               try {
                      await apiPatch(`/users/${userId}/restore`, {});
-                     // Újra betöltjük az aktív felhasználókat
                      const data = await apiGet<User[]>('/users');
                      setUsers(data);
                      setFilteredUsers(data);
-                     // Újra betöltjük a törölt felhasználókat
                      const deletedData = await apiGet<User[]>('/users/deleted');
                      setDeletedUsers(deletedData);
                      setFilteredDeletedUsers(deletedData);
@@ -162,28 +158,81 @@ export function UsersList() {
               <>
               <Menusor />
               <Container fluid className="users-list-container">
-                     <Row className="users-header">
-                            <Col md={6}>
-                                   <h2>Felhasználók kezelése</h2>
+                     <Row className="users-header align-items-center mb-3">
+                            <Col xs={12} md={6} className="mb-2 mb-md-0">
+                                   <h2 className="m-0">Felhasználók kezelése</h2>
                             </Col>
-                            <Col md={6} className="text-end">
-                                   <Button 
-                                          className="btn-new-user"
-                                          onClick={() => navigate('/uj-felhasznalo')}
-                                   >
-                                          + Új felhasználó
-                                   </Button>
-                                   <Button 
-                                          className="btn-back"
-                                          onClick={() => navigate('/fooldal')}
-                                   >
-                                          ← Vissza
-                                   </Button>
+                            <Col xs={12} md={6} className="text-md-end">
+                                   <div className="d-flex flex-column flex-md-row justify-content-md-end gap-2">
+                                          <Button 
+                                                 className="btn-new-user"
+                                                 onClick={() => navigate('/uj-felhasznalo')}
+                                          >
+                                                 + Új felhasználó
+                                          </Button>
+                                          <Button 
+                                                 className="btn-back"
+                                                 onClick={() => navigate('/fooldal')}
+                                          >
+                                                 ← Vissza
+                                          </Button>
+                                   </div>
                             </Col>
                      </Row>
 
                      <Row className="users-content">
-                            <Col md={9} className="users-table-column">
+                            <Col xs={12} md={3} className="users-sidebar order-1 order-md-2 mb-3 mb-md-0">
+                                   <Card className="search-filter-card p-3">
+                                          <Card.Body className="p-0">
+                                                 <h5 className="mb-3">Keresés és szűrés</h5>
+                                                 
+                                                 <InputGroup className="mb-3">
+                                                        <Form.Control
+                                                               placeholder="Keresés névre vagy munkacsoportra..."
+                                                               value={searchTerm}
+                                                               onChange={(e) => setSearchTerm(e.target.value)}
+                                                               className="search-input"
+                                                        />
+                                                        <InputGroup.Text>🔍</InputGroup.Text>
+                                                 </InputGroup>
+
+                                                 <div className="filter-section mb-3">
+                                                        <h6>Rendezés módja</h6>
+                                                        <Form.Select 
+                                                               value={sortBy}
+                                                               onChange={(e) => {
+                                                                      setSortBy(e.target.value as 'name' | 'department' | 'none');
+                                                                      setSortOrder('asc');
+                                                               }}
+                                                               className="sort-select"
+                                                        >
+                                                               <option value="name">Név szerint</option>
+                                                               <option value="department">Munkacsoportnév szerint</option>
+                                                        </Form.Select>
+                                                 </div>
+
+                                                 <div className="filter-section">
+                                                        <h6>Rendezési sorrend</h6>
+                                                        <div className="d-flex gap-2 mt-2">
+                                                               <button
+                                                                      className={`sort-order-btn btn btn-outline-secondary ${sortOrder === 'asc' ? 'active' : ''}`}
+                                                                      onClick={() => setSortOrder('asc')}
+                                                               >
+                                                                      ▲ Növekvő
+                                                               </button>
+                                                               <button
+                                                                      className={`sort-order-btn btn btn-outline-secondary ${sortOrder === 'desc' ? 'active' : ''}`}
+                                                                      onClick={() => setSortOrder('desc')}
+                                                               >
+                                                                      ▼ Csökkenő
+                                                               </button>
+                                                        </div>
+                                                 </div>
+                                          </Card.Body>
+                                   </Card>
+                            </Col>
+
+                            <Col xs={12} md={9} className="users-table-column order-2 order-md-1">
                                    <Nav fill variant="tabs" className="mb-3">
                                           <Nav.Item>
                                                  <Nav.Link 
@@ -211,81 +260,145 @@ export function UsersList() {
                                           </Nav.Item>
                                    </Nav>
 
-                                   <Card className="users-table-card">
-                                          <Table responsive hover className="users-table">
-                                                 <thead>
-                                                        <tr>
-                                                               <th>Név</th>
-                                                               <th>Munkacsoportneve</th>
-                                                               <th colSpan={2} className="text-center">Műveletek</th>
-                                                        </tr>
-                                                 </thead>
-                                                 <tbody>
-                                                        {activeTab === 'active' && currentUsers.length > 0 ? (
-                                                               currentUsers.map((user) => (
-                                                                      <tr key={user.user_id} className="user-row">
-                                                                             <td className="user-name">{user.nev}</td>
-                                                                             <td className="user-department">{user.munkakor}</td>
-                                                                             <td className="action-cell">
-                                                                                    <button 
-                                                                                           className="action-btn edit-btn"
+                                   <Card className="users-table-card mb-3">
+                                          <div className="d-none d-md-block">
+                                                 <Table responsive hover className="users-table mb-0">
+                                                        <thead>
+                                                               <tr>
+                                                                      <th>Név</th>
+                                                                      <th>Munkacsoportneve</th>
+                                                                      <th colSpan={2} className="text-center">Műveletek</th>
+                                                               </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                               {activeTab === 'active' && currentUsers.length > 0 ? (
+                                                                      currentUsers.map((user) => (
+                                                                             <tr key={user.user_id} className="user-row">
+                                                                                    <td className="user-name">{user.nev}</td>
+                                                                                    <td className="user-department">{user.munkakor}</td>
+                                                                                    <td className="action-cell text-center">
+                                                                                           <button 
+                                                                                                  className="action-btn edit-btn btn btn-sm btn-outline-primary"
+                                                                                                  aria-label={`Szerkesztés ${user.nev}`}
+                                                                                                  onClick={() => navigate(`/felhasznalo-modositas/${user.user_id}`)}
+                                                                                                  title="Szerkesztés"
+                                                                                           >
+                                                                                                  ✏️
+                                                                                           </button>
+                                                                                    </td>
+                                                                                    <td className="action-cell text-center">
+                                                                                           <button
+                                                                                                  className="action-btn delete-btn btn btn-sm btn-outline-danger"
+                                                                                                  aria-label={`Törlés ${user.nev}`}
+                                                                                                  onClick={() => {
+                                                                                                         if (window.confirm(`Biztosan törlöd ${user.nev} felhasználót?`)) {
+                                                                                                                deleteUser(user.user_id);
+                                                                                                         }
+                                                                                                  }}
+                                                                                                  title="Törlés"
+                                                                                           >
+                                                                                                  ❌
+                                                                                           </button>
+                                                                                    </td>
+                                                                             </tr>
+                                                                      ))
+                                                               ) : activeTab === 'deleted' && currentDeletedUsers.length > 0 ? (
+                                                                      currentDeletedUsers.map((user) => (
+                                                                             <tr key={user.user_id} className="user-row">
+                                                                                    <td className="user-name">{user.nev}</td>
+                                                                                    <td className="user-department">{user.munkakor}</td>
+                                                                                    <td colSpan={2} className="action-cell text-center">
+                                                                                           <button
+                                                                                                  className="action-btn restore-btn btn btn-sm btn-outline-success"
+                                                                                                  aria-label={`Visszaállítás ${user.nev}`}
+                                                                                                  onClick={() => {
+                                                                                                         if (window.confirm(`Biztosan visszaállítod ${user.nev} felhasználót?`)) {
+                                                                                                                restoreUser(user.user_id);
+                                                                                                         }
+                                                                                                  }}
+                                                                                                  title="Visszaállítás"
+                                                                                           >
+                                                                                                  ↻ Visszaállítás
+                                                                                           </button>
+                                                                                    </td>
+                                                                             </tr>
+                                                                      ))
+                                                               ) : (
+                                                                      <tr>
+                                                                             <td colSpan={4} className="text-center text-muted">
+                                                                                    Nincs találat
+                                                                             </td>
+                                                                      </tr>
+                                                               )}
+                                                        </tbody>
+                                                 </Table>
+                                          </div>
+
+                                          <div className="d-block d-md-none">
+                                                 {activeTab === 'active' && currentUsers.length > 0 ? (
+                                                        currentUsers.map((user) => (
+                                                               <Card key={user.user_id} className="mb-3">
+                                                                      <Card.Body className="p-3 d-flex justify-content-between align-items-start">
+                                                                             <div>
+                                                                                    <h6 className="mb-1">{user.nev}</h6>
+                                                                                    <div className="text-muted small">{user.munkakor}</div>
+                                                                             </div>
+                                                                             <div className="d-flex flex-column ms-3">
+                                                                                    <button
+                                                                                           className="btn btn-sm btn-outline-primary mb-2"
                                                                                            aria-label={`Szerkesztés ${user.nev}`}
                                                                                            onClick={() => navigate(`/felhasznalo-modositas/${user.user_id}`)}
-                                                                                           title="Szerkesztés"
                                                                                     >
                                                                                            ✏️
                                                                                     </button>
-                                                                             </td>
-                                                                             <td className="action-cell">
                                                                                     <button
-                                                                                           className="action-btn delete-btn"
+                                                                                           className="btn btn-sm btn-outline-danger"
                                                                                            aria-label={`Törlés ${user.nev}`}
                                                                                            onClick={() => {
                                                                                                   if (window.confirm(`Biztosan törlöd ${user.nev} felhasználót?`)) {
                                                                                                          deleteUser(user.user_id);
                                                                                                   }
                                                                                            }}
-                                                                                           title="Törlés"
                                                                                     >
                                                                                            ❌
                                                                                     </button>
-                                                                             </td>
-                                                                      </tr>
-                                                               ))
-                                                        ) : activeTab === 'deleted' && currentDeletedUsers.length > 0 ? (
-                                                               currentDeletedUsers.map((user) => (
-                                                                      <tr key={user.user_id} className="user-row">
-                                                                             <td className="user-name">{user.nev}</td>
-                                                                             <td className="user-department">{user.munkakor}</td>
-                                                                             <td colSpan={2} className="action-cell text-center">
+                                                                             </div>
+                                                                      </Card.Body>
+                                                               </Card>
+                                                        ))
+                                                 ) : activeTab === 'deleted' && currentDeletedUsers.length > 0 ? (
+                                                        currentDeletedUsers.map((user) => (
+                                                               <Card key={user.user_id} className="mb-3">
+                                                                      <Card.Body className="p-3 d-flex justify-content-between align-items-start">
+                                                                             <div>
+                                                                                    <h6 className="mb-1">{user.nev}</h6>
+                                                                                    <div className="text-muted small">{user.munkakor}</div>
+                                                                             </div>
+                                                                             <div>
                                                                                     <button
-                                                                                           className="action-btn restore-btn"
+                                                                                           className="btn btn-sm btn-outline-success"
                                                                                            aria-label={`Visszaállítás ${user.nev}`}
                                                                                            onClick={() => {
                                                                                                   if (window.confirm(`Biztosan visszaállítod ${user.nev} felhasználót?`)) {
                                                                                                          restoreUser(user.user_id);
                                                                                                   }
                                                                                            }}
-                                                                                           title="Visszaállítás"
                                                                                     >
                                                                                            ↻ Visszaállítás
                                                                                     </button>
-                                                                             </td>
-                                                                      </tr>
-                                                               ))
-                                                        ) : (
-                                                               <tr>
-                                                                      <td colSpan={4} className="text-center text-muted">
-                                                                             Nincs találat
-                                                                      </td>
-                                                               </tr>
-                                                        )}
-                                                 </tbody>
-                                          </Table>
+                                                                             </div>
+                                                                      </Card.Body>
+                                                               </Card>
+                                                        ))
+                                                 ) : (
+                                                        <div className="text-center text-muted p-3">Nincs találat</div>
+                                                 )}
+                                          </div>
                                    </Card>
-                                   <div className="pagination-controls">
+
+                                   <div className="pagination-controls d-flex justify-content-between align-items-center">
                                           <button 
-                                                 className="pagination-btn"
+                                                 className="pagination-btn btn btn-outline-secondary"
                                                  onClick={goToPrevPage}
                                                  disabled={currentPage === 1}
                                                  title="Előző oldal"
@@ -296,7 +409,7 @@ export function UsersList() {
                                                  Oldal {currentPage} / {currentTabTotal || 1}
                                           </span>
                                           <button 
-                                                 className="pagination-btn"
+                                                 className="pagination-btn btn btn-outline-secondary"
                                                  onClick={goToNextPage}
                                                  disabled={currentPage === currentTabTotal || currentTabTotal === 0}
                                                  title="Következő oldal"
@@ -304,57 +417,6 @@ export function UsersList() {
                                                  Következő →
                                           </button>
                                    </div>
-                            </Col>
-
-                            <Col md={3} className="users-sidebar">
-                                   <Card className="search-filter-card">
-                                          <Card.Body>
-                                                 <h5>Keresés és szűrés</h5>
-                                                 
-                                                 <InputGroup className="mb-3">
-                                                        <Form.Control
-                                                               placeholder="Keresés névre vagy munkacsoportra..."
-                                                               value={searchTerm}
-                                                               onChange={(e) => setSearchTerm(e.target.value)}
-                                                               className="search-input"
-                                                        />
-                                                        <InputGroup.Text>🔍</InputGroup.Text>
-                                                 </InputGroup>
-
-                                                 <div className="filter-section">
-                                                        <h6>Rendezés módja</h6>
-                                                        <Form.Select 
-                                                               value={sortBy}
-                                                               onChange={(e) => {
-                                                                      setSortBy(e.target.value as 'name' | 'department' | 'none');
-                                                                      setSortOrder('asc');
-                                                               }}
-                                                               className="sort-select"
-                                                        >
-                                                               <option value="name">Név szerint</option>
-                                                               <option value="department">Munkacsoportnév szerint</option>
-                                                        </Form.Select>
-                                                 </div>
-
-                                                 <div className="filter-section">
-                                                        <h6>Rendezési sorrend</h6>
-                                                        <div className="sort-order-buttons">
-                                                               <button
-                                                                      className={`sort-order-btn ${sortOrder === 'asc' ? 'active' : ''}`}
-                                                                      onClick={() => setSortOrder('asc')}
-                                                               >
-                                                                      ▲ Növekvő
-                                                               </button>
-                                                               <button
-                                                                      className={`sort-order-btn ${sortOrder === 'desc' ? 'active' : ''}`}
-                                                                      onClick={() => setSortOrder('desc')}
-                                                               >
-                                                                      ▼ Csökkenő
-                                                               </button>
-                                                        </div>
-                                                 </div>
-                                          </Card.Body>
-                                   </Card>
                             </Col>
                      </Row>
               </Container>

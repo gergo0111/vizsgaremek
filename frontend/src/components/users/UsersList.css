@@ -422,10 +422,69 @@
 
   .users-content {
     gap: 1rem;
+    flex-direction: column !important;
+    display: block !important;
+  }
+  .users-table-column,
+  .users-sidebar {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
   }
 
   .users-sidebar {
+    order: -1 !important;
+  }
+  .users-sidebar {
     margin-bottom: 1rem;
+  }
+
+  .users-list-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .search-filter-card {
+    padding: 0.5rem !important;
+    border-width: 1px;
+  }
+
+  .search-filter-card h5 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-input {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .sort-select {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .user-row td {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .users-table-card {
+    min-height: auto;
+  }
+
+  .action-btn {
+    font-size: 1rem;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0.35rem;
+  }
+
+  .users-table-card .card-body,
+  .users-table-card .card {
+    padding: 0.5rem !important;
+  }
+
+  .pagination-controls {
+    padding: 0.5rem;
+    gap: 0.5rem;
   }
 
   .users-table {
