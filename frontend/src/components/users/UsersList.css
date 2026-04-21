@@ -177,8 +177,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 500px;
-  max-height: 700px;
+  min-height: 440px;
+  max-height: 1000px;
 }
 
 .work-list-card {
@@ -266,7 +266,7 @@
 }
 
 .users-table tbody tr:hover {
-  background-color: rgba(0, 102, 204, 0.05);
+  background-color: rgba(0, 0, 0, 0.069);
 }
 
 .user-row td {
@@ -279,6 +279,8 @@
 
 .user-row td:nth-child(1) {
   width: 35%;
+  display: flex;
+  align-items: center;
 }
 
 .user-row td:nth-child(2) {
