@@ -18,6 +18,11 @@ export class EszkozController {
     return this.eszkozService.findAll();
   }
 
+  @Get('deleted')
+  findDeleted() {
+    return this.eszkozService.findDeleted();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eszkozService.findOne(+id);
@@ -31,5 +36,10 @@ export class EszkozController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eszkozService.delete(Number(id));
+  }
+
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.eszkozService.restore(Number(id));
   }
 }

@@ -18,6 +18,11 @@ export class FeladatController {
     return this.feladatService.findAll();
   }
 
+  @Get('deleted')
+  findDeleted() {
+    return this.feladatService.findDeleted();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feladatService.findOne(+id);
@@ -31,5 +36,10 @@ export class FeladatController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.feladatService.delete(Number(id));
+  }
+
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.feladatService.restore(Number(id));
   }
 }

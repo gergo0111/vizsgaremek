@@ -8,7 +8,9 @@ import { UpdateEszkozDto } from "./dto/update-eszkoz.dto";
 export class EszkozService {
        constructor(private prisma: PrismaService) {}
        async findAll() {
-                    return (this.prisma as any).eszkoz.findMany();
+                    return (this.prisma as any).eszkoz.findMany({
+                           where: { isActive: true }
+                    });
        }
 
        async findOne(id: number) {
@@ -19,7 +21,10 @@ export class EszkozService {
 
        async create(data: CreateEszkozDto) {
                     return (this.prisma as any).eszkoz.create({
-                     data
+                     data: {
+                            ...data,
+                            isActive: true
+                     }
               })
        }
 
@@ -31,8 +36,22 @@ export class EszkozService {
        }
 
        async delete(id:number) {
-                    return (this.prisma as any).eszkoz.delete({
-                     where: { eszkoz_id: id }
+                    return (this.prisma as any).eszkoz.update({
+                     where: { eszkoz_id: id },
+                     data: { isActive: false }
               })
+       }
+
+       async restore(id:number) {
+                    return (this.prisma as any).eszkoz.update({
+                     where: { eszkoz_id: id },
+                     data: { isActive: true }
+              })
+       }
+
+       async findDeleted() {
+                    return (this.prisma as any).eszkoz.findMany({
+                           where: { isActive: false }
+                    });
        }
 }

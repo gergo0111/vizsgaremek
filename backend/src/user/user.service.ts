@@ -11,7 +11,9 @@ export class UserService {
        constructor(private prisma: PrismaService) {}
        
        async findAll() {
-                    return (this.prisma as any).user.findMany();
+                           return (this.prisma as any).user.findMany({
+                                  where: { isActive: true }
+                           });
        }
 
        async findOne(id: number) {
@@ -45,10 +47,24 @@ export class UserService {
        }
 
        async delete(id: number) {
-                    return (this.prisma as any).user.delete({
-                     where: { user_id: id }
-              })
+                           return (this.prisma as any).user.update({
+                            where: { user_id: id },
+                            data: { isActive: false }
+                     })
        }
+
+              async restore(id: number) {
+                           return (this.prisma as any).user.update({
+                            where: { user_id: id },
+                            data: { isActive: true }
+                     })
+              }
+
+              async findDeleted() {
+                           return (this.prisma as any).user.findMany({
+                                  where: { isActive: false }
+                           });
+              }
 
        async login(loginData: LoginUserDto) {
                     const user = await (this.prisma as any).user.findUnique({

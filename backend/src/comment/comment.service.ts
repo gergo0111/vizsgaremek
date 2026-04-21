@@ -8,7 +8,9 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentService {
        constructor(private prisma: PrismaService) {}
        async findAll() {
-                    return (this.prisma as any).comment.findMany();
+                    return (this.prisma as any).comment.findMany({
+                           where: { isActive: true }
+                    });
        }
 
        async findOne(id: number) {
@@ -31,8 +33,22 @@ export class CommentService {
        }
 
        async delete(id:number) {
-                    return (this.prisma as any).comment.delete({
-                     where: { comment_id: id }
+                    return (this.prisma as any).comment.update({
+                     where: { comment_id: id },
+                     data: { isActive: false }
               })
+       }
+
+       async restore(id:number) {
+                    return (this.prisma as any).comment.update({
+                     where: { comment_id: id },
+                     data: { isActive: true }
+              })
+       }
+
+       async findDeleted() {
+                    return (this.prisma as any).comment.findMany({
+                           where: { isActive: false }
+                    });
        }
 }

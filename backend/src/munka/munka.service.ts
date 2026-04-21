@@ -10,6 +10,28 @@ export class MunkaService {
        async findAll(isAdmin?: boolean, userId?: number) {
               if (isAdmin) {
                      return (this.prisma as any).munka.findMany({
+                                   where: { isActive: true },
+                                   include: {
+                                   feladat: true,
+                                   munkaUsers: {
+                                          include: { user: true }
+                                   },
+                                   munkaEszkozok: {
+                                          include: { eszkoz: true }
+                                   }
+                            },
+                            });
+              }
+              
+                     return (this.prisma as any).munka.findMany({
+                            where: {
+                                   isActive: true,
+                                   munkaUsers: {
+                                          some: {
+                                                 user_id: userId
+                                          }
+                                   }
+                            },
                             include: {
                                    feladat: true,
                                    munkaUsers: {
@@ -20,26 +42,6 @@ export class MunkaService {
                                    }
                             },
                      });
-              }
-              
-              return (this.prisma as any).munka.findMany({
-                     where: {
-                            munkaUsers: {
-                                   some: {
-                                          user_id: userId
-                                   }
-                            }
-                     },
-                     include: {
-                            feladat: true,
-                            munkaUsers: {
-                                   include: { user: true }
-                            },
-                            munkaEszkozok: {
-                                   include: { eszkoz: true }
-                            }
-                     },
-              });
        }
 
        async findOne(id: number) {
@@ -61,16 +63,12 @@ export class MunkaService {
               const rawDolgozok: number[] = Array.isArray(data.dolgozok) ? data.dolgozok : [data.user_id].filter(Boolean);
               const rawEszkozok: number[] = Array.isArray(data.eszkozok) ? data.eszkozok : [data.eszkoz_id].filter(Boolean);
               const feladatok: string[] = Array.isArray(data.feladatok) ? data.feladatok : [];
-
-              // Deduplicate and normalize IDs to avoid creating duplicate relations
               const dolgozok = Array.from(new Set(rawDolgozok.filter(Boolean)));
               const eszkozok = Array.from(new Set(rawEszkozok.filter(Boolean)));
               if (dolgozok.length === 0 && data.user_id) dolgozok.push(data.user_id);
               if (eszkozok.length === 0 && data.eszkoz_id) eszkozok.push(data.eszkoz_id);
 
               const baseName = data.nev || `Munka ${new Date().toISOString()}`;
-              // If client provided a name, use it as-is. Only generate a unique
-              // name when no name is provided to avoid accidental renaming.
               const munkaName = data.nev ? data.nev : `${baseName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
               const munka = await (this.prisma as any).munka.create({
@@ -218,8 +216,53 @@ export class MunkaService {
        }
 
        async delete(id: number) {
-              return (this.prisma as any).munka.delete({
-                     where: { munka_id: id }
-              })
+                     return (this.prisma as any).munka.update({
+                            where: { munka_id: id },
+                            data: { isActive: false }
+                     })
        }
+
+              async restore(id: number) {
+                     return (this.prisma as any).munka.update({
+                            where: { munka_id: id },
+                            data: { isActive: true }
+                     })
+              }
+
+              async findDeleted(isAdmin?: boolean, userId?: number) {
+                     if (isAdmin) {
+                            return (this.prisma as any).munka.findMany({
+                                   where: { isActive: false },
+                                   include: {
+                                          feladat: true,
+                                          munkaUsers: {
+                                                 include: { user: true }
+                                          },
+                                          munkaEszkozok: {
+                                                 include: { eszkoz: true }
+                                          }
+                                   },
+                            });
+                     }
+
+                     return (this.prisma as any).munka.findMany({
+                            where: {
+                                   isActive: false,
+                                   munkaUsers: {
+                                          some: {
+                                                 user_id: userId
+                                          }
+                                   }
+                            },
+                            include: {
+                                   feladat: true,
+                                   munkaUsers: {
+                                          include: { user: true }
+                                   },
+                                   munkaEszkozok: {
+                                          include: { eszkoz: true }
+                                   }
+                            },
+                     });
+              }
 }

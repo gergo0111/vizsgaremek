@@ -17,6 +17,11 @@ export class CommentController {
     return this.commentService.findAll();
   }
 
+  @Get('deleted')
+  findDeleted() {
+    return this.commentService.findDeleted();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.commentService.findOne(+id);
@@ -30,5 +35,10 @@ export class CommentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.commentService.delete(+id);
+  }
+
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.commentService.restore(+id);
   }
 }

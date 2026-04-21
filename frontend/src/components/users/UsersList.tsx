@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { User } from "../../interfaces/User";
 import { Menusor } from "../Menusor";
-import { apiGet, apiDelete } from "../../lib/api";
-import { Container, Row, Col, Form, InputGroup, Table, Button, Card } from "react-bootstrap";
+import { apiGet, apiDelete, apiPatch } from "../../lib/api";
+import { Container, Row, Col, Form, InputGroup, Table, Button, Card, Nav } from "react-bootstrap";
 import "./UsersList.css";
 
 export function UsersList() {
        const [users, setUsers] = useState<User[]>([]);
+       const [deletedUsers, setDeletedUsers] = useState<User[]>([]);
        const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+       const [filteredDeletedUsers, setFilteredDeletedUsers] = useState<User[]>([]);
        const [searchTerm, setSearchTerm] = useState('');
        const [sortBy, setSortBy] = useState<'name' | 'department' | 'none'>('name');
        const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
        const [currentPage, setCurrentPage] = useState(1);
+       const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
        const itemsPerPage = 5;
        const navigate = useNavigate();
 
@@ -27,7 +30,18 @@ export function UsersList() {
                      }   
               };
 
+              const fetchDeletedUsers = async () => {
+                     try {
+                            const data = await apiGet<User[]>('/users/deleted');
+                            setDeletedUsers(data);
+                            setFilteredDeletedUsers(data);
+                     } catch (error) {
+                            console.error('Hiba a törölt felhasználók betöltésénél:', error);
+                     }
+              };
+
               fetchUsers();
+              fetchDeletedUsers();
        }, []);
 
        useEffect(() => {
@@ -52,6 +66,28 @@ export function UsersList() {
               setCurrentPage(1);
        }, [searchTerm, sortBy, sortOrder, users]);
 
+       useEffect(() => {
+              let filtered = deletedUsers.filter(user =>
+                     user.nev.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                     user.munkakor.toLowerCase().includes(searchTerm.toLowerCase())
+              );
+
+              if (sortBy === 'name') {
+                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu', { numeric: true, sensitivity: 'base' }));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              } else if (sortBy === 'department') {
+                     filtered.sort((a, b) => a.munkakor.localeCompare(b.munkakor, 'hu', { numeric: true, sensitivity: 'base' }));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              }
+
+              setFilteredDeletedUsers(filtered);
+              setCurrentPage(1);
+       }, [searchTerm, sortBy, sortOrder, deletedUsers]);
+
        const deleteUser = async (userId: number) => {
               if (!Number.isFinite(userId) || userId <= 0) {
                      console.warn('Invalid userId, skip delete:', userId);
@@ -59,9 +95,36 @@ export function UsersList() {
               }
               try {
                      await apiDelete(`/users/${userId}`);
-                     setUsers(prev => prev.filter(user => user.user_id !== userId));
+                     // Újra betöltjük az aktív felhasználókat
+                     const data = await apiGet<User[]>('/users');
+                     setUsers(data);
+                     setFilteredUsers(data);
+                     // Újra betöltjük a törölt felhasználókat
+                     const deletedData = await apiGet<User[]>('/users/deleted');
+                     setDeletedUsers(deletedData);
+                     setFilteredDeletedUsers(deletedData);
               } catch (error) {
                      console.error('Hiba:', error);
+              }
+       };
+
+       const restoreUser = async (userId: number) => {
+              if (!Number.isFinite(userId) || userId <= 0) {
+                     console.warn('Invalid userId, skip restore:', userId);
+                     return;
+              }
+              try {
+                     await apiPatch(`/users/${userId}/restore`, {});
+                     // Újra betöltjük az aktív felhasználókat
+                     const data = await apiGet<User[]>('/users');
+                     setUsers(data);
+                     setFilteredUsers(data);
+                     // Újra betöltjük a törölt felhasználókat
+                     const deletedData = await apiGet<User[]>('/users/deleted');
+                     setDeletedUsers(deletedData);
+                     setFilteredDeletedUsers(deletedData);
+              } catch (error) {
+                     console.error('Hiba a visszaállításnál:', error);
               }
        };
 
@@ -70,8 +133,16 @@ export function UsersList() {
        const endIndex = startIndex + itemsPerPage;
        const currentUsers = filteredUsers.slice(startIndex, endIndex);
 
+       const totalDeletedPages = Math.ceil(filteredDeletedUsers.length / itemsPerPage);
+       const deletedStartIndex = (currentPage - 1) * itemsPerPage;
+       const deletedEndIndex = deletedStartIndex + itemsPerPage;
+       const currentDeletedUsers = filteredDeletedUsers.slice(deletedStartIndex, deletedEndIndex);
+
        const goToNextPage = () => {
-              if (currentPage < totalPages) {
+              const currentTabTotal = activeTab === 'active' 
+                     ? totalPages
+                     : totalDeletedPages;
+              if (currentPage < currentTabTotal) {
                      setCurrentPage(currentPage + 1);
               }
        };
@@ -81,6 +152,10 @@ export function UsersList() {
                      setCurrentPage(currentPage - 1);
               }
        };
+
+       const currentTabTotal = activeTab === 'active' 
+              ? totalPages
+              : totalDeletedPages;
 
        
        return (
@@ -109,6 +184,33 @@ export function UsersList() {
 
                      <Row className="users-content">
                             <Col md={9} className="users-table-column">
+                                   <Nav fill variant="tabs" className="mb-3">
+                                          <Nav.Item>
+                                                 <Nav.Link 
+                                                        eventKey="active"
+                                                        active={activeTab === 'active'}
+                                                        onClick={() => {
+                                                               setActiveTab('active');
+                                                               setCurrentPage(1);
+                                                        }}
+                                                 >
+                                                        Aktív felhasználók
+                                                 </Nav.Link>
+                                          </Nav.Item>
+                                          <Nav.Item>
+                                                 <Nav.Link 
+                                                        eventKey="deleted"
+                                                        active={activeTab === 'deleted'}
+                                                        onClick={() => {
+                                                               setActiveTab('deleted');
+                                                               setCurrentPage(1);
+                                                        }}
+                                                 >
+                                                        Törölt felhasználók
+                                                 </Nav.Link>
+                                          </Nav.Item>
+                                   </Nav>
+
                                    <Card className="users-table-card">
                                           <Table responsive hover className="users-table">
                                                  <thead>
@@ -119,7 +221,7 @@ export function UsersList() {
                                                         </tr>
                                                  </thead>
                                                  <tbody>
-                                                        {currentUsers.length > 0 ? (
+                                                        {activeTab === 'active' && currentUsers.length > 0 ? (
                                                                currentUsers.map((user) => (
                                                                       <tr key={user.user_id} className="user-row">
                                                                              <td className="user-name">{user.nev}</td>
@@ -150,6 +252,27 @@ export function UsersList() {
                                                                              </td>
                                                                       </tr>
                                                                ))
+                                                        ) : activeTab === 'deleted' && currentDeletedUsers.length > 0 ? (
+                                                               currentDeletedUsers.map((user) => (
+                                                                      <tr key={user.user_id} className="user-row">
+                                                                             <td className="user-name">{user.nev}</td>
+                                                                             <td className="user-department">{user.munkakor}</td>
+                                                                             <td colSpan={2} className="action-cell text-center">
+                                                                                    <button
+                                                                                           className="action-btn restore-btn"
+                                                                                           aria-label={`Visszaállítás ${user.nev}`}
+                                                                                           onClick={() => {
+                                                                                                  if (window.confirm(`Biztosan visszaállítod ${user.nev} felhasználót?`)) {
+                                                                                                         restoreUser(user.user_id);
+                                                                                                  }
+                                                                                           }}
+                                                                                           title="Visszaállítás"
+                                                                                    >
+                                                                                           ↻ Visszaállítás
+                                                                                    </button>
+                                                                             </td>
+                                                                      </tr>
+                                                               ))
                                                         ) : (
                                                                <tr>
                                                                       <td colSpan={4} className="text-center text-muted">
@@ -170,12 +293,12 @@ export function UsersList() {
                                                  ← Előző
                                           </button>
                                           <span className="pagination-info">
-                                                 Oldal {currentPage} / {totalPages || 1}
+                                                 Oldal {currentPage} / {currentTabTotal || 1}
                                           </span>
                                           <button 
                                                  className="pagination-btn"
                                                  onClick={goToNextPage}
-                                                 disabled={currentPage === totalPages || totalPages === 0}
+                                                 disabled={currentPage === currentTabTotal || currentTabTotal === 0}
                                                  title="Következő oldal"
                                           >
                                                  Következő →

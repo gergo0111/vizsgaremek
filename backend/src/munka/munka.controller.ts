@@ -20,6 +20,14 @@ export class MunkaController {
     return this.munkaService.findAll(isAdmin, userId);
   }
 
+  @Get('deleted')
+  findDeleted(@Req() req: Request) {
+    const user = (req as any).user;
+    const isAdmin = user?.isAdmin === true;
+    const userId = user?.user_id ?? user?.id;
+    return this.munkaService.findDeleted(isAdmin, userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.munkaService.findOne(+id);
@@ -33,5 +41,10 @@ export class MunkaController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.munkaService.delete(+id);
+  }
+
+  @Patch(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.munkaService.restore(+id);
   }
 }

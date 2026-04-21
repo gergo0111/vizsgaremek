@@ -30,6 +30,7 @@ model Eszkoz {
   tipus          String
   darabszam      Int
   hasznalatban   Boolean @default(false)
+  isActive       Boolean @default(true)
   munkaEszkozok  MunkaEszkoz[]
 
   @@map("eszkoz")

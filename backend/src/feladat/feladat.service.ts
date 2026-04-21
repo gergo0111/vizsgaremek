@@ -8,7 +8,9 @@ import { UpdateFeladatDto } from "./dto/update-feladat.dto";
 export class FeladatService {
        constructor(private prisma: PrismaService) {}
        async findAll() {
-                    return (this.prisma as any).feladat.findMany();
+                    return (this.prisma as any).feladat.findMany({
+                           where: { isActive: true }
+                    });
        }
 
        async findOne(id: number) {
@@ -31,8 +33,22 @@ export class FeladatService {
        }
 
        async delete(id:number) {
-                    return (this.prisma as any).feladat.delete({
-                     where: { feladat_id: id }
+                    return (this.prisma as any).feladat.update({
+                     where: { feladat_id: id },
+                     data: { isActive: false }
               })
+       }
+
+       async restore(id:number) {
+                    return (this.prisma as any).feladat.update({
+                     where: { feladat_id: id },
+                     data: { isActive: true }
+              })
+       }
+
+       async findDeleted() {
+                    return (this.prisma as any).feladat.findMany({
+                           where: { isActive: false }
+                    });
        }
 }

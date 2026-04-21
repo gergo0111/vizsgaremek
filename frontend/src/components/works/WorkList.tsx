@@ -16,6 +16,7 @@ import {
   Row,
   Table,
   Badge,
+  Nav,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../users/UsersList.css";
@@ -56,12 +57,15 @@ interface EszkozData {
 
 export function WorkList() {
   const [works, setWorks] = useState<WorkData[]>([]);
+  const [deletedWorks, setDeletedWorks] = useState<WorkData[]>([]);
   const [filteredWorks, setFilteredWorks] = useState<WorkData[]>([]);
+  const [filteredDeletedWorks, setFilteredDeletedWorks] = useState<WorkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [users, SetUsers] = useState<UserData[]>([]);
   const [tools, SetTools] = useState<EszkozData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
   const itemsPerPage = 5;
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<
@@ -92,7 +96,28 @@ export function WorkList() {
       }
     };
 
+    const fetchDeletedWorks = async () => {
+      try {
+        const data = await apiGet<WorkData[]>("/munka/deleted");
+        const normalized = data.map((work) => ({
+          ...work,
+          kezdeti_datum: work.kezdeti_datum
+            ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+            : "",
+          varhato_befejezes_datuma: work.varhato_befejezes_datuma
+            ? new Date(work.varhato_befejezes_datuma)
+                .toISOString()
+                .split("T")[0]
+            : "",
+        }));
+        setDeletedWorks(normalized);
+      } catch (error) {
+        console.error("Hiba a törölt munkák betöltésénél:", error);
+      }
+    };
+
     fetchWorks();
+    fetchDeletedWorks();
   }, []);
 
   useEffect(() => {
@@ -135,6 +160,45 @@ export function WorkList() {
   }, [searchTerm, sortBy, sortOrder, tools, works]);
 
   useEffect(() => {
+    let filtered = deletedWorks.filter(
+      (work) =>
+        work.munka_neve.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        work.leiras?.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    if (sortBy === "name") {
+      filtered.sort((a, b) => a.munka_neve.localeCompare(b.munka_neve, "hu", { numeric: true, sensitivity: 'base' }));
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "user") {
+      filtered.sort((a, b) =>
+        getUsersNames(a).join(', ').localeCompare(getUsersNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "tool") {
+      filtered.sort((a, b) =>
+        getToolsNames(a).join(', ').localeCompare(getToolsNames(b).join(', '), "hu", { numeric: true, sensitivity: 'base' }),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    } else if (sortBy === "date") {
+      filtered.sort(
+        (a, b) => getDateValue(a.kezdeti_datum) - getDateValue(b.kezdeti_datum),
+      );
+      if (sortOrder === "desc") {
+        filtered.reverse();
+      }
+    }
+
+    setFilteredDeletedWorks(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, sortBy, sortOrder, tools, deletedWorks]);
+
+  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const data = await apiGet<UserData[]>("/users");
@@ -157,16 +221,84 @@ export function WorkList() {
     fetchTools();
   }, []);
 
-  const deleteWork = async (workId: number) => {
+  const deleteWork = async (workId: number, workName: string) => {
     if (!Number.isFinite(workId) || workId <= 0) {
       console.warn("Invalid workId, skip delete:", workId);
       return;
     }
+    if (!window.confirm(`Biztosan szeretnéd törölni a "${workName}" munkát?`)) {
+      return;
+    }
     try {
       await apiDelete(`/munka/${workId}`);
-      setWorks((prev) => prev.filter((work) => work.munka_id !== workId));
+      const data = await apiGet<WorkData[]>("/munka");
+      const normalized = data.map((work) => ({
+        ...work,
+        kezdeti_datum: work.kezdeti_datum
+          ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+          : "",
+        varhato_befejezes_datuma: work.varhato_befejezes_datuma
+          ? new Date(work.varhato_befejezes_datuma)
+              .toISOString()
+              .split("T")[0]
+          : "",
+      }));
+      setWorks(normalized);
+      const deletedData = await apiGet<WorkData[]>("/munka/deleted");
+      const normalizedDeleted = deletedData.map((work) => ({
+        ...work,
+        kezdeti_datum: work.kezdeti_datum
+          ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+          : "",
+        varhato_befejezes_datuma: work.varhato_befejezes_datuma
+          ? new Date(work.varhato_befejezes_datuma)
+              .toISOString()
+              .split("T")[0]
+          : "",
+      }));
+      setDeletedWorks(normalizedDeleted);
     } catch (error) {
       console.error("Hiba:", error);
+      alert('Hiba a munka törlésénél');
+    }
+  };
+
+  const restoreWork = async (workId: number) => {
+    if (!Number.isFinite(workId) || workId <= 0) {
+      console.warn("Invalid workId, skip restore:", workId);
+      return;
+    }
+    try {
+      await apiPatch(`/munka/${workId}/restore`, {});
+      const data = await apiGet<WorkData[]>("/munka");
+      const normalized = data.map((work) => ({
+        ...work,
+        kezdeti_datum: work.kezdeti_datum
+          ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+          : "",
+        varhato_befejezes_datuma: work.varhato_befejezes_datuma
+          ? new Date(work.varhato_befejezes_datuma)
+              .toISOString()
+              .split("T")[0]
+          : "",
+      }));
+      setWorks(normalized);
+      const deletedData = await apiGet<WorkData[]>("/munka/deleted");
+      const normalizedDeleted = deletedData.map((work) => ({
+        ...work,
+        kezdeti_datum: work.kezdeti_datum
+          ? new Date(work.kezdeti_datum).toISOString().split("T")[0]
+          : "",
+        varhato_befejezes_datuma: work.varhato_befejezes_datuma
+          ? new Date(work.varhato_befejezes_datuma)
+              .toISOString()
+              .split("T")[0]
+          : "",
+      }));
+      setDeletedWorks(normalizedDeleted);
+    } catch (error) {
+      console.error("Hiba a visszaállításnál:", error);
+      alert('Hiba a munka visszaállításánál');
     }
   };
 
@@ -191,6 +323,11 @@ export function WorkList() {
   const endIndex = startIndex + itemsPerPage;
   const currentWorks = filteredWorks.slice(startIndex, endIndex);
 
+  const totalDeletedPages = Math.ceil(filteredDeletedWorks.length / itemsPerPage);
+  const deletedStartIndex = (currentPage - 1) * itemsPerPage;
+  const deletedEndIndex = deletedStartIndex + itemsPerPage;
+  const currentDeletedWorks = filteredDeletedWorks.slice(deletedStartIndex, deletedEndIndex);
+
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
   const toggleExpand = (id: number) => {
@@ -198,7 +335,10 @@ export function WorkList() {
   };
 
   const goToNextPage = () => {
-    if (currentPage < totalPages) {
+    const currentTabTotal = activeTab === 'active' 
+      ? totalPages
+      : totalDeletedPages;
+    if (currentPage < currentTabTotal) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -208,6 +348,10 @@ export function WorkList() {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  const currentTabTotal = activeTab === 'active' 
+    ? totalPages
+    : totalDeletedPages;
 
   return (
     <>
@@ -235,6 +379,33 @@ export function WorkList() {
 
         <Row className="users-content">
           <Col md={9} className="users-table-column">
+            <Nav fill variant="tabs" className="mb-3">
+              <Nav.Item>
+                <Nav.Link 
+                  eventKey="active"
+                  active={activeTab === 'active'}
+                  onClick={() => {
+                    setActiveTab('active');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Aktív munkák
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link 
+                  eventKey="deleted"
+                  active={activeTab === 'deleted'}
+                  onClick={() => {
+                    setActiveTab('deleted');
+                    setCurrentPage(1);
+                  }}
+                >
+                  Törölt munkák
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+
             <Card className="users-table-card work-list-card">
               <Table responsive hover className="users-table work-table" style={{ tableLayout: 'auto' }}>
                 <thead>
@@ -255,7 +426,7 @@ export function WorkList() {
                         Betöltés...
                       </td>
                     </tr>
-                  ) : filteredWorks.length > 0 ? (
+                  ) : activeTab === 'active' && currentWorks.length > 0 ? (
                     currentWorks.map((work) => (
                       <tr key={work.munka_id} className="user-row">
                         <td className="user-name">{work.munka_neve}</td>
@@ -304,13 +475,68 @@ export function WorkList() {
                         <td className="action-cell">
                           <div className="actions-row">
                             <Button variant="outline-primary" size="sm" onClick={() => navigate(`/munka-modositas/${work.munka_id}`)}>✏️</Button>
-                            <Button variant="outline-danger" size="sm" onClick={() => deleteWork(work.munka_id)}>❌</Button>
+                            <Button variant="outline-danger" size="sm" onClick={() => deleteWork(work.munka_id, work.munka_neve)}>❌</Button>
                             {isAdmin() ? (
                               <Button variant={work.isActive ? 'outline-secondary' : 'outline-success'} size="sm" onClick={() => { const newActive = !work.isActive; apiPatch(`/munka/${work.munka_id}`, { isActive: newActive }).then(() => setWorks((prev) => prev.map((w) => w.munka_id === work.munka_id ? { ...w, isActive: newActive } : w))).catch((err) => { console.error(err); alert('Hiba történt'); }); }}>
-                                {work.isActive ? '🔒' : '🔓'}
+                                {work.isActive ? '🔓' : '🔒'}
                               </Button>
                             ) : null}
                           </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : activeTab === 'deleted' && currentDeletedWorks.length > 0 ? (
+                    currentDeletedWorks.map((work) => (
+                      <tr key={work.munka_id} className="user-row">
+                        <td className="user-name">{work.munka_neve}</td>
+                        <td className="user-department">
+                          <div className={expandedRows[work.munka_id] ? 'description-expanded' : 'description-truncated'}>
+                            {work.leiras || "-"}
+                          </div>
+                          {work.leiras && work.leiras.length > 120 && (
+                            <button
+                              className="toggle-desc-btn"
+                              onClick={() => toggleExpand(work.munka_id)}
+                              aria-label={expandedRows[work.munka_id] ? 'Rejtés' : 'Teljes leírás megtekintése'}
+                            >
+                              {expandedRows[work.munka_id] ? 'Kevesebb' : 'Tovább...'}
+                            </button>
+                          )}
+                        </td>
+                        <td>
+                          <div className="chip-wrap">
+                            {getUsersNames(work).length === 0 ? (
+                              <span className="text-muted">-</span>
+                            ) : (
+                              getUsersNames(work).map((n, i) => (
+                                <Badge key={i} bg="light" text="dark" className="chip">
+                                  {n}
+                                </Badge>
+                              ))
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="chip-wrap">
+                            {getToolsNames(work).length === 0 ? (
+                              <span className="text-muted">-</span>
+                            ) : (
+                              getToolsNames(work).map((t, i) => (
+                                <Badge key={i} bg="light" text="dark" className="chip">
+                                  {t}
+                                </Badge>
+                              ))
+                            )}
+                          </div>
+                        </td>
+                        <td>{work.kezdeti_datum || "-"}</td>
+                        <td>{work.varhato_befejezes_datuma || "-"}</td>
+                        <td className="action-cell text-center">
+                          <Button variant="outline-success" size="sm" onClick={() => {
+                            if (window.confirm(`Biztosan visszaállítod ${work.munka_neve} munkát?`)) {
+                              restoreWork(work.munka_id);
+                            }
+                          }}>↻ Visszaállítás</Button>
                         </td>
                       </tr>
                     ))
@@ -321,7 +547,7 @@ export function WorkList() {
                       </td>
                     </tr>
                   )}
-                  {currentWorks.length < itemsPerPage && !loading && Array.from({ length: itemsPerPage - currentWorks.length }).map((_, i) => (
+                  {activeTab === 'active' && currentWorks.length < itemsPerPage && !loading && Array.from({ length: itemsPerPage - currentWorks.length }).map((_, i) => (
                     <tr key={`empty-${i}`} className="user-row empty-row">
                       <td colSpan={7}>&nbsp;</td>
                     </tr>
@@ -339,12 +565,12 @@ export function WorkList() {
                 ← Előző
               </Button>
               <span className="pagination-info">
-                Oldal {currentPage} / {totalPages || 1}
+                Oldal {currentPage} / {currentTabTotal || 1}
               </span>
               <Button 
                 variant="primary"
                 onClick={goToNextPage}
-                disabled={currentPage === totalPages || totalPages === 0}
+                disabled={currentPage === currentTabTotal || currentTabTotal === 0}
                 title="Következő oldal"
               >
                 Következő →

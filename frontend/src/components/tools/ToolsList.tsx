@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menusor } from "../Menusor";
-import { apiGet, apiDelete } from "../../lib/api";
-import { Container, Row, Col, Form, InputGroup, Table, Button, Card } from "react-bootstrap";
+import { apiGet, apiDelete, apiPatch } from "../../lib/api";
+import { Container, Row, Col, Form, InputGroup, Table, Button, Card, Nav } from "react-bootstrap";
 import "../users/UsersList.css";
 
 interface Eszkoz {
@@ -14,11 +14,14 @@ interface Eszkoz {
 
 export function ToolsList() {
        const [tools, setTools] = useState<Eszkoz[]>([]);
+       const [deletedTools, setDeletedTools] = useState<Eszkoz[]>([]);
        const [filteredTools, setFilteredTools] = useState<Eszkoz[]>([]);
+       const [filteredDeletedTools, setFilteredDeletedTools] = useState<Eszkoz[]>([]);
        const [searchTerm, setSearchTerm] = useState('');
        const [sortBy, setSortBy] = useState<'name' | 'type' | 'quantity' | 'none'>('name');
        const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
        const [currentPage, setCurrentPage] = useState(1);
+       const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
        const itemsPerPage = 5;
        const navigate = useNavigate();
 
@@ -33,7 +36,18 @@ export function ToolsList() {
                      }
               };
 
+              const fetchDeletedTools = async () => {
+                     try {
+                            const data = await apiGet<Eszkoz[]>('/eszkozok/deleted');
+                            setDeletedTools(data);
+                            setFilteredDeletedTools(data);
+                     } catch (error) {
+                            console.error('Hiba a törölt eszközök betöltésénél:', error);
+                     }
+              };
+
               fetchTools();
+              fetchDeletedTools();
        }, []);
 
        useEffect(() => {
@@ -63,12 +77,62 @@ export function ToolsList() {
               setCurrentPage(1);
        }, [searchTerm, sortBy, sortOrder, tools]);
 
+       useEffect(() => {
+              let filtered = deletedTools.filter(tool =>
+                     tool.nev.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                     tool.tipus.toLowerCase().includes(searchTerm.toLowerCase())
+              );
+
+              if (sortBy === 'name') {
+                     filtered.sort((a, b) => a.nev.localeCompare(b.nev, 'hu', { numeric: true, sensitivity: 'base' }));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              } else if (sortBy === 'type') {
+                     filtered.sort((a, b) => a.tipus.localeCompare(b.tipus, 'hu', { numeric: true, sensitivity: 'base' }));
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              } else if (sortBy === 'quantity') {
+                     filtered.sort((a, b) => a.darabszam - b.darabszam);
+                     if (sortOrder === 'desc') {
+                            filtered.reverse();
+                     }
+              }
+
+              setFilteredDeletedTools(filtered);
+              setCurrentPage(1);
+       }, [searchTerm, sortBy, sortOrder, deletedTools]);
+
        const deleteTool = async (eszkozId: string) => {
               try {
                      await apiDelete(`/eszkozok/${eszkozId}`);
-                     setTools(prev => prev.filter(tool => tool.eszkoz_id !== eszkozId));
+                     // Újra betöltjük az aktív eszközöket
+                     const data = await apiGet<Eszkoz[]>('/eszkozok');
+                     setTools(data);
+                     setFilteredTools(data);
+                     // Újra betöltjük a törölt eszközöket
+                     const deletedData = await apiGet<Eszkoz[]>('/eszkozok/deleted');
+                     setDeletedTools(deletedData);
+                     setFilteredDeletedTools(deletedData);
               } catch (error) {
                      console.error('Hiba:', error);
+              }
+       };
+
+       const restoreTool = async (eszkozId: string) => {
+              try {
+                     await apiPatch(`/eszkozok/${eszkozId}/restore`, {});
+                     // Újra betöltjük az aktív eszközöket
+                     const data = await apiGet<Eszkoz[]>('/eszkozok');
+                     setTools(data);
+                     setFilteredTools(data);
+                     // Újra betöltjük a törölt eszközöket
+                     const deletedData = await apiGet<Eszkoz[]>('/eszkozok/deleted');
+                     setDeletedTools(deletedData);
+                     setFilteredDeletedTools(deletedData);
+              } catch (error) {
+                     console.error('Hiba a visszaállításnál:', error);
               }
        };
 
@@ -77,8 +141,16 @@ export function ToolsList() {
        const endIndex = startIndex + itemsPerPage;
        const currentTools = filteredTools.slice(startIndex, endIndex);
 
+       const totalDeletedPages = Math.ceil(filteredDeletedTools.length / itemsPerPage);
+       const deletedStartIndex = (currentPage - 1) * itemsPerPage;
+       const deletedEndIndex = deletedStartIndex + itemsPerPage;
+       const currentDeletedTools = filteredDeletedTools.slice(deletedStartIndex, deletedEndIndex);
+
        const goToNextPage = () => {
-              if (currentPage < totalPages) {
+              const currentTabTotal = activeTab === 'active'
+                     ? totalPages
+                     : totalDeletedPages;
+              if (currentPage < currentTabTotal) {
                      setCurrentPage(currentPage + 1);
               }
        };
@@ -88,6 +160,10 @@ export function ToolsList() {
                      setCurrentPage(currentPage - 1);
               }
        };
+
+       const currentTabTotal = activeTab === 'active'
+              ? totalPages
+              : totalDeletedPages;
 
        return (
               <>
@@ -115,6 +191,33 @@ export function ToolsList() {
 
                      <Row className="users-content">
                             <Col md={9} className="users-table-column">
+                                   <Nav fill variant="tabs" className="mb-3">
+                                          <Nav.Item>
+                                                 <Nav.Link 
+                                                        eventKey="active"
+                                                        active={activeTab === 'active'}
+                                                        onClick={() => {
+                                                               setActiveTab('active');
+                                                               setCurrentPage(1);
+                                                        }}
+                                                 >
+                                                        Aktív eszközök
+                                                 </Nav.Link>
+                                          </Nav.Item>
+                                          <Nav.Item>
+                                                 <Nav.Link 
+                                                        eventKey="deleted"
+                                                        active={activeTab === 'deleted'}
+                                                        onClick={() => {
+                                                               setActiveTab('deleted');
+                                                               setCurrentPage(1);
+                                                        }}
+                                                 >
+                                                        Törölt eszközök
+                                                 </Nav.Link>
+                                          </Nav.Item>
+                                   </Nav>
+
                                    <Card className="users-table-card">
                                           <Table responsive hover className="users-table tools-table">
                                                  <thead>
@@ -126,7 +229,7 @@ export function ToolsList() {
                                                         </tr>
                                                  </thead>
                                                  <tbody>
-                                                        {currentTools.length > 0 ? (
+                                                        {activeTab === 'active' && currentTools.length > 0 ? (
                                                                currentTools.map((tool) => (
                                                                       <tr key={tool.eszkoz_id} className="user-row">
                                                                              <td className="user-name">{tool.nev}</td>
@@ -159,9 +262,31 @@ export function ToolsList() {
                                                                              </td>
                                                                       </tr>
                                                                ))
+                                                        ) : activeTab === 'deleted' && currentDeletedTools.length > 0 ? (
+                                                               currentDeletedTools.map((tool) => (
+                                                                      <tr key={tool.eszkoz_id} className="user-row">
+                                                                             <td className="user-name">{tool.nev}</td>
+                                                                             <td className="user-department">{tool.tipus}</td>
+                                                                             <td className="text-center">{tool.darabszam}</td>
+                                                                             <td colSpan={2} className="action-cell text-center">
+                                                                                    <button
+                                                                                           className="action-btn restore-btn"
+                                                                                           aria-label={`Visszaállítás ${tool.nev}`}
+                                                                                           onClick={() => {
+                                                                                                  if (window.confirm(`Biztosan visszaállítod ${tool.nev} eszközt?`)) {
+                                                                                                         restoreTool(tool.eszkoz_id);
+                                                                                                  }
+                                                                                           }}
+                                                                                           title="Visszaállítás"
+                                                                                    >
+                                                                                           ↻ Visszaállítás
+                                                                                    </button>
+                                                                             </td>
+                                                                      </tr>
+                                                               ))
                                                         ) : (
                                                                <tr>
-                                                                      <td colSpan={6} className="text-center text-muted">
+                                                                      <td colSpan={5} className="text-center text-muted">
                                                                              Nincs találat
                                                                       </td>
                                                                </tr>
@@ -179,12 +304,12 @@ export function ToolsList() {
                                                  ← Előző
                                           </button>
                                           <span className="pagination-info">
-                                                 Oldal {currentPage} / {totalPages || 1}
+                                                 Oldal {currentPage} / {currentTabTotal || 1}
                                           </span>
                                           <button 
                                                  className="pagination-btn"
                                                  onClick={goToNextPage}
-                                                 disabled={currentPage === totalPages || totalPages === 0}
+                                                 disabled={currentPage === currentTabTotal || currentTabTotal === 0}
                                                  title="Következő oldal"
                                           >
                                                  Következő →
