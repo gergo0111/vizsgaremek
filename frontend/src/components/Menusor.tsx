@@ -8,26 +8,26 @@ export function Menusor() {
   const user = getUser();
   const navigate = useNavigate();
   const isAdmin = user?.isAdmin === true;
-
+ 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
-
+ 
   return (
     <nav
       className="navbar navbar-expand-lg navbar-dark"
       style={{ backgroundColor: "#084885" }}
     >
       <div className="container-fluid">
-        <img 
-          src={ptlogo} 
-          alt="P&T Pasztik logo" 
+        <img
+          src={ptlogo}
+          alt="P&T Pasztik logo"
           className="logo navbar-brand"
           style={{ cursor: 'pointer' }}
-          onClick={() => navigate('/fooldal')} 
+          onClick={() => navigate('/fooldal')}
         />
-
+ 
         <div className="collapse navbar-collapse" id="navbarText">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
@@ -55,7 +55,7 @@ export function Menusor() {
               </>
             )}
           </ul>
-      
+     
             <div className="navbar-nav">
               <span className="badge bg-success">
                 {user?.nev || 'Kérlek jelentkezz be❗️'}
@@ -74,3 +74,4 @@ export function Menusor() {
     </nav>
   );
 }
+ 

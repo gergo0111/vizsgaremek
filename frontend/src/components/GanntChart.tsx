@@ -4,6 +4,7 @@ import type { Munka } from "../interfaces/Munka";
 import { apiGet } from "../lib/api";
 import { isAdmin, getUser } from "../lib/auth";
 import { WorkDisplay } from "./works/WorkDisplay";
+import { Container, Row, Col, Card, ProgressBar, Offcanvas, Button, Form } from "react-bootstrap";
  
 type ViewMode = "week" | "month" | "year";
  
@@ -102,6 +103,17 @@ function sameDay(a: Date, b: Date) {
     a.getDate() === b.getDate()
   );
 }
+
+function formatDateRange(start: Date, end: Date): string {
+  const formatDate = (d: Date) => {
+    return d.toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+  return `${formatDate(start)} – ${formatDate(end)}`;
+}
  
 function computeProgressPercent(w: Munka) {
   const total = w.feladat?.length ?? 0;
@@ -135,6 +147,8 @@ export function GanntChart() {
   const [sortKey, setSortKey] = useState<SortKey>("start");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [selectedWork, setSelectedWork] = useState<DecoratedWork | null>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<Record<StatusKey, boolean>>({
     p0_25: true,
     p25_50: true,
@@ -218,7 +232,10 @@ export function GanntChart() {
     const visible = decoratedAll.filter((w) => {
       const isStatusMatch = filters[w.status];
       const isInView = w.start <= rangeEnd && w.end >= rangeStart;
-      return isStatusMatch && isInView;
+      const isSearchMatch = searchTerm === "" || 
+        w.munka_neve.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (w.munka_id && w.munka_id.toString().includes(searchTerm));
+      return isStatusMatch && isInView && isSearchMatch;
     });
  
     const dir = sortDir === "asc" ? 1 : -1;
@@ -241,7 +258,7 @@ export function GanntChart() {
           return 0;
       }
     });
-  }, [decoratedAll, filters, sortKey, sortDir, rangeStart, rangeEnd]);
+  }, [decoratedAll, filters, sortKey, sortDir, rangeStart, rangeEnd, searchTerm]);
  
   const today = useMemo(() => {
     const t = new Date();
@@ -266,127 +283,273 @@ export function GanntChart() {
   }
  
   return (
-    <div className="pt-page">
-      <div className="pt-main">
-        <div className="pt-panel pt-left">
-          <div className="pt-panelHeader">
-            <span>Rendezés</span>
-            <span className="pt-dropdown">▼</span>
-          </div>
- 
-          <div className="pt-sortBar">
-            <div className="pt-sortGroup">
-              <button
-                className={`pt-sortBtn ${sortKey === "name" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("name");
-                  setSortDir("asc");
-                }}
-              >
-                Név ▲
-              </button>
-              <button
-                className={`pt-sortBtn ${sortKey === "name" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("name");
-                  setSortDir("desc");
-                }}
-              >
-                Név ▼
-              </button>
+    <>
+      <div className="pt-page d-none d-lg-block">
+        <div className="pt-search-wrapper">
+          <Form.Control
+            type="text"
+            placeholder="Keressen a munka nevére vagy ID-ra..."
+            className="pt-search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className="pt-date-range-display">
+          Jelenlegi idősáv: <strong>{formatDateRange(rangeStart, rangeEnd)}</strong>
+        </div>
+
+        <div className="pt-main">
+          <div className="pt-panel pt-left">
+            <div className="pt-panelHeader">
+              <span>Rendezés</span>
+              <span className="pt-dropdown">▼</span>
             </div>
-            <div className="pt-sortGroup">
-              <button
-                className={`pt-sortBtn ${sortKey === "start" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("start");
-                  setSortDir("asc");
-                }}
-              >
-                Kezdet ▲
-              </button>
-              <button
-                className={`pt-sortBtn ${sortKey === "start" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("start");
-                  setSortDir("desc");
-                }}
-              >
-                Kezdet ▼
-              </button>
+     
+            <div className="pt-sortBar">
+              <div className="pt-sortGroup">
+                <button
+                  className={`pt-sortBtn ${sortKey === "name" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("name");
+                    setSortDir("asc");
+                  }}
+                >
+                  Név ▲
+                </button>
+                <button
+                  className={`pt-sortBtn ${sortKey === "name" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("name");
+                    setSortDir("desc");
+                  }}
+                >
+                  Név ▼
+                </button>
+              </div>
+              <div className="pt-sortGroup">
+                <button
+                  className={`pt-sortBtn ${sortKey === "start" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("start");
+                    setSortDir("asc");
+                  }}
+                >
+                  Kezdet ▲
+                </button>
+                <button
+                  className={`pt-sortBtn ${sortKey === "start" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("start");
+                    setSortDir("desc");
+                  }}
+                >
+                  Kezdet ▼
+                </button>
+              </div>
+              <div className="pt-sortGroup">
+                <button
+                  className={`pt-sortBtn ${sortKey === "end" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("end");
+                    setSortDir("asc");
+                  }}
+                >
+                  Határidő ▲
+                </button>
+                <button
+                  className={`pt-sortBtn ${sortKey === "end" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
+                  onClick={() => {
+                    setSortKey("end");
+                    setSortDir("desc");
+                  }}
+                >
+                  Határidő ▼
+                </button>
+              </div>
             </div>
-            <div className="pt-sortGroup">
-              <button
-                className={`pt-sortBtn ${sortKey === "end" && sortDir === "asc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("end");
-                  setSortDir("asc");
-                }}
-              >
-                Határidő ▲
-              </button>
-              <button
-                className={`pt-sortBtn ${sortKey === "end" && sortDir === "desc" ? "pt-sortBtn--active" : ""}`}
-                onClick={() => {
-                  setSortKey("end");
-                  setSortDir("desc");
-                }}
-              >
-                Határidő ▼
-              </button>
-            </div>
-          </div>
- 
-          <div className="pt-leftList">
-            {error && <div className="pt-error">{error}</div>}
-            {filteredSorted.map((w) => (
-              <div
-                key={w.munka_id}
-                className="pt-workCard"
-                onClick={() => setSelectedWork(w)}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelectedWork(w);
-                  }
-                }}
-                role="button"
-                aria-label={`Megnyitás: ${w.munka_neve}`}
-              >
+     
+            <div className="pt-leftList">
+              {error && <div className="pt-error">{error}</div>}
+              {filteredSorted.map((w) => (
                 <div
-                  className={`pt-bar ${progressColorClass(w.status)}`}
+                  key={w.munka_id}
+                  className="pt-workCard"
+                  onClick={() => setSelectedWork(w)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedWork(w);
+                    }
+                  }}
+                  role="button"
+                  aria-label={`Megnyitás: ${w.munka_neve}`}
                 >
                   <div
-                    className="pt-barFill"
-                    style={{ width: `${w.progress}%` }}
-                  />
-                  <div className="pt-barLabel">
-                    {w.munka_neve} {w.progress}%
+                    className={`pt-bar ${progressColorClass(w.status)}`}
+                  >
+                    <div
+                      className="pt-barFill"
+                      style={{ width: `${w.progress}%` }}
+                    />
+                    <div className="pt-barLabel">
+                      {w.munka_neve} {w.progress}%
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+     
+          <div
+            className="pt-panel pt-right"
+            style={{ ["--pt-days" as any]: days.length }}
+          >
+            <div className="pt-ganttHeader">
+              <div className="pt-ganttYearNav">
+                <button className="pt-navBtn" onClick={() => step(-1)}>
+                  ◀
+                </button>
+                <div className="pt-year">{rangeStart.getFullYear()}</div>
+                <button className="pt-navBtn" onClick={() => step(1)}>
+                  ▶
+                </button>
               </div>
-            ))}
+              <div className="pt-filter">
+                <select
+                  className="pt-viewSelect"
+                  value={viewMode}
+                  onChange={(e) => setViewMode(e.target.value as ViewMode)}
+                >
+                  <option value="week">Heti</option>
+                  <option value="month">Havi</option>
+                  <option value="year">Éves</option>
+                </select>
+                <button
+                  className="pt-todayBtn"
+                  onClick={() => setAnchorDate(new Date())}
+                >
+                  Ma
+                </button>
+              </div>
+            </div>
+     
+            <div className="pt-ganttGrid">
+              <div className="pt-col pt-col--label">Dátum:</div>
+              {days.map((d) => (
+                <div
+                  key={d.toISOString()}
+                  className={`pt-col ${isWeekend(d) ? "pt-col--weekend" : ""} ${sameDay(d, today) ? "pt-col--today" : ""}`}
+                >
+                  <div className="pt-colTop">
+                    <div className="pt-colDate">{formatMonthDay(d)}</div>
+                    <div className="pt-colDow">{formatDowHu(d)}</div>
+                  </div>
+                </div>
+              ))}
+     
+              {filteredSorted.map((w) => {
+                const totalDays = days.length;
+     
+                const visibleStart = new Date(
+                  Math.max(w.start.getTime(), rangeStart.getTime()),
+                );
+                const visibleEnd = new Date(
+                  Math.min(w.end.getTime(), rangeEnd.getTime()),
+                );
+     
+                const startOffset =
+                  daysBetweenInclusive(rangeStart, visibleStart) - 1;
+                const span = daysBetweenInclusive(visibleStart, visibleEnd);
+     
+                const leftPct = (startOffset / totalDays) * 100;
+                const widthPct = (span / totalDays) * 100;
+     
+                return (
+                  <div
+                    key={w.munka_id}
+                    className="pt-gridRow"
+                    onClick={() => setSelectedWork(w)}
+                  >
+                    <div />
+                    <div className="pt-rowTrack">
+                      <div
+                        className={`pt-ganttBar ${progressColorClass(w.status)}`}
+                        style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                      >
+                        <div
+                          className="pt-ganttBarFill"
+                          style={{ width: `${w.progress}%` }}
+                        />
+                        <div className="pt-ganttBarLabel">{w.munka_neve}</div>
+                        <div className="pt-ganttBarPercent">{w.progress}%</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+     
+            <div className="pt-legend">
+              {(Object.keys(filters) as StatusKey[]).map((key) => (
+                <label key={key} className="pt-legendItem">
+                  <input
+                    type="checkbox"
+                    checked={filters[key]}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, [key]: e.target.checked }))
+                    }
+                  />
+                  <span className={`pt-dot pt-dot--${key}`} />
+                  {key === "p0_25" && "0% - 24%"}
+                  {key === "p25_50" && "25% - 49%"}
+                  {key === "p50_75" && "50% - 74%"}
+                  {key === "p75_100" && "75% - 99%"}
+                  {key === "late" && "Késésben"}
+                  {key === "done" && "Kész (100%)"}
+                  {key === "planned" && "Tervezett"}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
- 
-        <div
-          className="pt-panel pt-right"
-          style={{ ["--pt-days" as any]: days.length }}
-        >
-          <div className="pt-ganttHeader">
-            <div className="pt-ganttYearNav">
-              <button className="pt-navBtn" onClick={() => step(-1)}>
-                ◀
-              </button>
-              <div className="pt-year">{rangeStart.getFullYear()}</div>
-              <button className="pt-navBtn" onClick={() => step(1)}>
-                ▶
-              </button>
-            </div>
-            <div className="pt-filter">
+      </div>
+
+      <div className="pt-page-mobile d-lg-none">
+        <Container className="pt-mobile-container">
+          <Row className="pt-mobile-search mb-3">
+            <Col className="d-flex">
+              <Form.Control
+                type="text"
+                placeholder="Keressen a munka nevére vagy ID-ra..."
+                className="pt-search-input pt-mobile-search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </Col>
+          </Row>
+
+          <Row className="pt-mobile-date-range mb-3">
+            <Col>
+              <div className="pt-date-range-display pt-mobile-date-range-text">
+                Jelenlegi idősáv: <strong>{formatDateRange(rangeStart, rangeEnd)}</strong>
+              </div>
+            </Col>
+          </Row>
+
+          <Row className="pt-mobile-header mb-3">
+            <Col className="d-flex gap-1 align-items-center">
+              <Button 
+                variant="outline-light" 
+                size="sm"
+                onClick={() => setShowMobileFilters(true)}
+                className="pt-mobile-filter-btn"
+              >
+                ☰ Szűrés & Rendezés
+              </Button>
               <select
-                className="pt-viewSelect"
+                className="form-select form-select-sm pt-mobile-viewselect"
                 value={viewMode}
                 onChange={(e) => setViewMode(e.target.value as ViewMode)}
               >
@@ -394,93 +557,205 @@ export function GanntChart() {
                 <option value="month">Havi</option>
                 <option value="year">Éves</option>
               </select>
-              <button
-                className="pt-todayBtn"
+              <Button
+                variant="outline-light"
+                size="sm"
                 onClick={() => setAnchorDate(new Date())}
+                className="pt-mobile-today-btn"
               >
                 Ma
-              </button>
-            </div>
-          </div>
- 
-          <div className="pt-ganttGrid">
-            <div className="pt-col pt-col--label">Dátum:</div>
-            {days.map((d) => (
-              <div
-                key={d.toISOString()}
-                className={`pt-col ${isWeekend(d) ? "pt-col--weekend" : ""} ${sameDay(d, today) ? "pt-col--today" : ""}`}
+              </Button>
+            </Col>
+          </Row>
+
+          <Row className="pt-mobile-date-nav mb-3">
+            <Col className="d-flex gap-2 justify-content-between align-items-center">
+              <Button 
+                variant="outline-light" 
+                size="sm"
+                onClick={() => step(-1)}
+                className="pt-mobile-nav-btn"
               >
-                <div className="pt-colTop">
-                  <div className="pt-colDate">{formatMonthDay(d)}</div>
-                  <div className="pt-colDow">{formatDowHu(d)}</div>
+                ◀ Előző
+              </Button>
+              <span className="pt-mobile-year-label">{rangeStart.getFullYear()}</span>
+              <Button 
+                variant="outline-light" 
+                size="sm"
+                onClick={() => step(1)}
+                className="pt-mobile-nav-btn"
+              >
+                Következő ▶
+              </Button>
+            </Col>
+          </Row>
+
+          <Offcanvas 
+            show={showMobileFilters} 
+            onHide={() => setShowMobileFilters(false)}
+            placement="start"
+            className="pt-mobile-offcanvas"
+          >
+            <Offcanvas.Header closeButton className="pt-offcanvas-header">
+              <Offcanvas.Title className="text-white">Szűrés & Rendezés</Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body className="pt-offcanvas-body">
+              <div className="pt-mobile-section">
+                <h6 className="text-uppercase pt-mobile-section-title">Rendezés</h6>
+                <div className="pt-mobile-sort-group">
+                  {(['name', 'start', 'end', 'progress'] as SortKey[]).map((key) => (
+                    <div key={key} className="pt-mobile-sort-buttons">
+                      <Button
+                        variant={sortKey === key && sortDir === "asc" ? "success" : "outline-light"}
+                        size="sm"
+                        className="w-100 mb-2"
+                        onClick={() => {
+                          setSortKey(key);
+                          setSortDir("asc");
+                        }}
+                      >
+                        {key === 'name' && 'Név ▲'}
+                        {key === 'start' && 'Kezdet ▲'}
+                        {key === 'end' && 'Határidő ▲'}
+                        {key === 'progress' && 'Haladás ▲'}
+                      </Button>
+                      <Button
+                        variant={sortKey === key && sortDir === "desc" ? "success" : "outline-light"}
+                        size="sm"
+                        className="w-100 mb-3"
+                        onClick={() => {
+                          setSortKey(key);
+                          setSortDir("desc");
+                        }}
+                      >
+                        {key === 'name' && 'Név ▼'}
+                        {key === 'start' && 'Kezdet ▼'}
+                        {key === 'end' && 'Határidő ▼'}
+                        {key === 'progress' && 'Haladás ▼'}
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
- 
-            {filteredSorted.map((w) => {
-              const totalDays = days.length;
- 
-              const visibleStart = new Date(
-                Math.max(w.start.getTime(), rangeStart.getTime()),
-              );
-              const visibleEnd = new Date(
-                Math.min(w.end.getTime(), rangeEnd.getTime()),
-              );
- 
-              const startOffset =
-                daysBetweenInclusive(rangeStart, visibleStart) - 1;
-              const span = daysBetweenInclusive(visibleStart, visibleEnd);
- 
-              const leftPct = (startOffset / totalDays) * 100;
-              const widthPct = (span / totalDays) * 100;
- 
-              return (
-                <div
-                  key={w.munka_id}
-                  className="pt-gridRow"
-                  onClick={() => setSelectedWork(w)}
-                >
-                  <div />
-                  <div className="pt-rowTrack">
-                    <div
-                      className={`pt-ganttBar ${progressColorClass(w.status)}`}
-                      style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                    >
-                      <div
-                        className="pt-ganttBarFill"
-                        style={{ width: `${w.progress}%` }}
+
+              <div className="pt-mobile-section">
+                <h6 className="text-uppercase pt-mobile-section-title">Szűrés állapot szerint</h6>
+                <div className="pt-mobile-filters">
+                  {(Object.keys(filters) as StatusKey[]).map((key) => (
+                    <div key={key} className="form-check pt-mobile-filter-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id={`filter-${key}`}
+                        checked={filters[key]}
+                        onChange={(e) =>
+                          setFilters((prev) => ({ ...prev, [key]: e.target.checked }))
+                        }
                       />
-                      <div className="pt-ganttBarLabel">{w.munka_neve}</div>
-                      <div className="pt-ganttBarPercent">{w.progress}%</div>
+                      <label className="form-check-label text-light" htmlFor={`filter-${key}`}>
+                        <span className={`pt-mobile-dot pt-dot--${key}`} />
+                        {key === "p0_25" && "0% - 24%"}
+                        {key === "p25_50" && "25% - 49%"}
+                        {key === "p50_75" && "50% - 74%"}
+                        {key === "p75_100" && "75% - 99%"}
+                        {key === "late" && "Késésben"}
+                        {key === "done" && "Kész (100%)"}
+                        {key === "planned" && "Tervezett"}
+                      </label>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
- 
-          <div className="pt-legend">
-            {(Object.keys(filters) as StatusKey[]).map((key) => (
-              <label key={key} className="pt-legendItem">
-                <input
-                  type="checkbox"
-                  checked={filters[key]}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, [key]: e.target.checked }))
-                  }
-                />
-                <span className={`pt-dot pt-dot--${key}`} />
-                {key === "p0_25" && "0% - 24%"}
-                {key === "p25_50" && "25% - 49%"}
-                {key === "p50_75" && "50% - 74%"}
-                {key === "p75_100" && "75% - 99%"}
-                {key === "late" && "Késésben"}
-                {key === "done" && "Kész (100%)"}
-                {key === "planned" && "Tervezett"}
-              </label>
-            ))}
-          </div>
-        </div>
+              </div>
+            </Offcanvas.Body>
+          </Offcanvas>
+
+          {error && (
+            <Row className="mb-3">
+              <Col>
+                <div className="alert alert-danger pt-mobile-error" role="alert">
+                  {error}
+                </div>
+              </Col>
+            </Row>
+          )}
+
+          <Row className="g-2 pt-mobile-cards">
+            {filteredSorted.length === 0 ? (
+              <Col xs={12}>
+                <div className="pt-mobile-empty">
+                  <p className="text-light">Nincs adat a megadott szűréshez</p>
+                </div>
+              </Col>
+            ) : (
+              filteredSorted.map((w) => (
+                <Col xs={12} key={w.munka_id}>
+                  <Card 
+                    className="pt-mobile-card"
+                    onClick={() => setSelectedWork(w)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedWork(w);
+                      }
+                    }}
+                    aria-label={`Megnyitás: ${w.munka_neve}`}
+                  >
+                    <Card.Body className="pt-mobile-card-body">
+                      <Card.Title className="pt-mobile-card-title">
+                        {w.munka_neve}
+                      </Card.Title>
+
+                      <div className="pt-mobile-progress-section">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <small className="pt-mobile-card-label">Haladás</small>
+                          <strong className="text-warning">{w.progress}%</strong>
+                        </div>
+                        <ProgressBar
+                          now={w.progress}
+                          className={`pt-mobile-progressbar pt-mobile-progress--${w.status}`}
+                          label={`${w.progress}%`}
+                          striped={w.status !== "done"}
+                          animated={w.progress > 0 && w.progress < 100}
+                        />
+                      </div>
+
+                      <div className="pt-mobile-dates mt-3">
+                        <Row className="g-2">
+                          <Col xs={6}>
+                            <div className="pt-mobile-date-item">
+                              <small className="pt-mobile-date-label d-block">Kezdés</small>
+                              <span className="pt-mobile-date-value">{w.start.toLocaleDateString('hu-HU')}</span>
+                            </div>
+                          </Col>
+                          <Col xs={6}>
+                            <div className="pt-mobile-date-item">
+                              <small className="pt-mobile-date-label d-block">Határidő</small>
+                              <span className="pt-mobile-date-value">{w.end.toLocaleDateString('hu-HU')}</span>
+                            </div>
+                          </Col>
+                        </Row>
+                      </div>
+
+                      <div className="pt-mobile-status mt-3">
+                        <span className={`badge pt-status-badge pt-status--${w.status}`}>
+                          {w.status === "p0_25" && "0% - 24%"}
+                          {w.status === "p25_50" && "25% - 49%"}
+                          {w.status === "p50_75" && "50% - 74%"}
+                          {w.status === "p75_100" && "75% - 99%"}
+                          {w.status === "late" && "Késésben"}
+                          {w.status === "done" && "Kész"}
+                          {w.status === "planned" && "Tervezett"}
+                        </span>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            )}
+          </Row>
+        </Container>
       </div>
  
       {selectedWork && (
@@ -490,7 +765,7 @@ export function GanntChart() {
           onSave={handleWorkSave}
         />
       )}
-    </div>
+    </>
   );
 }
  
