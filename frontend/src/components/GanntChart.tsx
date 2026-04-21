@@ -763,6 +763,15 @@ export function GanntChart() {
           work={selectedWork}
           onClose={() => setSelectedWork(null)}
           onSave={handleWorkSave}
+          isLocallyLocked={(() => {
+            try {
+              const raw = localStorage.getItem('lockedWorks');
+              const arr = raw ? JSON.parse(raw) : [];
+              return Array.isArray(arr) && selectedWork ? arr.includes(selectedWork.munka_id) : false;
+            } catch (e) {
+              return false;
+            }
+          })()}
         />
       )}
     </>

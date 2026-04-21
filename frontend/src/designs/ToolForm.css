@@ -1,5 +1,5 @@
 .tool-form-page {
-  background: linear-gradient(135deg, #1a4d2e 0%, #2d5a3d 100%);
+  background: linear-gradient(135deg, #1a2d4d 0%, #2d3f5a 100%);
   min-height: 100vh;
   padding: 2rem 1rem;
   display: flex;
@@ -143,7 +143,7 @@
 
 .btn-submit {
   flex: 1;
-  background: linear-gradient(135deg, #52b788 0%, #40916c 100%);
+  background: linear-gradient(135deg, #5288b7 0%, #405891 100%);
   border: none;
   color: white;
   padding: 0.75rem 1.5rem;
@@ -156,7 +156,7 @@
 }
 
 .btn-submit:hover {
-  background: linear-gradient(135deg, #40916c 0%, #2d5a3d 100%);
+  background: linear-gradient(135deg, #406b91 0%, #2d3f5a 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(45, 90, 61, 0.4);
 }
@@ -179,7 +179,7 @@
 }
 
 .btn-back-secondary:hover {
-  background: #2d5a3d;
+  background: #2d455a;
   color: white;
   box-shadow: 0 4px 8px rgba(45, 90, 61, 0.3);
 }

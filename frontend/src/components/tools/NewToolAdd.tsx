@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { apiPost } from "../../lib/api";
 import { ToastContainer } from "../common/Toast";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
-import "../../designs/UserForm.css";
+import "../../designs/ToolForm.css";
 import { Menusor } from "../Menusor";
 
 interface Toast {

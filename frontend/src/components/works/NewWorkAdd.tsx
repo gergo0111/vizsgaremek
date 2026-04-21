@@ -375,22 +375,15 @@ export function NewWorkAdd() {
                                                                       </div>
                                                                </Form.Group>
 
-                                                               <Form.Group className="mt-4 work-form-full d-flex gap-2">
-                                                                      <Button 
-                                                                             type="submit" 
-                                                                             variant="primary"
-                                                                             className="flex-grow-1"
-                                                                      >
-                                                                             Munka mentése
-                                                                      </Button>
-                                                                      <Button 
-                                                                             type="button" 
-                                                                             variant="outline-primary"
-                                                                             onClick={() => navigate("/munka-lista")}
-                                                                             className="flex-grow-1"
-                                                                      >
-                                                                             ← Vissza
-                                                                      </Button>
+                                                               <Form.Group className="form-group work-form-full">
+                                                                      <div className="button-group">
+                                                                             <Button type="submit" variant="primary" className="btn-submit">
+                                                                                    Munka mentése
+                                                                             </Button>
+                                                                             <Button type="button" variant="outline-primary" onClick={() => navigate("/munka-lista")} className="btn-back-secondary">
+                                                                                    ← Vissza
+                                                                             </Button>
+                                                                      </div>
                                                                </Form.Group>
                                                         </div>
                                                  </Form>

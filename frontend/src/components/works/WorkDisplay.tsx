@@ -9,9 +9,10 @@ interface WorkDisplayProps {
 	work: Munka;
 	onClose: () => void;
 	onSave?: (updatedWork: Munka) => void;
+	isLocallyLocked?: boolean;
 }
 
-export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
+export function WorkDisplay({ work, onClose, onSave, isLocallyLocked }: WorkDisplayProps) {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [tasks, setTasks] = useState<Feladat[]>(work.feladat || []);
 	const [isSaving, setIsSaving] = useState(false);
@@ -77,7 +78,6 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 	}
 
 	function handleClose() {
-		// Bez­árás gomb: elveti az összes módosítást
 		setTasks(work.feladat || []);
 		onClose();
 	}
@@ -116,7 +116,7 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 											label={task.leiras}
 														checked={task.isCompleted}
 														onChange={() => toggleTask(task.feladat_id)}
-														disabled={work.isActive === false}
+													disabled={work.isActive === false || !!isLocallyLocked}
 										/>
 										{task.isCompleted && <span className="wd-done">✓</span>}
 									</ListGroup.Item>
@@ -151,7 +151,7 @@ export function WorkDisplay({ work, onClose, onSave }: WorkDisplayProps) {
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="secondary" onClick={handleClose}>Mégsem</Button>
-				<Button variant="primary" onClick={handleSave} disabled={isSaving || work.isActive === false}>
+				<Button variant="primary" onClick={handleSave} disabled={isSaving || work.isActive === false || !!isLocallyLocked}>
 					{isSaving ? "Mentés..." : "Mentés"}
 				</Button>
 			</Modal.Footer>

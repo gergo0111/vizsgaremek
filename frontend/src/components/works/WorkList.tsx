@@ -73,6 +73,14 @@ export function WorkList() {
     "name" | "user" | "tool" | "date" | "none"
   >("name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [lockedWorkIds, setLockedWorkIds] = useState<number[]>(() => {
+    try {
+      const raw = localStorage.getItem('lockedWorks');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  });
 
   useEffect(() => {
     const fetchWorks = async () => {
@@ -325,6 +333,22 @@ export function WorkList() {
     }
   };
 
+  const toggleWorkActive = (workId: number) => {
+    const currentlyLocked = lockedWorkIds.includes(workId);
+    const confirmMsg = currentlyLocked
+      ? 'Biztosan feloldod a lezárást?'
+      : 'Biztosan lezárod a munkát?';
+    if (!window.confirm(confirmMsg)) return;
+
+    const newLocked = currentlyLocked ? lockedWorkIds.filter((id) => id !== workId) : [...lockedWorkIds, workId];
+    setLockedWorkIds(newLocked);
+    try {
+      localStorage.setItem('lockedWorks', JSON.stringify(newLocked));
+    } catch (e) {
+      console.warn('Nem sikerült elmenteni a helyi zárolásokat:', e);
+    }
+  };
+
   const getUsersNames = (work: WorkData) => {
     if (!work.munkaUsers || work.munkaUsers.length === 0) return [];
     return work.munkaUsers
@@ -466,7 +490,6 @@ export function WorkList() {
             </Card>
           </Col>
 
-          {/* Main content */}
           <Col xs={12} md={9} className="users-table-column order-2 order-md-1">
             <Nav fill variant="tabs" className="mb-3">
               <Nav.Item>
@@ -496,7 +519,6 @@ export function WorkList() {
             </Nav>
 
             <Card className="users-table-card work-list-card mb-3">
-              {/* Desktop table */}
               <div className="d-none d-md-block">
                 <Table responsive hover className="users-table work-table mb-0" style={{ tableLayout: "auto" }}>
                   <thead>
@@ -520,7 +542,6 @@ export function WorkList() {
                         <tr key={work.munka_id} className="user-row">
                           <td className="user-name">
                             {work.munka_neve}
-                            <Badge bg={work.isActive ? "success" : "danger"} className="ms-2" style={{ fontSize: '0.75rem' }}>{work.isActive ? "Folyamatban" : "Lezárva"}</Badge>
                           </td>
                           <td className="user-department">
                             <div className={expandedRows[work.munka_id] ? "description-expanded" : "description-truncated"}>{work.leiras || "-"}</div>
@@ -548,14 +569,19 @@ export function WorkList() {
                             <div className="actions-row">
                               <Button variant="outline-primary" size="sm" onClick={() => navigate(`/munka-modositas/${work.munka_id}`)}>✏️</Button>
                               <Button variant="outline-danger" size="sm" onClick={() => deleteWork(work.munka_id, work.munka_neve)}>❌</Button>
-                              {isAdmin() ? (
-                                <Button variant={work.isActive ? "outline-secondary" : "outline-success"} size="sm" onClick={() => {
-                                  const newActive = !work.isActive;
-                                  apiPatch(`/munka/${work.munka_id}`, { isActive: newActive })
-                                    .then(() => setWorks((prev) => prev.map((w) => w.munka_id === work.munka_id ? { ...w, isActive: newActive } : w)))
-                                    .catch((err) => { console.error(err); alert("Hiba történt"); });
-                                }}>{work.isActive ? "🔓" : "🔒"}</Button>
-                              ) : null}
+                              {isAdmin() ? (() => {
+                                const isLocallyLocked = lockedWorkIds.includes(work.munka_id);
+                                return (
+                                  <Button
+                                    variant={isLocallyLocked ? "outline-warning" : "outline-secondary"}
+                                    size="sm"
+                                    onClick={() => toggleWorkActive(work.munka_id)}
+                                    title={isLocallyLocked ? 'Helyi zárolás feloldása (feladatok jelölése engedélyezve lesz)' : 'Helyi zárolás: a feladatok jelölése le lesz tiltva (a munka nem lesz törölve vagy inaktiválva)'}
+                                  >
+                                    {isLocallyLocked ? "🔒" : "🔓"}
+                                  </Button>
+                                );
+                              })() : null}
                             </div>
                           </td>
                         </tr>
@@ -617,7 +643,6 @@ export function WorkList() {
                       <Card.Body className="p-3">
                         <div className="d-flex justify-content-between align-items-start">
                           <div>
-                            <h6 className="mb-1">{work.munka_neve} <Badge bg={work.isActive ? "success" : "danger"} className="ms-2" style={{ fontSize: '0.65rem' }}>{work.isActive ? "Folyamatban" : "Lezárva"}</Badge></h6>
                             <div className="text-muted small mb-2">{work.leiras ? (work.leiras.length > 120 ? `${work.leiras.slice(0, 120)}...` : work.leiras) : "-"}</div>
                             <div className="mb-2">
                               {getUsersNames(work).map((n, i) => <Badge key={i} bg="light" text="dark" className="chip me-1">{n}</Badge>)}
@@ -629,7 +654,7 @@ export function WorkList() {
                           <div className="d-flex flex-column ms-3">
                             <Button variant="outline-primary" size="sm" className="mb-2" onClick={() => navigate(`/munka-modositas/${work.munka_id}`)}>✏️</Button>
                             <Button variant="outline-danger" size="sm" className="mb-2" onClick={() => deleteWork(work.munka_id, work.munka_neve)}>❌</Button>
-                            {isAdmin() ? <Button variant={work.isActive ? "outline-secondary" : "outline-success"} size="sm" onClick={() => { const newActive = !work.isActive; apiPatch(`/munka/${work.munka_id}`, { isActive: newActive }).then(() => setWorks((prev) => prev.map((w) => w.munka_id === work.munka_id ? { ...w, isActive: newActive } : w))).catch((err) => { console.error(err); alert("Hiba történt"); }); }}>{work.isActive ? "🔓" : "🔒"}</Button> : null}
+                            {isAdmin() ? <Button variant={work.isActive ? "outline-secondary" : "outline-success"} size="sm" onClick={() => toggleWorkActive(work.munka_id)} title={work.isActive ? 'Lezárás (tiltja a feladatok jelölését)' : 'Megnyitás (engedi a feladatok jelölését)'}>{work.isActive ? "🔓" : "🔒"}</Button> : null}
                           </div>
                         </div>
                         <div className="mt-3 small text-muted">Kezdete: {work.kezdeti_datum || "-"} • Befejezés: {work.varhato_befejezes_datuma || "-"}</div>

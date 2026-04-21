@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Menusor } from "../Menusor";
 import { apiGet, apiPatch } from "../../lib/api";
 import { Container, Button, Card, Col, Form, Row } from "react-bootstrap";
+import "../../designs/WorkForm.css";
 
 interface User {
   user_id: number;
@@ -371,23 +372,16 @@ export function ModifyWork() {
                       </Button>
                     </Form.Group>
 
-                    <Form.Group className="mt-4 work-form-full d-flex gap-2">
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        className="flex-grow-1"
-                      >
-                        Mentés
-                      </Button>
+                    <Form.Group className="form-group work-form-full">
+                      <div className="button-group">
+                        <Button type="submit" variant="primary" className="btn-submit">
+                          Mentés
+                        </Button>
 
-                      <Button
-                        type="button"
-                        variant="outline-secondary"
-                        onClick={() => navigate("/munka-lista")}
-                        className="flex-grow-1"
-                      >
-                        Mégse
-                      </Button>
+                        <Button type="button" variant="outline-secondary" onClick={() => navigate("/munka-lista")} className="btn-back-secondary">
+                          Mégse
+                        </Button>
+                      </div>
                     </Form.Group>
                   </div>
                 </form>
