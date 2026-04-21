@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { ToastContainer } from "../common/Toast";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import "../../designs/UserForm.css";
+import { Menusor } from "../Menusor";
 
 interface Toast {
   id: string;
@@ -85,6 +86,8 @@ export function NewUserAdd() {
        };
 
        return (
+              <>
+              <Menusor />
               <div className="user-form-page">
                      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
                      <Container className="user-form-container-wide">
@@ -230,5 +233,6 @@ export function NewUserAdd() {
                             </Row>
                      </Container>
               </div>
+              </>
        );
 }

@@ -4,6 +4,7 @@ import { apiPost } from "../../lib/api";
 import { ToastContainer } from "../common/Toast";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import "../../designs/UserForm.css";
+import { Menusor } from "../Menusor";
 
 interface Toast {
   id: string;
@@ -76,6 +77,8 @@ export function NewToolAdd() {
        };
 
        return (
+              <>
+              <Menusor />
               <div className="user-form-page">
                      <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
                      <Container className="tool-form-container-wide">
@@ -158,6 +161,7 @@ export function NewToolAdd() {
                             </Row>
                      </Container>
               </div>
+              </>
        );
 }
 
