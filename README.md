@@ -1,15 +1,16 @@
-## Telepítés és futtatás
+## Telepítés és futtatás lépésrő -> lépésre
 
-### 1. Töltse le az appot
-ZIP formátumban, majd bontsa ki
+### 1. Letöltés
+Töltse le az appot ZIP formátumban, majd bontsa ki
 
 ### 2. Változtatások
-A backend mappában írja át a ".env.example" fájlt ".env"-re majd a tartalom helyére ezt írja:
+A backend mappában írja át a ".env.example" fájlt ".env"-re, majd a tartalmát írja át erre:
 ```
 PORT=3000
 DATABASE_URL="mysql://root:@localhost:3306/vizsgaremek"
 ```
 ### 3. Backend indítása:
+> ❗ Fontos: A backend futtatásához MySQL szükséges.
 ```
 cd backend
 ```
