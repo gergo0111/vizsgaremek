@@ -1,11 +1,10 @@
 .pt-page {
-	height: calc(100vh - 56px);
 	background: #061a46;
 	padding: 18px;
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
-	
+	overflow: scroll;
+	height: 100%;
 }
 
 .pt-search-wrapper {
@@ -60,8 +59,9 @@
 	gap: 22px;
 	align-items: start;
 	flex: 1;
-	overflow: hidden;
+	overflow: scroll;
 	min-height: 0;
+	height: 100%;
 }
 
 .pt-panel {
@@ -69,7 +69,7 @@
 	border: 3px solid #cfcfcf;
 	border-radius: 26px;
 	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
-	overflow: hidden;
+	overflow: scroll;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
