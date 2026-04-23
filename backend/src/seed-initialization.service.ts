@@ -18,7 +18,6 @@ export class SeedInitializationService implements OnModuleInit {
 
     try {
       console.log('Meglévő adatok törlése...');
-      await (this.prisma as any).comment.deleteMany({});
       await (this.prisma as any).feladat.deleteMany({});
       await (this.prisma as any).munka.deleteMany({});
       await (this.prisma as any).eszkoz.deleteMany({});

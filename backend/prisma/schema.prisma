@@ -17,7 +17,6 @@ model User {
   munkaora       Float     @default(8)
   isActive       Boolean   @default(false)
   isAdmin        Boolean   @default(false)
-  comment        Comment[]
   munkaUsers     MunkaUser[]
   token          Token[]
 
@@ -56,7 +55,6 @@ model Munka {
   isActive                 Boolean   @default(true)
   kezdeti_datum            DateTime  @default(now())
   varhato_befejezes_datuma DateTime
-  comment                  Comment[]
   feladat                  Feladat[]
   munkaUsers               MunkaUser[]
   munkaEszkozok            MunkaEszkoz[]
@@ -84,22 +82,6 @@ model MunkaEszkoz {
   @@id([munka_id, eszkoz_id])
   @@index([eszkoz_id])
   @@map("munka_eszkoz")
-}
-
-model Comment {
-  comment_id  Int      @id @default(autoincrement())
-  user_id     Int
-  munka_id    Int
-  uzenet      String   @db.Text
-  kuldesi_ido DateTime @default(now())
-  delete      Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  munka       Munka    @relation(fields: [munka_id], references: [munka_id], onDelete: Cascade)
-  user        User     @relation(fields: [user_id], references: [user_id])
-
-  @@index([munka_id], map: "comment_munka_id_fkey")
-  @@index([user_id], map: "comment_user_id_fkey")
-  @@map("comment")
 }
 
 model Token {

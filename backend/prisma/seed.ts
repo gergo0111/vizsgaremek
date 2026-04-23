@@ -15,7 +15,6 @@ async function main() {
   try {
 
     console.log('Meglévő adatok törlése...');
-    await prisma.comment.deleteMany({});
     await prisma.feladat.deleteMany({});
     await prisma.munka.deleteMany({});
     await prisma.eszkoz.deleteMany({});
