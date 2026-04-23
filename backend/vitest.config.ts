@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitest/config';
-import tsConfigPaths from 'tsconfig-paths';
+import path from 'path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      src: path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     globals: true,
     environment: 'node',
+    setupFiles: ['./test/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
@@ -25,11 +31,5 @@ export default defineConfig({
       },
     },
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts', 'test/**/*.spec.ts'],
-    setupFiles: ['./test/setup.ts'],
-  },
-  resolve: {
-    alias: {
-      src: '/Users/szaboloveygergo/Documents/vizsgaremek/vizsgaremek/backend/src',
-    },
   },
 });
