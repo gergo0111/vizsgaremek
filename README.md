@@ -52,8 +52,5 @@ Felhasználónév: admin
 Felhasználónév: felhasznalo1 (1-10)
 > Jelszó: Felhasznalo123
 
-### Felhasználói dokumentáció 📚
-A megtekintéséhez töltse le a ZIP fájlt majd bontsa ki
-
 ### Adatbázismodell - Diagram 🚩
 <img width="800" height="586" alt="image" src="https://github.com/user-attachments/assets/39e73f2a-c3a5-4a71-aabc-55203c8e8c96" />
