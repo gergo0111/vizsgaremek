@@ -4,7 +4,7 @@
 Töltse le az appot ZIP formátumban, majd bontsa ki
 
 ### 2. Változtatások 🔧
-A backend mappában írja át a ".env.example" fájlt ".env"-re, majd a tartalmát írja át erre:
+A backend mappában írja át a ".env.example" fájlt ".env"-re, majd a tartalmát írja át a saját autentikációira:
 ```
 PORT=3000
 DATABASE_URL="mysql://root:@localhost:3306/vizsgaremek"
@@ -18,10 +18,13 @@ cd backend
 npm install
 ```
 ```
-npm install class-validator class-transformer prisma @faker-js/faker --save-dev
+npm install @nestjs/swagger swagger-ui-express class-validator class-transformer prisma @faker-js/faker bcrypt argon2--save-dev
 ```
 ```
-npx prisma migrate dev
+npx prisma generate
+```
+```
+npx prisma db push
 ```
 ```
 npm run start:dev
@@ -35,8 +38,16 @@ cd frontend
 npm install
 ```
 ```
-npm install react-router react-router-dom
+npm install react-router react-router-dom react-bootstrap bootstrap
 ```
 ```
 npm run dev
 ```
+
+### 5. Bejelentkezés 🔐
+## - Adminként
+Felhasználónév: admin
+> Jelszó Admin123
+## - Felhasználóként
+Felhasználónév: felhasznalo1 (1-10)
+> Jelszó: Felhasznalo123
