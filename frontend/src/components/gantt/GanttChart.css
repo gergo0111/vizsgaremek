@@ -59,7 +59,7 @@
 	gap: 22px;
 	align-items: start;
 	flex: 1;
-	overflow: scroll;
+	overflow: hidden;
 	min-height: 0;
 	height: 100%;
 }
@@ -69,7 +69,7 @@
 	border: 3px solid #cfcfcf;
 	border-radius: 26px;
 	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
-	overflow: scroll;
+	overflow: hidden;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
