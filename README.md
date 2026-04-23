@@ -47,7 +47,7 @@ npm run dev
 ### 5. Bejelentkezés 🔐
 ## - Adminként
 Felhasználónév: admin
-> Jelszó Admin123
+> Jelszó: Admin123
 ## - Felhasználóként
 Felhasználónév: felhasznalo1 (1-10)
 > Jelszó: Felhasznalo123
