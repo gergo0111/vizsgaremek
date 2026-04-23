@@ -1,15 +1,15 @@
 ## Telepítés és futtatás lépésrő -> lépésre
 
-### 1. Letöltés
+### 1. Letöltés 🎯
 Töltse le az appot ZIP formátumban, majd bontsa ki
 
-### 2. Változtatások
+### 2. Változtatások 🔧
 A backend mappában írja át a ".env.example" fájlt ".env"-re, majd a tartalmát írja át erre:
 ```
 PORT=3000
 DATABASE_URL="mysql://root:@localhost:3306/vizsgaremek"
 ```
-### 3. Backend indítása:
+### 3. Backend indítása 🚀
 > ❗ Fontos: A backend futtatásához MySQL szükséges.
 ```
 cd backend
@@ -27,7 +27,7 @@ npx prisma migrate dev
 npm run start:dev
 ```
 
-### 4. Frontend indítása:
+### 4. Frontend indítása 🚀
 ```
 cd frontend
 ```
